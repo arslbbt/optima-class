@@ -33,12 +33,10 @@ class Properties extends Model
     public static function findAll($query)
     {
         $lang = \Yii::$app->language;
+        $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
-//        echo '<pre>';
-//        print_r($apiData);
-//        die;
         $return_data = [];
 
         foreach ($apiData as $property)
@@ -552,6 +550,78 @@ class Properties extends Model
         $return_data['custom_parking'] = $custom_parking;
         $return_data['climate_control'] = $climate_control;
         return $return_data;
+    }
+
+    public static function setQuery()
+    {
+        $get = Yii::$app->request->get();
+        $query = '';
+        /*
+         * transaction 1 = Rental
+         * transaction 2 = Bank repossessions
+         * transaction 3 = New homes
+         * transaction 4 = Resale
+         */
+        if (isset($get["transaction"]) && $get["transaction"] != "")
+        {
+            if ($get["transaction"] == '1')
+                $query .= '&rent=1';
+//            if ($get["transaction"] == '2')
+
+            if ($get["transaction"] == '3')
+                $query .= '&new_construction=1';
+            if ($get["transaction"] == '4')
+                $query .= '&sale=1';
+        }
+        if (isset($get["province"]) && $get["province"] != "")
+        {
+            if (is_array($get["province"]) && count($get["province"]))
+            {
+                foreach ($get["province"] as $value)
+                {
+                    $query .= '&address_province[]=' . $value;
+                }
+            }
+        }
+        if (isset($get["location"]) && $get["location"] != "")
+        {
+            if (is_array($get["location"]) && count($get["location"]))
+            {
+                foreach ($get["location"] as $value)
+                {
+                    $query .= '&location[]=' . $value;
+                }
+            }
+        }
+        if (isset($get["type"]) && $get["type"] != "")
+        {
+            
+        }
+        if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
+        {
+            $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
+        }
+        if (isset($get["price_from"]) && $get["price_from"] != "")
+        {
+            $query .= '&currentprice[]=' . $get["price_from"];
+        }
+        if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "")
+        {
+            $query .= '&currentprice[]=0';
+        }
+        if (isset($get["price_to"]) && $get["price_to"] != "")
+        {
+            $query .= '&currentprice[]=' . $get["price_to"];
+        }
+        if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "")
+        {
+            $query .= '&currentprice[]=100000000';
+        }
+        if (isset($get["reference"]) && $get["reference"] != "")
+        {
+            $query .= '&reference=' . $_POST['reference'];
+        }
+        return $query;
     }
 
 }
