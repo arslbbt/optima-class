@@ -94,6 +94,7 @@ class Properties extends Model
                 $data['terrace'] = $property->property->terrace->value;
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
+                $attachments = [];
                 foreach ($property->attachments as $pic)
                 {
                     $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=400&name=' . $pic->file_md5_name;
