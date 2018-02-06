@@ -4,12 +4,19 @@
     "require-dev": {
         "yiisoft/yii2": "2.0.13.1"
     },
+    "version": "1.0.0",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "arsl",
             "email": "arsl@optimageeks.com"
         }
     ],
+        "autoload": {
+        "psr-4": {
+            "optima\\": "src/"
+        }
+    },
     "license": [
        "LGPL-2.1-only",
        "GPL-3.0-or-later"
