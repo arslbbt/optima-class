@@ -1,0 +1,14 @@
+{
+    "name": "arsl/optima-class",
+    "description": "class for optima crm",
+    "require-dev": {
+        "yiisoft/yii2": "2.0.13.1"
+    },
+    "authors": [
+        {
+            "name": "arsl",
+            "email": "arsl@optimageeks.com"
+        }
+    ],
+    "require": {}
+}
