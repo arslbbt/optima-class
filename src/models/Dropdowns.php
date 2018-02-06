@@ -102,4 +102,33 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
+    public static function numbers($limit)
+    {
+        return range(1, $limit);
+    }
+
+    public static function prices($from, $to, $to_json = false)
+    {
+        $range = range($from, $to);
+        $data = [];
+        foreach ($range as $value)
+        {
+            if ($value <= 2000 && $value % 200 == 0)
+            {
+                $data[] = [
+                    'key' => $value,
+                    'value' => str_replace(',', '.', (number_format((int) $value))) . ' €'
+                ];
+            }
+            if ($value > 25000 && $value % 25000 == 0)
+            {
+                $data[] = [
+                    'key' => $value,
+                    'value' => str_replace(',', '.', (number_format((int) $value))) . ' €'
+                ];
+            }
+        }
+        return $to_json ? json_encode($data) : $data;
+    }
+
 }
