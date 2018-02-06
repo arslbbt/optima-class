@@ -52,6 +52,7 @@ class Properties extends Model
                 $data['_id'] = $property->property->_id;
             if ($ref == 'reference')
             {
+                $data['propertyref'] = $property->property->$ref;
                 $data['reference'] = $property->agency_code . '-' . $property->property->$ref;
             }
             else
