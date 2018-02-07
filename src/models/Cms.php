@@ -107,7 +107,12 @@ class Cms extends Model
         {
             $file_data = file_get_contents($file);
         }
-        return json_decode($file_data, TRUE);
+        $data = json_decode($file_data, TRUE);
+
+        return [
+            'featured_image' => isset($data['featured_image']['EN']['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image']['EN']['name'] : '',
+            'content' => $data['content']['EN']
+        ];
     }
 
     public static function postTypes($name)
