@@ -54,7 +54,7 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function locations()
+    public static function locations($provinces = [], $to_json = false)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -66,7 +66,16 @@ class Dropdowns extends Model
             mkdir($webroot . '/uploads/temp/');
         }
         $file = $webroot . '/uploads/temp/locations.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        if (is_array($provinces) && count($provinces))
+        {
+            $p_q = '';
+            foreach ($provinces as $province)
+            {
+                $p_q .= '&province[]=' . $province;
+            }
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] . $p_q);
+        }
+        elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
@@ -75,7 +84,7 @@ class Dropdowns extends Model
         {
             $file_data = file_get_contents($file);
         }
-        return json_decode($file_data, TRUE);
+        return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
 
     public static function types()
