@@ -14,7 +14,6 @@ use yii\base\Model;
 class Properties extends Model
 {
 
-
     public static function findAll($query)
     {
         $lang = \Yii::$app->language;
@@ -588,13 +587,18 @@ class Properties extends Model
         }
         if (isset($get["type"]) && is_array($get["type"]) && $get["type"] != "")
         {
-            foreach ($get["type"] as $key => $value) {
-                $query .= '&type_one[]=' . $value;   
+            foreach ($get["type"] as $key => $value)
+            {
+                $query .= '&type_one[]=' . $value;
             }
         }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
         {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
+        }
+        if (isset($get["bathrooms"]) && $get["bathrooms"] != "")
+        {
+            $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
         if (isset($get["price_from"]) && $get["price_from"] != "")
         {
@@ -611,6 +615,10 @@ class Properties extends Model
         if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "")
         {
             $query .= '&currentprice[]=100000000';
+        }
+        if (isset($get["orientation"]) && $get["orientation"] != "")
+        {
+            $query .= '&orientation[]=' . $_POST['orientation'];
         }
         if (isset($get["reference"]) && $get["reference"] != "")
         {
