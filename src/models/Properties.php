@@ -262,6 +262,8 @@ class Properties extends Model
             $return_data['province'] = $property->property->address_province;
         if (isset($property->property->address_city))
             $return_data['city'] = $property->property->address_city;
+        if (isset($property->property->address_city))
+            $return_data['city_key'] = $property->property->city;
         if (isset($property->property->location))
             $return_data['location'] = $property->property->location;
         if (isset($property->property->sale) && $property->property->sale == 1)
