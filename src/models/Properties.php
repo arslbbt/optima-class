@@ -14,21 +14,6 @@ use yii\base\Model;
 class Properties extends Model
 {
 
-    public $username;
-    public $password;
-    public $rememberMe = true;
-    private $_user = false;
-
-    /**
-     * @return array the validation rules.
-     */
-    public function rules()
-    {
-        return [
-            // rememberMe must be a boolean value
-            ['rememberMe', 'boolean'],
-        ];
-    }
 
     public static function findAll($query)
     {
