@@ -33,6 +33,8 @@ class Properties extends Model
                 $data['total_properties'] = $property->total_properties;
             if (isset($property->property->_id))
                 $data['_id'] = $property->property->_id;
+            if (isset($property->property->reference))
+                $data['id'] = $property->property->reference;
             if ($ref == 'reference')
             {
                 $data['propertyref'] = $property->property->$ref;
