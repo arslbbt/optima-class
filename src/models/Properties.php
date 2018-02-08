@@ -247,6 +247,8 @@ class Properties extends Model
             $return_data['currentprice'] = $property->property->currentprice;
         if (isset($property->property->type_one))
             $return_data['type'] = $property->property->type_one;
+        if (isset($property->property->type_one_key))
+            $return_data['type_key'] = $property->property->type_one_key;
         if (isset($property->property->built))
             $return_data['built'] = $property->property->built;
         if (isset($property->property->plot))
@@ -273,7 +275,7 @@ class Properties extends Model
         {
             foreach ($property->attachments as $pic)
             {
-                $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=400&name=' . $pic->file_md5_name;
+                $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
             }
             $return_data['attachments'] = $attachments;
         }
