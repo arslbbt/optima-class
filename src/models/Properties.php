@@ -210,8 +210,6 @@ class Properties extends Model
     {
         $ref = $reference;
         $lang = \Yii::$app->language;
-//        $ref_array = explode('-', $reference);
-//        $ref = $ref_array[1];
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
@@ -246,6 +244,8 @@ class Properties extends Model
             $return_data['bathrooms'] = $property->property->bathrooms;
         if (isset($property->property->currentprice))
             $return_data['currentprice'] = $property->property->currentprice;
+        if (isset($property->property->currentprice))
+            $return_data['price'] = number_format((int)$property->property->currentprice,0,'','.');
         if (isset($property->property->type_one))
             $return_data['type'] = $property->property->type_one;
         if (isset($property->property->type_one_key))
@@ -258,7 +258,7 @@ class Properties extends Model
             $return_data['year_built'] = $property->property->year_built;
         if (isset($property->property->address_country))
             $return_data['country'] = $property->property->address_country;
-        if (isset($property->property->description->property->$lang))
+        if (isset($property->property->description->$lang))
             $return_data['description'] = $property->property->description->$lang;
         if (isset($property->property->address_province))
             $return_data['province'] = $property->property->address_province;
