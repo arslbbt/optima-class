@@ -47,6 +47,8 @@ class Properties extends Model
             else if (isset($property->property->location))
                 $data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
 
+            if (isset($property->property->type_one))
+                $return_data['type'] = $property->property->type_one;
             if (isset($property->property->description->$lang))
                 $data['description'] = $property->property->description->$lang;
             if (isset($property->property->location))
@@ -578,9 +580,11 @@ class Properties extends Model
                 }
             }
         }
-        if (isset($get["type"]) && $get["type"] != "")
+        if (isset($get["type"]) && is_array($get["type"]) && $get["type"] != "")
         {
-            
+            foreach ($get["type"] as $key => $value) {
+                $query .= '&type_one[]=' . $value;   
+            }
         }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
         {
