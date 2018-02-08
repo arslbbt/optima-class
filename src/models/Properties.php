@@ -48,7 +48,7 @@ class Properties extends Model
                 $data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
 
             if (isset($property->property->type_one))
-                $return_data['type'] = $property->property->type_one;
+                $data['type'] = $property->property->type_one;
             if (isset($property->property->description->$lang))
                 $data['description'] = $property->property->description->$lang;
             if (isset($property->property->location))
