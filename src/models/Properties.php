@@ -592,6 +592,13 @@ class Properties extends Model
                 $query .= '&type_one[]=' . $value;
             }
         }
+        if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"])>0)
+        {
+            foreach ($get["location_group"] as $key => $value)
+            {
+                $query .= '&location_group[]=' . $value;
+            }
+        }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
         {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
