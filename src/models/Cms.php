@@ -120,13 +120,4 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function email()
-    {
-        Yii::$app->mail->compose('template', [])
-                ->setFrom('from@domain.com')
-                ->setTo('someemail@server.com')
-                ->setSubject('Advanced email from Yii2-SwiftMailer')
-                ->send();
-    }
-
 }
