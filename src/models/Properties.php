@@ -202,7 +202,7 @@ class Properties extends Model
             $data['features'] = $features;
             $return_data[] = $data;
         }
-        return $return_data;
+        return array_reverse($return_data);
     }
 
     public static function findOne($reference)
@@ -244,7 +244,7 @@ class Properties extends Model
         if (isset($property->property->currentprice))
             $return_data['currentprice'] = $property->property->currentprice;
         if (isset($property->property->currentprice))
-            $return_data['price'] = number_format((int)$property->property->currentprice,0,'','.');
+            $return_data['price'] = number_format((int) $property->property->currentprice, 0, '', '.');
         if (isset($property->property->type_one))
             $return_data['type'] = $property->property->type_one;
         if (isset($property->property->type_one_key))
@@ -574,7 +574,7 @@ class Properties extends Model
                     $query .= '&type_one[]=' . $value;
             }
         }
-        if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"])>0)
+        if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"]) > 0)
         {
             foreach ($get["location_group"] as $key => $value)
             {

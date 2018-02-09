@@ -95,7 +95,7 @@ class Cms extends Model
 
         return [
             'featured_image' => isset($data['featured_image']['EN']['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image']['EN']['name'] : '',
-            'content' => $data['content']['EN']
+            'content' => isset($data['content']['EN']) ? $data['content']['EN'] : ''
         ];
     }
 
