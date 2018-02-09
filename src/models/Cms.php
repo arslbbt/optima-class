@@ -14,22 +14,6 @@ use yii\base\Model;
 class Cms extends Model
 {
 
-    public $username;
-    public $password;
-    public $rememberMe = true;
-    private $_user = false;
-
-    /**
-     * @return array the validation rules.
-     */
-    public function rules()
-    {
-        return [
-            // rememberMe must be a boolean value
-            ['rememberMe', 'boolean'],
-        ];
-    }
-
     public static function settings()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -133,6 +117,15 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         return json_decode($file_data, TRUE);
+    }
+
+    public static function email()
+    {
+        Yii::$app->mail->compose('template', [])
+                ->setFrom('from@domain.com')
+                ->setTo('someemail@server.com')
+                ->setSubject('Advanced email from Yii2-SwiftMailer')
+                ->send();
     }
 
 }
