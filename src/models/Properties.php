@@ -625,6 +625,14 @@ class Properties extends Model
         {
             $query .= '&reference=' . $get['reference'];
         }
+        if (isset($get["st_rental"]) && $get["st_rental"] != "")
+        {
+            $query .= '&st_rental=1';
+        }
+        if (isset($get["lt_rental"]) && $get["lt_rental"] != "")
+        {
+            $query .= '&lt_rental=1';
+        }
         return $query;
     }
 

@@ -11,14 +11,14 @@ use yii\base\Model;
  * @property User|null $user This property is read-only.
  *
  */
-class Properties extends Model
+class Developments extends Model
 {
 
     public static function findAll($query)
     {
         $lang = \Yii::$app->language;
         $query .= self::setQuery();
-        $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+        $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
         $return_data = [];
@@ -27,182 +27,33 @@ class Properties extends Model
         {
             $data = [];
             $features = [];
-            $ref = $property->agency_reference;
-            if (isset($property->total_properties))
-                $data['total_properties'] = $property->total_properties;
-            if (isset($property->property->_id))
-                $data['_id'] = $property->property->_id;
-            if (isset($property->property->reference))
-                $data['id'] = $property->property->reference;
-            if ($ref == 'reference')
-            {
-                $data['propertyref'] = $property->property->$ref;
-                $data['reference'] = $property->agency_code . '-' . $property->property->$ref;
-            }
-            else
-            {
-                $data['reference'] = $property->property->$ref;
-            }
+
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
                 $data['title'] = $property->property->title->$lang;
-            else if (isset($property->property->location))
-                $data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
 
-            if (isset($property->property->type_one))
-                $data['type'] = $property->property->type_one;
-            if (isset($property->property->description->$lang))
-                $data['description'] = $property->property->description->$lang;
-            if (isset($property->property->location))
-                $data['location'] = $property->property->location;
-            if (isset($property->property->region))
-                $data['region'] = $property->property->region;
-            if (isset($property->property->address_country))
-                $data['country'] = $property->property->address_country;
-            if (isset($property->property->address_city))
-                $data['city'] = $property->property->address_city;
-            if (isset($property->property->sale) && $property->property->sale == 1)
-                $data['sale'] = $property->property->sale;
-            if (isset($property->property->rent) && $property->property->rent == 1)
-                $data['sale'] = $property->property->rent;
-            if (isset($property->property->bedrooms) && $property->property->bedrooms > 0)
-                $data['bedrooms'] = $property->property->bedrooms;
-            if (isset($property->property->bathrooms) && $property->property->bathrooms > 0)
-                $data['bathrooms'] = $property->property->bathrooms;
-            if (isset($property->property->currentprice) && $property->property->currentprice > 0)
-                $data['currentprice'] = str_replace(',', '.', (number_format((int) ($property->property->currentprice))));
-            if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0)
-                $data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
-            if (isset($property->property->built) && $property->property->built > 0)
-                $data['built'] = $property->property->built;
-            if (isset($property->property->plot) && $property->property->plot > 0)
-                $data['plot'] = $property->property->plot;
-            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && $property->property->terrace->value > 0)
-                $data['terrace'] = $property->property->terrace->value;
+            if (isset($property->property->description->$lang) && $property->property->description->$lang != '')
+                $data['content'] = $property->property->description->$lang;
+
+            if (isset($property->property->type) && $property->property->type != '')
+                $data['type'] = implode(', ', $property->property->type);
+
+            if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
+                $data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
+
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
                 $attachments = [];
                 foreach ($property->attachments as $pic)
                 {
-                    $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=400&name=' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['dev_img'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
-            if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
-            {
-                foreach ($property->property->feet_categories as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
-            {
-                foreach ($property->property->feet_features as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0)
-            {
-                foreach ($property->property->feet_climate_control as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
-            {
-                foreach ($property->property->feet_kitchen as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
-            {
-                foreach ($property->property->feet_setting as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
-            {
-                foreach ($property->property->feet_orientation as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
-            {
-                foreach ($property->property->feet_views as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
-            {
-                foreach ($property->property->feet_utilities as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
-            {
-                foreach ($property->property->feet_security as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
-            {
-                foreach ($property->property->feet_furniture as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
-            {
-                foreach ($property->property->feet_parking as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
-            {
-                foreach ($property->property->feet_garden as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
-            {
-                foreach ($property->property->feet_pool as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
-            {
-                foreach ($property->property->feet_condition as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
-            }
-            $data['features'] = $features;
+
             $return_data[] = $data;
         }
-        return array_reverse($return_data);
+
+        return $return_data;
     }
 
     public static function findOne($reference)
