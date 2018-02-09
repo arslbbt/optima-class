@@ -456,81 +456,60 @@ class Properties extends Model
         {
             $distances[] = 'Next Town Distance ' . $property->property->distance_next_town . ' km';
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->garden) && count($property->property->value_of_custom->garden))
         {
-            if (isset($property->property->value_of_custom->garden) && count($property->property->value_of_custom->garden) > 0)
+            foreach ($property->property->value_of_custom->garden as $voc)
             {
-                foreach ($property->property->value_of_custom->garden as $grdn)
-                {
-                    $features[] = $grdn->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $features[] = $voc->key;
             }
         }
-
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control))
         {
-            if (isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control) > 0)
+            foreach ($property->property->value_of_custom->climate_control as $voc)
             {
-
-                foreach ($property->property->value_of_custom->climate_control as $climate)
-                {
-                    $climate_control[] = $climate->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $climate_control[] = $voc->key;
             }
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories))
         {
-            if (isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories) > 0)
+            foreach ($property->property->value_of_custom->feet_custom_categories as $voc)
             {
-
-                foreach ($property->property->value_of_custom->feet_custom_categories as $cat)
-                {
-                    $categories[] = $cat->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $categories[] = $voc->key;
             }
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool))
         {
-            if (isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool) > 0)
+            foreach ($property->property->value_of_custom->pool as $voc)
             {
-
-                foreach ($property->property->value_of_custom->pool as $pool)
-                {
-                    $custom_pool[] = $pool->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $custom_pool[] = $voc->key;
             }
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->parking) && count($property->property->value_of_custom->parking))
         {
-            if (isset($property->property->value_of_custom->parking) && count($property->property->value_of_custom->parking) > 0)
+            foreach ($property->property->value_of_custom->parking as $voc)
             {
-
-                foreach ($property->property->value_of_custom->pool as $parking)
-                {
-                    $custom_parking[] = $parking->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $custom_parking[] = $voc->key;
             }
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features))
         {
-            if (isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features) > 0)
+            foreach ($property->property->value_of_custom->features as $voc)
             {
-
-                foreach ($property->property->value_of_custom->features as $fetur)
-                {
-                    $custom_features[] = $fetur->key;
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $custom_features[] = $voc->key;
             }
         }
-        if (isset($property->property->value_of_custom) && $property->property->value_of_custom)
+        if (isset($property->property->value_of_custom->basic_info) && count($property->property->value_of_custom->basic_info))
         {
-
-            if (isset($property->property->value_of_custom->basic_info) && count($property->property->value_of_custom->basic_info) > 0)
+            foreach ($property->property->value_of_custom->basic_info as $voc)
             {
-                foreach ($property->property->value_of_custom->basic_info as $info)
-                {
-                    $basic_info[] = ['key' => $info->field, 'value' => $info->value];
-                }
+                if (isset($voc->key) && isset($voc->value) && $voc->value)
+                    $basic_info[] = $voc->key;
             }
         }
         $return_data['distances'] = $distances;
@@ -571,7 +550,8 @@ class Properties extends Model
             {
                 foreach ($get["province"] as $value)
                 {
-                    $query .= '&address_province[]=' . $value;
+                    if ($value != '')
+                        $query .= '&address_province[]=' . $value;
                 }
             }
         }
@@ -581,7 +561,8 @@ class Properties extends Model
             {
                 foreach ($get["location"] as $value)
                 {
-                    $query .= '&location[]=' . $value;
+                    if ($value != '')
+                        $query .= '&location[]=' . $value;
                 }
             }
         }
@@ -589,7 +570,8 @@ class Properties extends Model
         {
             foreach ($get["type"] as $key => $value)
             {
-                $query .= '&type_one[]=' . $value;
+                if ($value != '')
+                    $query .= '&type_one[]=' . $value;
             }
         }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
@@ -618,11 +600,23 @@ class Properties extends Model
         }
         if (isset($get["orientation"]) && $get["orientation"] != "")
         {
-            $query .= '&orientation[]=' . $_POST['orientation'];
+            $query .= '&orientation[]=' . $get['orientation'];
+        }
+        if (isset($get["usefull_area"]) && $get["usefull_area"] != "")
+        {
+            $query .= '&usefull_area=' . $get['usefull_area'];
+        }
+        if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"])
+        {
+            $query .= '&pool[]=pool_communal';
+        }
+        if (isset($get["new_property"]) && $get["new_property"] != "" && $get["new_property"])
+        {
+            $query .= '&conditions[]=never_lived';
         }
         if (isset($get["reference"]) && $get["reference"] != "")
         {
-            $query .= '&reference=' . $_POST['reference'];
+            $query .= '&reference=' . $get['reference'];
         }
         return $query;
     }
