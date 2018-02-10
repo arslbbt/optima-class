@@ -270,7 +270,15 @@ class Properties extends Model
         if (isset($property->property->sale) && $property->property->sale == 1)
             $return_data['sale'] = $property->property->sale;
         if (isset($property->property->rent) && $property->property->rent == 1)
-            $return_data['sale'] = $property->property->rent;
+            $return_data['rent'] = $property->property->rent;
+        if(isset($property->property->st_rental) && $property->property->st_rental == 1)
+            $return_data['st_rental'] = $property->property->st_rental;
+        if(isset($property->property->lt_rental) && $property->property->lt_rental == 1)
+            $return_data['lt_rental'] = $property->property->lt_rental;
+        if(isset($property->property->new_construction) && $property->property->new_construction == 1)
+            $return_data['new_construction'] = $property->property->new_construction;
+        if(isset($property->property->sale) && isset($property->property->new_construction) && $property->property->sale == 1 && $property->property->new_construction == 1)
+            $return_data['new_construction'] = $property->property->new_construction;
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
@@ -322,6 +330,8 @@ class Properties extends Model
             {
                 if ($value == true)
                     $features[] = ucfirst(str_replace('_', ' ', $key));
+                if($value == true && $key == 'repossession')
+                    $return_data['bank_Repossession'] = 1;
             }
         }
         if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
