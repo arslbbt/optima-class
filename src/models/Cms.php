@@ -95,7 +95,8 @@ class Cms extends Model
 
         return [
             'featured_image' => isset($data['featured_image']['EN']['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image']['EN']['name'] : '',
-            'content' => isset($data['content']['EN']) ? $data['content']['EN'] : ''
+            'content' => isset($data['content']['EN']) ? $data['content']['EN'] : '',
+            'title' => isset($data['title']['EN']) ? $data['title']['EN'] : ''
         ];
     }
 
@@ -117,15 +118,6 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         return json_decode($file_data, TRUE);
-    }
-
-    public static function email()
-    {
-        Yii::$app->mail->compose('template', [])
-                ->setFrom('from@domain.com')
-                ->setTo('someemail@server.com')
-                ->setSubject('Advanced email from Yii2-SwiftMailer')
-                ->send();
     }
 
 }
