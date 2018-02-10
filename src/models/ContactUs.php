@@ -32,11 +32,11 @@ class ContactUs extends Model
         $settings = Cms::settings();
         if (isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
         {
-//            Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-//                    ->setFrom($this->email)
-//                    ->setTo($settings['general_settings']['admin_email'])
-//                    ->setSubject('Contact')
-//                    ->send();
+            Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                    ->setFrom($this->email)
+                    ->setTo($settings['general_settings']['admin_email'])
+                    ->setSubject('Contact')
+                    ->send();
             $this->saveAccount();
             return true;
         }
