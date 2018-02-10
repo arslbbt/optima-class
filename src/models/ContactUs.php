@@ -17,11 +17,12 @@ class ContactUs extends Model
     public $call_remember;
     public $message;
     public $redirect_url;
+    public $reference;
 
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'redirect_url'], 'safe'],
+            [['name', 'phone', 'call_remember', 'redirect_url', 'reference'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
         ];
