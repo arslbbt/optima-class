@@ -87,12 +87,26 @@ class Properties extends Model
                 }
                 $data['attachments'] = $attachments;
             }
+            $categories=[];
+            $features=[];
+            $climate_control=[];
+            $kitchen=[];
+            $setting=[];
+            $orientation=[];
+            $views=[];
+            $utilities=[];
+            $security=[];
+            $furniture=[];
+            $parking=[];
+            $garden=[];
+            $pool=[];
+            $condition=[];
             if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
             {
                 foreach ($property->property->feet_categories as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $categories[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
@@ -108,7 +122,7 @@ class Properties extends Model
                 foreach ($property->property->feet_climate_control as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $climate_control[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
@@ -116,7 +130,7 @@ class Properties extends Model
                 foreach ($property->property->feet_kitchen as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $kitchen[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
@@ -124,7 +138,7 @@ class Properties extends Model
                 foreach ($property->property->feet_setting as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $setting[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
@@ -132,7 +146,7 @@ class Properties extends Model
                 foreach ($property->property->feet_orientation as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $orientation[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
@@ -140,7 +154,7 @@ class Properties extends Model
                 foreach ($property->property->feet_views as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $views[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
@@ -148,7 +162,7 @@ class Properties extends Model
                 foreach ($property->property->feet_utilities as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $utilities[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
@@ -156,7 +170,7 @@ class Properties extends Model
                 foreach ($property->property->feet_security as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $security[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
@@ -164,7 +178,7 @@ class Properties extends Model
                 foreach ($property->property->feet_furniture as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $furniture[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
@@ -172,7 +186,7 @@ class Properties extends Model
                 foreach ($property->property->feet_parking as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $parking[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
@@ -180,7 +194,7 @@ class Properties extends Model
                 foreach ($property->property->feet_garden as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $garden[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
@@ -188,7 +202,7 @@ class Properties extends Model
                 foreach ($property->property->feet_pool as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $pool[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
@@ -196,13 +210,25 @@ class Properties extends Model
                 foreach ($property->property->feet_condition as $key => $value)
                 {
                     if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $condition[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
             $data['features'] = $features;
+            $data['categories']=$categories;
+            $data['climate_control']=$climate_control;
+            $data['kitchen']=$kitchen;
+            $data['setting']=$setting;
+            $data['orientation']=$orientation;
+            $data['views']=$views;
+            $data['utilities']=$utilities;
+            $data['security']=$security;
+            $data['parking']=$parking;
+            $data['garden']=$garden;
+            $data['pool']=$pool;
+            $data['condition']=$condition;
             $return_data[] = $data;
         }
-        return array_reverse($return_data);
+        return $return_data;
     }
 
     public static function findOne($reference)
@@ -214,14 +240,6 @@ class Properties extends Model
         $property = json_decode($JsonData);
         $return_data = [];
         $attachments = [];
-        $features = [];
-        $distances = [];
-        $basic_info = [];
-        $climate_control = [];
-        $categories = [];
-        $custom_pool = [];
-        $custom_parking = [];
-        $custom_features = [];
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;
@@ -280,246 +298,146 @@ class Properties extends Model
             $return_data['attachments'] = $attachments;
         }
 
-
-        //Neighbourhood if exists
-        if (isset($property->property->location) && $property->property->location != '')
-        {
-            $loc_key = $property->property->location_key;
-            $slug = str_replace(' ', '-', strtolower($property->property->location));
-            $slug .= '-';
-            $slug .= $loc_key;
-            $pagejson = file_get_contents('https://my.optima-crm.com/yiiapp/frontend/web/index.php?r=cms/page-by-slug&user=' . Yii::$app->params['user'] . '&slug=' . $slug);
-            $page = json_decode($pagejson);
-        }
-
-        if ($page)
-        {
-            $neighbourhood = [];
-            $loc_title = $page->title->$lang;
-            if (isset($page->custom_settings))
+            $categories=[];
+            $features=[];
+            $climate_control=[];
+            $kitchen=[];
+            $setting=[];
+            $orientation=[];
+            $views=[];
+            $utilities=[];
+            $security=[];
+            $furniture=[];
+            $parking=[];
+            $garden=[];
+            $pool=[];
+            $condition=[];
+            if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
             {
-                foreach ($page->custom_settings as $setting)
+                foreach ($property->property->feet_categories as $key => $value)
                 {
-                    if ($setting->key == 'lg_slug')
-                    {
-                        $loc_group_title = ucwords(str_replace('-', ' ', $setting->value));
-                    }
+                    if ($value == true)
+                        $categories[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
-            $nh_title = $loc_title . ' | ' . $loc_group_title;
-            if (isset($page->featured_image->$lang->name))
+            if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
             {
-                $nh_img_src = 'https://my.optima-crm.com/uploads/cms_pages/' . $page->_id . '/' . $page->featured_image->$lang->name;
+                foreach ($property->property->feet_features as $key => $value)
+                {
+                    if ($value == true)
+                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-            $neighbourhood['title'] = $nh_title;
-            $neighbourhood['img_src'] = $nh_img_src;
-            $return_data['neighbourhood_data'] = $neighbourhood;
-        }
-
-        if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
-        {
-            foreach ($property->property->feet_categories as $key => $value)
+            if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_climate_control as $key => $value)
+                {
+                    if ($value == true)
+                        $climate_control[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
-        {
-            foreach ($property->property->feet_features as $key => $value)
+            if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_kitchen as $key => $value)
+                {
+                    if ($value == true)
+                        $kitchen[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0)
-        {
-            foreach ($property->property->feet_climate_control as $key => $value)
+            if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_setting as $key => $value)
+                {
+                    if ($value == true)
+                        $setting[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
-        {
-            foreach ($property->property->feet_kitchen as $key => $value)
+            if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_orientation as $key => $value)
+                {
+                    if ($value == true)
+                        $orientation[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
-        {
-            foreach ($property->property->feet_setting as $key => $value)
+            if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_views as $key => $value)
+                {
+                    if ($value == true)
+                        $views[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
-        {
-            foreach ($property->property->feet_orientation as $key => $value)
+            if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_utilities as $key => $value)
+                {
+                    if ($value == true)
+                        $utilities[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
-        {
-            foreach ($property->property->feet_views as $key => $value)
+            if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_security as $key => $value)
+                {
+                    if ($value == true)
+                        $security[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
-        {
-            foreach ($property->property->feet_utilities as $key => $value)
+            if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_furniture as $key => $value)
+                {
+                    if ($value == true)
+                        $furniture[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
-        {
-            foreach ($property->property->feet_security as $key => $value)
+            if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_parking as $key => $value)
+                {
+                    if ($value == true)
+                        $parking[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
-        {
-            foreach ($property->property->feet_furniture as $key => $value)
+            if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_garden as $key => $value)
+                {
+                    if ($value == true)
+                        $garden[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
-        {
-            foreach ($property->property->feet_parking as $key => $value)
+            if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_pool as $key => $value)
+                {
+                    if ($value == true)
+                        $pool[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
-        {
-            foreach ($property->property->feet_garden as $key => $value)
+            if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
             {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                foreach ($property->property->feet_condition as $key => $value)
+                {
+                    if ($value == true)
+                        $condition[] = ucfirst(str_replace('_', ' ', $key));
+                }
             }
-        }
-        if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
-        {
-            foreach ($property->property->feet_pool as $key => $value)
-            {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
-            }
-        }
-        if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
-        {
-            foreach ($property->property->feet_condition as $key => $value)
-            {
-                if ($value == true)
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
-            }
-        }
-        if (isset($property->property->distance_airport) && $property->property->distance_airport > 0)
-        {
-            $distances[] = 'Airport Distance ' . $property->property->distance_airport . ' km';
-        }
-        if (isset($property->property->distance_beach) && $property->property->distance_beach > 0)
-        {
-            $distances[] = 'Beach Distance ' . $property->property->distance_beach . ' km';
-        }
-        if (isset($property->property->distance_golf) && $property->property->distance_golf > 0)
-        {
-            $distances[] = 'Golf Distance ' . $property->property->distance_golf . ' km';
-        }
-        if (isset($property->property->distance_restaurant) && $property->property->distance_restaurant > 0)
-        {
-            $distances[] = 'Restaurant Distance ' . $property->property->distance_restaurant . ' km';
-        }
-        if (isset($property->property->distance_sea) && $property->property->distance_sea > 0)
-        {
-            $distances[] = 'Sea Distance ' . $property->property->distance_sea . ' km';
-        }
-        if (isset($property->property->distance_supermarket) && $property->property->distance_supermarket > 0)
-        {
-            $distances[] = 'Super Market Distance ' . $property->property->distance_supermarket . ' km';
-        }
-        if (isset($property->property->distance_next_town) && $property->property->distance_next_town > 0)
-        {
-            $distances[] = 'Next Town Distance ' . $property->property->distance_next_town . ' km';
-        }
-        if (isset($property->property->value_of_custom->garden) && count($property->property->value_of_custom->garden))
-        {
-            foreach ($property->property->value_of_custom->garden as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $features[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control))
-        {
-            foreach ($property->property->value_of_custom->climate_control as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $climate_control[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories))
-        {
-            foreach ($property->property->value_of_custom->feet_custom_categories as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $categories[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool))
-        {
-            foreach ($property->property->value_of_custom->pool as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $custom_pool[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->parking) && count($property->property->value_of_custom->parking))
-        {
-            foreach ($property->property->value_of_custom->parking as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $custom_parking[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features))
-        {
-            foreach ($property->property->value_of_custom->features as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $custom_features[] = $voc->key;
-            }
-        }
-        if (isset($property->property->value_of_custom->basic_info) && count($property->property->value_of_custom->basic_info))
-        {
-            foreach ($property->property->value_of_custom->basic_info as $voc)
-            {
-                if (isset($voc->key) && isset($voc->value) && $voc->value)
-                    $basic_info[] = $voc->key;
-            }
-        }
-        $return_data['distances'] = $distances;
-        $return_data['features'] = $features;
-        $return_data['basic_info'] = $basic_info;
-        $return_data['custom_features'] = $custom_features;
-        $return_data['custom_pool'] = $custom_pool;
-        $return_data['categories'] = $categories;
-        $return_data['custom_parking'] = $custom_parking;
-        $return_data['climate_control'] = $climate_control;
+            $return_data['property_features']=[];
+            $return_data['property_features']['features'] = $features;
+            $return_data['property_features']['categories']=$categories;
+            $return_data['property_features']['climate_control']=$climate_control;
+            $return_data['property_features']['kitchen']=$kitchen;
+            $return_data['property_features']['setting']=$setting;
+            $return_data['property_features']['orientation']=$orientation;
+            $return_data['property_features']['views']=$views;
+            $return_data['property_features']['utilities']=$utilities;
+            $return_data['property_features']['security']=$security;
+            $return_data['property_features']['parking']=$parking;
+            $return_data['property_features']['garden']=$garden;
+            $return_data['property_features']['pool']=$pool;
+            $return_data['property_features']['condition']=$condition;
         return $return_data;
     }
 
