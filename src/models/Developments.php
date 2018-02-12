@@ -27,8 +27,8 @@ class Developments extends Model
         {
             $data = [];
             $features = [];
-            if (isset($property->property->reference) && $property->property->reference != '')
-                $data['id'] = $property->property->reference;
+            if (isset($property->property->hidden_reference) && $property->property->hidden_reference != '')
+                $data['id'] = $property->property->hidden_reference;
 
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
                 $data['title'] = $property->property->title->$lang;
