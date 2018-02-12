@@ -4,7 +4,7 @@ namespace optima\models;
 
 use Yii;
 use yii\base\Model;
-
+use optima\models\CMS;
 /**
  * LoginForm is the model behind the login form.
  *
@@ -21,28 +21,28 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
+        $settings=CMS::settings();
+
         $return_data = [];
 
         foreach ($apiData as $property)
         {
             $data = [];
             $features = [];
-            $ref = $property->agency_reference;
             if (isset($property->total_properties))
                 $data['total_properties'] = $property->total_properties;
             if (isset($property->property->_id))
                 $data['_id'] = $property->property->_id;
             if (isset($property->property->reference))
                 $data['id'] = $property->property->reference;
-            if ($ref == 'reference')
-            {
-                $data['propertyref'] = $property->property->$ref;
-                $data['reference'] = $property->agency_code . '-' . $property->property->$ref;
+            if(isset($settings['general_settings']['reference']) && $settings['general_settings']['reference']!='reference'){
+                 $ref=$settings['general_settings']['reference'];
+                 $data['reference'] = $property->property->$ref;
+            }else{
+                
+                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
-            else
-            {
-                $data['reference'] = $property->property->$ref;
-            }
+
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
                 $data['title'] = $property->property->title->$lang;
             else if (isset($property->property->location))
@@ -458,6 +458,7 @@ class Properties extends Model
             $return_data['property_features']['parking']=$parking;
             $return_data['property_features']['garden']=$garden;
             $return_data['property_features']['pool']=$pool;
+            $return_data['property_features']['furniture']=$furniture;
             $return_data['property_features']['condition']=$condition;
         return $return_data;
     }
