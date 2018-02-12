@@ -214,19 +214,20 @@ class Properties extends Model
                         $condition[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
-            $data['features'] = $features;
-            $data['categories']=$categories;
-            $data['climate_control']=$climate_control;
-            $data['kitchen']=$kitchen;
-            $data['setting']=$setting;
-            $data['orientation']=$orientation;
-            $data['views']=$views;
-            $data['utilities']=$utilities;
-            $data['security']=$security;
-            $data['parking']=$parking;
-            $data['garden']=$garden;
-            $data['pool']=$pool;
-            $data['condition']=$condition;
+            $data['property_features']=[];
+            $data['property_features']['features'] = $features;
+            $data['property_features']['categories']=$categories;
+            $data['property_features']['climate_control']=$climate_control;
+            $data['property_features']['kitchen']=$kitchen;
+            $data['property_features']['setting']=$setting;
+            $data['property_features']['orientation']=$orientation;
+            $data['property_features']['views']=$views;
+            $data['property_features']['utilities']=$utilities;
+            $data['property_features']['security']=$security;
+            $data['property_features']['parking']=$parking;
+            $data['property_features']['garden']=$garden;
+            $data['property_features']['pool']=$pool;
+            $data['property_features']['condition']=$condition;
             $return_data[] = $data;
         }
         return $return_data;
