@@ -241,9 +241,10 @@ class Properties extends Model
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings=Cms::settings();
-        
+
         $return_data = [];
         $attachments = [];
+        $floor_plans = [];
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;
@@ -318,6 +319,7 @@ class Properties extends Model
             $return_data['meta_desc'] = $property->property->seo_description->$lang;
         if (isset($property->property->keywords->$lang) && $property->property->keywords->$lang != '')
             $return_data['meta_keywords'] = $property->property->keywords->$lang;
+
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
@@ -327,6 +329,16 @@ class Properties extends Model
             $return_data['attachments'] = $attachments;
         }
 
+        if (isset($property->documents) && count($property->documents) > 0)
+        {
+            foreach ($property->documents as $pic)
+            {
+                if($pic->identification_type=='FP'){
+                  $floor_plans[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                }
+            }
+            $return_data['floor_plans'] = $floor_plans;
+        }
             $categories=[];
             $features=[];
             $climate_control=[];
