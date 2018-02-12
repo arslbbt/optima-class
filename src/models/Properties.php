@@ -155,9 +155,7 @@ class Properties extends Model
                 {
                     if ($value == true)
                         $views[] = ucfirst(str_replace('_', ' ', $key));
-                    if($value == true && $key == 'sea')
-                        $data['sea_view'] = 'Sea view';
-                        
+                       
                 }
             }
             if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
@@ -190,8 +188,6 @@ class Properties extends Model
                 {
                     if ($value == true)
                         $parking[] = ucfirst(str_replace('_', ' ', $key));
-                    if($value == true && $key == 'private')
-                        $data['parking'] = 'Parking';
                 }
             }
             if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
@@ -200,8 +196,6 @@ class Properties extends Model
                 {
                     if ($value == true)
                         $garden[] = ucfirst(str_replace('_', ' ', $key));
-                    if($value == true && $key == 'garden_private')
-                        $data['private_garden'] == 'Private garden';
                 }
             }
             if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
@@ -210,9 +204,6 @@ class Properties extends Model
                 {
                     if ($value == true)
                         $pool[] = ucfirst(str_replace('_', ' ', $key));
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                    if($value == true && $key == 'pool_private')
-                        $data['private_pool'] = 'Private pool';
                 }
             }
             if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
