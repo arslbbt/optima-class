@@ -92,11 +92,15 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         $data = json_decode($file_data, TRUE);
+        $lang = \Yii::$app->language;
 
         return [
-            'featured_image' => isset($data['featured_image']['EN']['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image']['EN']['name'] : '',
-            'content' => isset($data['content']['EN']) ? $data['content']['EN'] : '',
-            'title' => isset($data['title']['EN']) ? $data['title']['EN'] : ''
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '',
+            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
+            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+            'meta_title'=>isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+            'meta_desc'=>isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+            'meta_keywords'=>isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
         ];
     }
 

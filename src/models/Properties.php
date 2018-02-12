@@ -304,6 +304,12 @@ class Properties extends Model
             $return_data['new_construction'] = $property->property->new_construction;
         if(isset($property->property->sale) && isset($property->property->new_construction) && $property->property->sale == 1 && $property->property->new_construction == 1)
             $return_data['new_construction'] = $property->property->new_construction;
+        if (isset($property->property->seo_title->$lang) && $property->property->seo_title->$lang != '')
+            $return_data['meta_title'] = $property->property->seo_title->$lang;
+        if (isset($property->property->seo_description->$lang) && $property->property->seo_description->$lang != '')
+            $return_data['meta_desc'] = $property->property->seo_description->$lang;
+        if (isset($property->property->keywords->$lang) && $property->property->keywords->$lang != '')
+            $return_data['meta_keywords'] = $property->property->keywords->$lang;
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
