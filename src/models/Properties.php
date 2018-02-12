@@ -4,7 +4,7 @@ namespace optima\models;
 
 use Yii;
 use yii\base\Model;
-use optima\models\CMS;
+use optima\models\Cms;
 /**
  * LoginForm is the model behind the login form.
  *
@@ -21,7 +21,7 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
-        $settings=CMS::settings();
+        $settings=Cms::settings();
 
         $return_data = [];
 
