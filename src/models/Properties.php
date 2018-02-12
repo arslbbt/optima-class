@@ -246,6 +246,8 @@ class Properties extends Model
             $return_data['_id'] = $property->property->_id;
         if (isset($property->property->reference))
             $return_data['reference'] = $property->property->reference;
+        if (isset($property->property->reference))
+            $return_data['propertyref'] = $property->property->reference;
         if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
             $return_data['title'] = $property->property->title->$lang;
         else
