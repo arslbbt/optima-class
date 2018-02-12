@@ -240,15 +240,23 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
+        $settings=Cms::settings();
+        
         $return_data = [];
         $attachments = [];
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;
         if (isset($property->property->reference))
-            $return_data['reference'] = $property->property->reference;
-        if (isset($property->property->reference))
-            $return_data['propertyref'] = $property->property->reference;
+            $return_data['id'] = $property->property->reference;
+
+            if(isset($settings['general_settings']['reference']) && $settings['general_settings']['reference']!='reference'){
+                 $ref=$settings['general_settings']['reference'];
+                 $return_data['reference'] = $property->property->$ref;
+            }else{
+                
+                 $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
+            }
         if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
             $return_data['title'] = $property->property->title->$lang;
         else
