@@ -53,9 +53,10 @@ class Cms extends Model
         }
         return json_decode($file_data, TRUE);
     }
+
     public static function menuYII($id)
     {
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
@@ -71,21 +72,27 @@ class Cms extends Model
         {
             $file_data = file_get_contents($file);
         }
-        $menu= json_decode($file_data, TRUE);
-    $itemsArr=[];
-    foreach ($menu['menu_items'] as $key => $value) {
-        if(isset($value['children']) && count($value['children'])>0){
-            $childArr=[];
-            foreach ($value['children'] as $childkey => $child) {
-                $childArr[]=['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang]!='')?$child['item']['title'][$lang]:'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang]!='')?$child['item']['slug'][$lang]:'slug-not-set'];
+        $menu = json_decode($file_data, TRUE);
+        $itemsArr = [];
+        foreach ($menu['menu_items'] as $key => $value)
+        {
+            if (isset($value['children']) && count($value['children']) > 0)
+            {
+                $childArr = [];
+                foreach ($value['children'] as $childkey => $child)
+                {
+                    $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? $child['item']['slug'][$lang] : 'slug-not-set'];
+                }
+                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'items' => $childArr];
             }
-            $itemsArr[]=['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang]!='')?$value['item']['title'][$lang]:'please set menu label', 'items' => $childArr];
-        }else{
-            $itemsArr[]=['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang]!='')?$value['item']['title'][$lang]:'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang]!='')?$value['item']['slug'][$lang]:'slug-not-set'];
+            else
+            {
+                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? $value['item']['slug'][$lang] : 'slug-not-set'];
+            }
         }
+        return $itemsArr;
     }
-    return $itemsArr;
-    }
+
     public static function languages()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -124,15 +131,15 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         $data = json_decode($file_data, TRUE);
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
 
         return [
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
-            'meta_title'=>isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
-            'meta_desc'=>isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
-            'meta_keywords'=>isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
         ];
     }
 
@@ -153,19 +160,20 @@ class Cms extends Model
         {
             $file_data = file_get_contents($file);
         }
-        $dataEach= json_decode($file_data, TRUE);
-        $lang = \Yii::$app->language;
+        $dataEach = json_decode($file_data, TRUE);
+        $lang = strtoupper(\Yii::$app->language);
 
-        $retdata=[];
-        $array=[];
-        foreach ($dataEach as $key => $data) {
-             $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
-             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
-             $array['meta_title']=isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
-             $array['meta_desc']=isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
-             $array['meta_keywords']=isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
-        $retdata[]=$array;
+        $retdata = [];
+        $array = [];
+        foreach ($dataEach as $key => $data)
+        {
+            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
+            $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
+            $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
+            $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
+            $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
+            $retdata[] = $array;
         }
         return $retdata;
     }
