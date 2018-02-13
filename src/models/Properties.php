@@ -342,7 +342,7 @@ class Properties extends Model
             {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP')
                 {
-                    $floor_plans[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                    $floor_plans[] = 'https://my.optima-crm.com/uploads/properties_images/' . $pic->model_id . '/'. $pic->file_md5_name;
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
