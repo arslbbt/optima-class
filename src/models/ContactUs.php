@@ -30,60 +30,65 @@ class ContactUs extends Model
         ];
     }
 
-    /**
-     * @return array customized attribute labels
-     */
-    public function attributeLabels()
-    {
-        return [
-            'verifyCode' => 'Verification Code',
-        ];
-    }
+/**
+* @return array customized attribute labels
+*/
+public function attributeLabels()
+{
+    return [
+        'verifyCode' => 'Verification Code',
+    ];
+}
 
-    public function sendMail()
+public function sendMail()
+{
+    $settings = Cms::settings();
+    if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
     {
-        $settings = Cms::settings();
-        if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
-        {
             Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(Yii::$app->params['from_email'])
-                    ->setTo($settings['general_settings']['admin_email'])
-                    ->setSubject('Fcs contact us email')
-                    ->send();
-            $this->saveAccount();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+            ->setFrom(Yii::$app->params['from_email'])
+            ->setTo($settings['general_settings']['admin_email'])
+            ->setSubject('Fcs contact us email')
+            ->send();
 
-    public function saveAccount()
+            Yii::$app->mailer->compose()
+            ->setFrom(Yii::$app->params['from_email'])
+            ->setTo($this->email)
+            ->setSubject('Thank you for contacting us')
+            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language])?$settings['email_response'][\Yii::$app->language]:'Thank you for contacting us')
+            ->send();
+
+        $this->saveAccount();
+        return true;
+    }
+    else
     {
-        if (!$this->name)
-            $this->name = $this->first_name . ' ' . $this->last_name;
-        $post_items = [];
-        foreach ($this as $key => $value)
-        {
-            $post_items[] = $key . '=' . $value;
-        }
-
-        $post_string = implode('&', $post_items);
-        $post_string .= '&source=web-client';
-
-        $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
-        $curl_connection = curl_init($url);
-
-        curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($curl_connection, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
-        curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl_connection, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($curl_connection, CURLOPT_POSTFIELDS, $post_string);
-        curl_exec($curl_connection);
-        curl_errno($curl_connection) . '-' . curl_error($curl_connection);
-        curl_close($curl_connection);
+        return false;
     }
+}
+
+public function saveAccount()
+{
+    $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
+    $fields = array(
+        'forename' => urlencode($this->first_name),
+        'surname' => urlencode($this->last_name),
+        'email' => urlencode($this->email),
+        'source' => urlencode('web-client'),
+        'message' => urlencode($this->message),
+        'phone' => urlencode($this->phone)
+    );
+    $fields_string='';
+    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    rtrim($fields_string, '&');
+
+    $ch = curl_init();
+    curl_setopt($ch,CURLOPT_URL, $url);
+    curl_setopt($ch,CURLOPT_POST, count($fields));
+    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+
+    $result = curl_exec($ch);
+    curl_close($ch);
+}
 
 }
