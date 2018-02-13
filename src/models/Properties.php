@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use optima\models\Cms;
+
 /**
  * LoginForm is the model behind the login form.
  *
@@ -21,7 +22,7 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
-        $settings=Cms::settings();
+        $settings = Cms::settings();
 
         $return_data = [];
 
@@ -35,12 +36,15 @@ class Properties extends Model
                 $data['_id'] = $property->property->_id;
             if (isset($property->property->reference))
                 $data['id'] = $property->property->reference;
-            if(isset($settings['general_settings']['reference']) && $settings['general_settings']['reference']!='reference'){
-                 $ref=$settings['general_settings']['reference'];
-                 $data['reference'] = $property->property->$ref;
-            }else{
-                
-                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
+            if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
+            {
+                $ref = $settings['general_settings']['reference'];
+                $data['reference'] = $property->property->$ref;
+            }
+            else
+            {
+
+                $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
 
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
@@ -87,20 +91,20 @@ class Properties extends Model
                 }
                 $data['attachments'] = $attachments;
             }
-            $categories=[];
-            $features=[];
-            $climate_control=[];
-            $kitchen=[];
-            $setting=[];
-            $orientation=[];
-            $views=[];
-            $utilities=[];
-            $security=[];
-            $furniture=[];
-            $parking=[];
-            $garden=[];
-            $pool=[];
-            $condition=[];
+            $categories = [];
+            $features = [];
+            $climate_control = [];
+            $kitchen = [];
+            $setting = [];
+            $orientation = [];
+            $views = [];
+            $utilities = [];
+            $security = [];
+            $furniture = [];
+            $parking = [];
+            $garden = [];
+            $pool = [];
+            $condition = [];
             if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
             {
                 foreach ($property->property->feet_categories as $key => $value)
@@ -155,7 +159,6 @@ class Properties extends Model
                 {
                     if ($value == true)
                         $views[] = ucfirst(str_replace('_', ' ', $key));
-                       
                 }
             }
             if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
@@ -214,20 +217,20 @@ class Properties extends Model
                         $condition[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
-            $data['property_features']=[];
+            $data['property_features'] = [];
             $data['property_features']['features'] = $features;
-            $data['property_features']['categories']=$categories;
-            $data['property_features']['climate_control']=$climate_control;
-            $data['property_features']['kitchen']=$kitchen;
-            $data['property_features']['setting']=$setting;
-            $data['property_features']['orientation']=$orientation;
-            $data['property_features']['views']=$views;
-            $data['property_features']['utilities']=$utilities;
-            $data['property_features']['security']=$security;
-            $data['property_features']['parking']=$parking;
-            $data['property_features']['garden']=$garden;
-            $data['property_features']['pool']=$pool;
-            $data['property_features']['condition']=$condition;
+            $data['property_features']['categories'] = $categories;
+            $data['property_features']['climate_control'] = $climate_control;
+            $data['property_features']['kitchen'] = $kitchen;
+            $data['property_features']['setting'] = $setting;
+            $data['property_features']['orientation'] = $orientation;
+            $data['property_features']['views'] = $views;
+            $data['property_features']['utilities'] = $utilities;
+            $data['property_features']['security'] = $security;
+            $data['property_features']['parking'] = $parking;
+            $data['property_features']['garden'] = $garden;
+            $data['property_features']['pool'] = $pool;
+            $data['property_features']['condition'] = $condition;
             $return_data[] = $data;
         }
         return $return_data;
@@ -240,7 +243,7 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
-        $settings=Cms::settings();
+        $settings = Cms::settings();
 
         $return_data = [];
         $attachments = [];
@@ -251,13 +254,16 @@ class Properties extends Model
         if (isset($property->property->reference))
             $return_data['id'] = $property->property->reference;
 
-            if(isset($settings['general_settings']['reference']) && $settings['general_settings']['reference']!='reference'){
-                 $ref=$settings['general_settings']['reference'];
-                 $return_data['reference'] = $property->property->$ref;
-            }else{
-                
-                 $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
-            }
+        if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
+        {
+            $ref = $settings['general_settings']['reference'];
+            $return_data['reference'] = $property->property->$ref;
+        }
+        else
+        {
+
+            $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
+        }
         if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
             $return_data['title'] = $property->property->title->$lang;
         else
@@ -300,18 +306,19 @@ class Properties extends Model
             $return_data['location'] = $property->property->location;
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '')
             $return_data['energy_certificate'] = $property->property->energy_certificate;
-        else $return_data['energy_certificate'] = 'In Progress';
+        else
+            $return_data['energy_certificate'] = 'In Progress';
         if (isset($property->property->sale) && $property->property->sale == 1)
             $return_data['sale'] = $property->property->sale;
         if (isset($property->property->rent) && $property->property->rent == 1)
             $return_data['rent'] = $property->property->rent;
-        if(isset($property->property->st_rental) && $property->property->st_rental == 1)
+        if (isset($property->property->st_rental) && $property->property->st_rental == 1)
             $return_data['st_rental'] = $property->property->st_rental;
-        if(isset($property->property->lt_rental) && $property->property->lt_rental == 1)
+        if (isset($property->property->lt_rental) && $property->property->lt_rental == 1)
             $return_data['lt_rental'] = $property->property->lt_rental;
-        if(isset($property->property->new_construction) && $property->property->new_construction == 1)
+        if (isset($property->property->new_construction) && $property->property->new_construction == 1)
             $return_data['new_construction'] = $property->property->new_construction;
-        if(isset($property->property->sale) && isset($property->property->new_construction) && $property->property->sale == 1 && $property->property->new_construction == 1)
+        if (isset($property->property->sale) && isset($property->property->new_construction) && $property->property->sale == 1 && $property->property->new_construction == 1)
             $return_data['new_construction'] = $property->property->new_construction;
         if (isset($property->property->seo_title->$lang) && $property->property->seo_title->$lang != '')
             $return_data['meta_title'] = $property->property->seo_title->$lang;
@@ -333,153 +340,154 @@ class Properties extends Model
         {
             foreach ($property->documents as $pic)
             {
-                if($pic->identification_type=='FP'){
-                  $floor_plans[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                if (isset($pic->identification_type) && $pic->identification_type == 'FP')
+                {
+                    $floor_plans[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
         }
-            $categories=[];
-            $features=[];
-            $climate_control=[];
-            $kitchen=[];
-            $setting=[];
-            $orientation=[];
-            $views=[];
-            $utilities=[];
-            $security=[];
-            $furniture=[];
-            $parking=[];
-            $garden=[];
-            $pool=[];
-            $condition=[];
-            if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
+        $categories = [];
+        $features = [];
+        $climate_control = [];
+        $kitchen = [];
+        $setting = [];
+        $orientation = [];
+        $views = [];
+        $utilities = [];
+        $security = [];
+        $furniture = [];
+        $parking = [];
+        $garden = [];
+        $pool = [];
+        $condition = [];
+        if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0)
+        {
+            foreach ($property->property->feet_categories as $key => $value)
             {
-                foreach ($property->property->feet_categories as $key => $value)
-                {
-                    if ($value == true)
-                        $categories[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $categories[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
+        }
+        if (isset($property->property->feet_features) && count($property->property->feet_features) > 0)
+        {
+            foreach ($property->property->feet_features as $key => $value)
             {
-                foreach ($property->property->feet_features as $key => $value)
-                {
-                    if ($value == true)
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $features[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0)
+        }
+        if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0)
+        {
+            foreach ($property->property->feet_climate_control as $key => $value)
             {
-                foreach ($property->property->feet_climate_control as $key => $value)
-                {
-                    if ($value == true)
-                        $climate_control[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $climate_control[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
+        }
+        if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0)
+        {
+            foreach ($property->property->feet_kitchen as $key => $value)
             {
-                foreach ($property->property->feet_kitchen as $key => $value)
-                {
-                    if ($value == true)
-                        $kitchen[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $kitchen[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
+        }
+        if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0)
+        {
+            foreach ($property->property->feet_setting as $key => $value)
             {
-                foreach ($property->property->feet_setting as $key => $value)
-                {
-                    if ($value == true)
-                        $setting[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $setting[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
+        }
+        if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0)
+        {
+            foreach ($property->property->feet_orientation as $key => $value)
             {
-                foreach ($property->property->feet_orientation as $key => $value)
-                {
-                    if ($value == true)
-                        $orientation[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $orientation[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
+        }
+        if (isset($property->property->feet_views) && count($property->property->feet_views) > 0)
+        {
+            foreach ($property->property->feet_views as $key => $value)
             {
-                foreach ($property->property->feet_views as $key => $value)
-                {
-                    if ($value == true)
-                        $views[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $views[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
+        }
+        if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0)
+        {
+            foreach ($property->property->feet_utilities as $key => $value)
             {
-                foreach ($property->property->feet_utilities as $key => $value)
-                {
-                    if ($value == true)
-                        $utilities[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $utilities[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
+        }
+        if (isset($property->property->feet_security) && count($property->property->feet_security) > 0)
+        {
+            foreach ($property->property->feet_security as $key => $value)
             {
-                foreach ($property->property->feet_security as $key => $value)
-                {
-                    if ($value == true)
-                        $security[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $security[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
+        }
+        if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0)
+        {
+            foreach ($property->property->feet_furniture as $key => $value)
             {
-                foreach ($property->property->feet_furniture as $key => $value)
-                {
-                    if ($value == true)
-                        $furniture[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $furniture[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
+        }
+        if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0)
+        {
+            foreach ($property->property->feet_parking as $key => $value)
             {
-                foreach ($property->property->feet_parking as $key => $value)
-                {
-                    if ($value == true)
-                        $parking[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $parking[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
+        }
+        if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0)
+        {
+            foreach ($property->property->feet_garden as $key => $value)
             {
-                foreach ($property->property->feet_garden as $key => $value)
-                {
-                    if ($value == true)
-                        $garden[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $garden[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
+        }
+        if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0)
+        {
+            foreach ($property->property->feet_pool as $key => $value)
             {
-                foreach ($property->property->feet_pool as $key => $value)
-                {
-                    if ($value == true)
-                        $pool[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $pool[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
+        }
+        if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0)
+        {
+            foreach ($property->property->feet_condition as $key => $value)
             {
-                foreach ($property->property->feet_condition as $key => $value)
-                {
-                    if ($value == true)
-                        $condition[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $condition[] = ucfirst(str_replace('_', ' ', $key));
             }
-            $return_data['property_features']=[];
-            $return_data['property_features']['features'] = $features;
-            $return_data['property_features']['categories']=$categories;
-            $return_data['property_features']['climate_control']=$climate_control;
-            $return_data['property_features']['kitchen']=$kitchen;
-            $return_data['property_features']['setting']=$setting;
-            $return_data['property_features']['orientation']=$orientation;
-            $return_data['property_features']['views']=$views;
-            $return_data['property_features']['utilities']=$utilities;
-            $return_data['property_features']['security']=$security;
-            $return_data['property_features']['parking']=$parking;
-            $return_data['property_features']['garden']=$garden;
-            $return_data['property_features']['pool']=$pool;
-            $return_data['property_features']['furniture']=$furniture;
-            $return_data['property_features']['condition']=$condition;
+        }
+        $return_data['property_features'] = [];
+        $return_data['property_features']['features'] = $features;
+        $return_data['property_features']['categories'] = $categories;
+        $return_data['property_features']['climate_control'] = $climate_control;
+        $return_data['property_features']['kitchen'] = $kitchen;
+        $return_data['property_features']['setting'] = $setting;
+        $return_data['property_features']['orientation'] = $orientation;
+        $return_data['property_features']['views'] = $views;
+        $return_data['property_features']['utilities'] = $utilities;
+        $return_data['property_features']['security'] = $security;
+        $return_data['property_features']['parking'] = $parking;
+        $return_data['property_features']['garden'] = $garden;
+        $return_data['property_features']['pool'] = $pool;
+        $return_data['property_features']['furniture'] = $furniture;
+        $return_data['property_features']['condition'] = $condition;
         return $return_data;
     }
 
