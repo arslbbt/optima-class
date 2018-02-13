@@ -18,6 +18,7 @@ class ContactUs extends Model
     public $message;
     public $redirect_url;
     public $reference;
+    public $verifyCode;
 
     public function rules()
     {
@@ -25,13 +26,24 @@ class ContactUs extends Model
             [['name', 'phone', 'call_remember', 'redirect_url', 'reference'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
+            ['verifyCode', 'captcha'],
+        ];
+    }
+
+    /**
+     * @return array customized attribute labels
+     */
+    public function attributeLabels()
+    {
+        return [
+            'verifyCode' => 'Verification Code',
         ];
     }
 
     public function sendMail()
     {
         $settings = Cms::settings();
-        if (isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
+        if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
         {
             Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                     ->setFrom($this->email)
@@ -60,7 +72,10 @@ class ContactUs extends Model
         $post_string = implode('&', $post_items);
         $post_string .= '&source=web-client';
 
-        $curl_connection = curl_init("https://my.optima-crm.com/yiiapp/frontend/web/index.php?r=accounts/index&user=" . Yii::$app->params['user']);
+       echo  $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
+        die;
+        $curl_connection = curl_init($url);
+
         curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 30);
         curl_setopt($curl_connection, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
         curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
