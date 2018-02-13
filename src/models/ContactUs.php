@@ -46,7 +46,7 @@ class ContactUs extends Model
         if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
         {
             Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom($this->email)
+                    ->setFrom(Yii::$app->params['from_email'])
                     ->setTo($settings['general_settings']['admin_email'])
                     ->setSubject('Contact')
                     ->send();
@@ -72,8 +72,7 @@ class ContactUs extends Model
         $post_string = implode('&', $post_items);
         $post_string .= '&source=web-client';
 
-       echo  $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
-        die;
+        $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
         $curl_connection = curl_init($url);
 
         curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 30);
