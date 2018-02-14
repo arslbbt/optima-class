@@ -12,6 +12,7 @@ class ContactUs extends Model
     public $name;
     public $first_name;
     public $last_name;
+    public $lead_status;
     public $email;
     public $phone;
     public $call_remember;
@@ -23,10 +24,21 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'redirect_url', 'reference'], 'safe'],
+            [['name', 'phone', 'call_remember', 'redirect_url', 'reference','lead_status'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
-            ['verifyCode', 'captcha'],
+            [['verifyCode'], 'captcha', 'when' => function($model)
+                {
+                    if ($model->verifyCode == 'null')
+                    {
+                            $return = false;
+                    }
+                    else
+                    {
+                        $return = true;
+                    }
+                    return $return;
+                }],
         ];
     }
 
@@ -75,6 +87,7 @@ public function saveAccount()
         'surname' => urlencode($this->last_name),
         'email' => urlencode($this->email),
         'source' => urlencode('web-client'),
+        'lead_status'=>isset($this->lead_status)?$this->lead_status:'1001',
         'message' => urlencode($this->message),
         'phone' => urlencode($this->phone)
     );
