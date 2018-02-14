@@ -73,6 +73,7 @@ class Developments extends Model
             $return_data['_id'] = $property->property->_id;
         if (isset($property->property->reference))
             $return_data['reference'] = $property->property->reference;
+
         if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
             $return_data['title'] = $property->property->title->$lang;
         else
@@ -132,6 +133,8 @@ class Developments extends Model
                 $data['type'] = $value->property->type_one;
             if (isset($value->property->location))
                 $data['location'] = $value->property->location;
+            if (isset($value->property->reference))
+                $data['id'] = $value->property->reference;
                 if (isset($value->attachments) && count($value->attachments) > 0)
                 {
                     $attachments = [];

@@ -4,7 +4,7 @@
     "require-dev": {
         "yiisoft/yii2": "2.0.13.1"
     },
-    "version": "1.4.8",
+    "version": "1.5.0",
     "minimum-stability": "dev",
     "authors": [
         {
