@@ -12,6 +12,7 @@ class ContactUs extends Model
     public $name;
     public $first_name;
     public $last_name;
+    public $lead_status;
     public $email;
     public $phone;
     public $call_remember;
@@ -88,6 +89,7 @@ public function saveAccount()
         'surname' => urlencode($this->last_name),
         'email' => urlencode($this->email),
         'source' => urlencode('web-client'),
+        'lead_status'=>isset($this->lead_status)?$this->lead_status:'1001',
         'message' => urlencode($this->message),
         'phone' => urlencode($this->phone)
     );
@@ -102,6 +104,8 @@ public function saveAccount()
 
     $result = curl_exec($ch);
     curl_close($ch);
+print_r($result);
+die;
 }
 
 }
