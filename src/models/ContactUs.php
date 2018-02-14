@@ -20,11 +20,25 @@ class ContactUs extends Model
     public $redirect_url;
     public $reference;
     public $verifyCode;
+    public $transaction;
+    public $property_type;
+    public $bedrooms;
+    public $bathrooms;
+    public $swimming_pool;
+    public $address;
+    public $house_area;
+    public $plot_area;
+    public $price;
+    public $price_reduced;
+    public $close_to_sea;
+    public $sea_view;
+    public $exclusive_property;
 
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'redirect_url', 'reference','lead_status'], 'safe'],
+            [['name', 'phone', 'call_remember', 'redirect_url', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property'], 'safe'],
+
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
             [['verifyCode'], 'captcha', 'when' => function($model)
