@@ -135,6 +135,10 @@ class Developments extends Model
                 $data['location'] = $value->property->location;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
+            if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
+                $data['title'] = $value->property->title->$lang;
+            else if (isset($value->property->location))
+                $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
                 if (isset($value->attachments) && count($value->attachments) > 0)
                 {
                     $attachments = [];
