@@ -4,6 +4,7 @@ namespace optima\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\Url;
 
 /**
  * LoginForm is the model behind the login form.
@@ -132,9 +133,10 @@ class Cms extends Model
         }
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
-
+        $url='https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
+        $name=$data['featured_image'][$lang]['name'];
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '',
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
@@ -167,7 +169,9 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data)
         {
-            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $url='https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
+            $name=$data['featured_image'][$lang]['name'];
+            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '';
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
@@ -176,6 +180,22 @@ class Cms extends Model
             $retdata[] = $array;
         }
         return $retdata;
+    }
+
+    public static function CacheImage($url,$name){
+
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $filesaved = $webroot . '/uploads/temp/' .$name;
+        if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
+        {
+            $file_data = file_get_contents($url);
+            file_put_contents($filesaved, $file_data);
+        }
+        return Url::home(true).'uploads/temp/' .$name;  
     }
 
 }
