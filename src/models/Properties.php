@@ -326,12 +326,21 @@ class Properties extends Model
             $return_data['meta_desc'] = $property->property->seo_description->$lang;
         if (isset($property->property->keywords->$lang) && $property->property->keywords->$lang != '')
             $return_data['meta_keywords'] = $property->property->keywords->$lang;
-
+        $whitelist = array(
+            '127.0.0.1',
+            '::1'
+        );
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
             {
-                $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                $url=Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                $name=$pic->file_md5_name;
+                if(!in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
+                    $attachments[] = Cms::CacheImage($url,$name);
+                }else{
+                     $attachments[] = $url;
+                }
             }
             $return_data['attachments'] = $attachments;
         }
