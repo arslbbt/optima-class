@@ -266,9 +266,11 @@ class Properties extends Model
         }
         $title='title';
         $description='description';
+        $price='sale';
         if($property->property->rent==true){
             $title='rental_title';
             $description='rental_description';
+            $price='rent';
         }
         if (isset($property->property->$title->$lang) && $property->property->$title->$lang != '')
             $return_data['title'] = $property->property->$title->$lang;
@@ -286,8 +288,20 @@ class Properties extends Model
             $return_data['bathrooms'] = $property->property->bathrooms;
         if (isset($property->property->currentprice))
             $return_data['currentprice'] = $property->property->currentprice;
+
+        if($price=='rent'){
+            if(isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)){
+                $return_data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').'per month';
+            }
+            elseif(isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)){
+                $return_data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ',$property->property->rental_seasons->{'0'}->period);
+            }else{
+                $return_data['price']=0;
+            }
+        }else{
         if (isset($property->property->currentprice))
             $return_data['price'] = number_format((int) $property->property->currentprice, 0, '', '.');
+        }
         if (isset($property->property->type_one))
             $return_data['type'] = $property->property->type_one;
         if (isset($property->property->type_one_key))
