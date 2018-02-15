@@ -139,9 +139,11 @@ class Cms extends Model
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
             'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
             'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
             'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
         ];
     }
 
