@@ -133,8 +133,8 @@ class Cms extends Model
         }
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
-        $url='https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
-        $name=$data['featured_image'][$lang]['name'];
+        $url=isset($data['featured_image'][$lang]['name']) ?'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name']:'';
+        $name=isset($data['featured_image'][$lang]['name']) ?$data['featured_image'][$lang]['name']:'';
         return [
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
@@ -171,8 +171,8 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data)
         {
-            $url='https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
-            $name=$data['featured_image'][$lang]['name'];
+            $url=isset($data['featured_image'][$lang]['name']) ?'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name']:'';
+            $name=isset($data['featured_image'][$lang]['name']) ?$data['featured_image'][$lang]['name']:'';
             $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '';
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
