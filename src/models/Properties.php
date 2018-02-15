@@ -291,7 +291,7 @@ class Properties extends Model
 
         if($price=='rent'){
             if(isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)){
-                $return_data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').'per month';
+                $return_data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
             }
             elseif(isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)){
                 $return_data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ',$property->property->rental_seasons->{'0'}->period);
