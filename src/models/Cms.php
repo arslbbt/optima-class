@@ -197,7 +197,7 @@ class Cms extends Model
             $file_data = file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
-        return Url::home(true).'uploads/temp/' .$name;  
+        return '/uploads/temp/' .$name;  
     }
 
 }
