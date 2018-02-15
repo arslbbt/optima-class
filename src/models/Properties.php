@@ -264,8 +264,14 @@ class Properties extends Model
 
             $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
-        if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
-            $return_data['title'] = $property->property->title->$lang;
+        $title='title';
+        $description='description';
+        if($property->property->rent==true){
+            $title='rental_title';
+            $description='rental_description';
+        }
+        if (isset($property->property->$title->$lang) && $property->property->$title->$lang != '')
+            $return_data['title'] = $property->property->$title->$lang;
         else
             $return_data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
         if (isset($property->property->property_name))
@@ -294,8 +300,8 @@ class Properties extends Model
             $return_data['year_built'] = $property->property->year_built;
         if (isset($property->property->address_country))
             $return_data['country'] = $property->property->address_country;
-        if (isset($property->property->description->$lang))
-            $return_data['description'] = $property->property->description->$lang;
+        if (isset($property->property->$description->$lang))
+            $return_data['description'] = $property->property->$description->$lang;
         if (isset($property->property->address_province))
             $return_data['province'] = $property->property->address_province;
         if (isset($property->property->address_city))
