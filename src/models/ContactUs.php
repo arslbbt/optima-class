@@ -98,8 +98,8 @@ public function sendMail()
 public function saveAccount()
 {
     if($this->owner)
-    $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
-    else
+    $url=Yii::$app->params['apiUrl']."owners/index&user=" . Yii::$app->params['user'];
+        else
     $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
     $fields = array(
         'forename' => urlencode($this->first_name),
