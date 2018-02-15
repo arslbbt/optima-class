@@ -267,7 +267,7 @@ class Properties extends Model
         $title='title';
         $description='description';
         $price='sale';
-        if($property->property->rent==true){
+        if(isset($property->property->rent) && $property->property->rent==true){
             $title='rental_title';
             $description='rental_description';
             $price='rent';
