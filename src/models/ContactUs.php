@@ -35,11 +35,12 @@ class ContactUs extends Model
     public $exclusive_property;
     public $to_email;
     public $owner;
+    public $source;
 
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember','to_email', 'owner','lead_status', 'redirect_url', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property'], 'safe'],
+            [['name', 'phone', 'call_remember','to_email', 'source', 'owner','lead_status', 'redirect_url', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property'], 'safe'],
 
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
@@ -105,10 +106,11 @@ public function saveAccount()
         'forename' => urlencode($this->first_name),
         'surname' => urlencode($this->last_name),
         'email' => urlencode($this->email),
-        'source' => urlencode('web-client'),
+        'source' => isset($this->source)?$this->source:urlencode('web-client'),
         'lead_status'=>isset($this->lead_status)?$this->lead_status:'1001',
         'message' => urlencode($this->message),
         'phone' => urlencode($this->phone),
+        'property' =>isset($this->reference)?$this->reference:null,
         'to_email'=>isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:'',
     );
     $fields_string='';
