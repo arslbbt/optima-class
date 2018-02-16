@@ -28,6 +28,8 @@ class Properties extends Model
          * transaction 1 = Rental
          * transaction 4 = Resale
          */
+        $rent=false;
+        $sale=true;
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
                 $rent =true;
@@ -609,17 +611,32 @@ class Properties extends Model
         if (isset($get["bathrooms"]) && $get["bathrooms"] != "") {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
-        if (isset($get["price_from"]) && $get["price_from"] != "") {
-            $query .= '&currentprice[]=' . $get["price_from"];
-        }
-        if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
-            $query .= '&currentprice[]=0';
-        }
-        if (isset($get["price_to"]) && $get["price_to"] != "") {
-            $query .= '&currentprice[]=' . $get["price_to"];
-        }
-        if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
-            $query .= '&currentprice[]=100000000';
+        if (isset($get["transaction"]) && $get["transaction"]!='' && $get["transaction"] == '1') {
+          if (isset($get["price_from"]) && $get["price_from"] != "") {
+              $query .= '&lt_new_price[]=' . $get["price_from"];
+          }
+          if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
+              $query .= '&lt_new_price[]=0';
+          }
+          if (isset($get["price_to"]) && $get["price_to"] != "") {
+              $query .= '&lt_new_price[]=' . $get["price_to"];
+          }
+          if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
+              $query .= '&lt_new_price[]=100000000';
+          }
+        }else{
+          if (isset($get["price_from"]) && $get["price_from"] != "") {
+              $query .= '&currentprice[]=' . $get["price_from"];
+          }
+          if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
+              $query .= '&currentprice[]=0';
+          }
+          if (isset($get["price_to"]) && $get["price_to"] != "") {
+              $query .= '&currentprice[]=' . $get["price_to"];
+          }
+          if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
+              $query .= '&currentprice[]=100000000';
+          }
         }
         if (isset($get["orientation"]) && $get["orientation"] != "") {
             $query .= '&orientation[]=' . $get['orientation'];
