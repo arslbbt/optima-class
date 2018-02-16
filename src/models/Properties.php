@@ -95,15 +95,15 @@ class Properties extends Model
             }
             if ($rent) {
                 if (isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                    $return_data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
+                    $data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
                 } elseif (isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                    $return_data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
+                    $data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
                 } else {
-                    $return_data['price']=0;
+                    $data['price']=0;
                 }
             } else {
                 if (isset($property->property->currentprice)) {
-                    $return_data['price'] = number_format((int) $property->property->currentprice, 0, '', '.');
+                    $data['price'] = number_format((int) $property->property->currentprice, 0, '', '.');
                 }
             }
             if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
