@@ -29,11 +29,22 @@ class Properties extends Model
          * transaction 4 = Resale
          */
         $rent=false;
+        $strent=false;
+        $ltrent=false;
         $sale=true;
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
                 $rent =true;
-            } else {
+            }
+            else if ($get["transaction"] == '5') {
+                $rent =true;
+                $strent =true;
+            }
+            else if ($get["transaction"] == '6') {
+                $rent =true;
+                $ltrent =true;
+            }
+             else {
                 $sale=true;
             }
         }
@@ -96,9 +107,9 @@ class Properties extends Model
                 $data['bathrooms'] = $property->property->bathrooms;
             }
             if ($rent) {
-                if (isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)) {
+                if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
-                } elseif (isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)) {
+                } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)) {
                     $data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
                 } else {
                     $data['price']=0;
@@ -561,10 +572,18 @@ class Properties extends Model
          * transaction 2 = Bank repossessions
          * transaction 3 = New homes
          * transaction 4 = Resale
+         * transaction 5 = short term rental
+         * transaction 6 = long term rental
          */
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
                 $query .= '&rent=1';
+            }
+            if ($get["transaction"] == '5') {
+                $query .= '&rent=1&st_rental=1';
+            }
+            if ($get["transaction"] == '6') {
+                $query .= '&rent=1&lt_rental=1';
             }
 //            if ($get["transaction"] == '2')
 
