@@ -222,5 +222,25 @@ class Cms extends Model
         }
         return '/uploads/temp/' .$name;  
     }
+    
+    public static function favIcon($name)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if(!is_dir($webroot . 'Uploads/'))
+            mkdir ($webroot .'Uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/' .$name . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = Yii::$app->params['rootUrl'] . 'uploads/cms_settings/' . Yii::$app->params['template'] . '/'. $name;
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        return $file_data;
+    }
 
 }
