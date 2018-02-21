@@ -43,7 +43,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/translations_'.$lang.'.json';
+        $file = $webroot . '/uploads/temp/menu_' . str_replace(' ', '_', strtolower($name)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang);
@@ -154,10 +154,10 @@ class Cms extends Model
         }
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
-        $url=isset($data['featured_image'][$lang]['name']) ?'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name']:'';
-        $name=isset($data['featured_image'][$lang]['name']) ?$data['featured_image'][$lang]['name']:'';
+        $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '',
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -192,9 +192,9 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data)
         {
-            $url=isset($data['featured_image'][$lang]['name']) ?'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name']:'';
-            $name=isset($data['featured_image'][$lang]['name']) ?$data['featured_image'][$lang]['name']:'';
-            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url,$name) : '';
+            $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
@@ -207,33 +207,34 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function CacheImage($url,$name){
+    public static function CacheImage($url, $name)
+    {
 
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $filesaved = $webroot . '/uploads/temp/' .$name;
+        $filesaved = $webroot . '/uploads/temp/' . $name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $file_data = file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
-        return '/uploads/temp/' .$name;  
+        return '/uploads/temp/' . $name;
     }
-    
+
     public static function favIcon($name)
     {
         $webroot = Yii::getAlias('@webroot');
-        if(!is_dir($webroot . 'Uploads/'))
-            mkdir ($webroot .'Uploads/');
+        if (!is_dir($webroot . 'Uploads/'))
+            mkdir($webroot . 'Uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' .$name . '.json';
+        $file = $webroot . '/uploads/temp/' . $name . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = Yii::$app->params['rootUrl'] . 'uploads/cms_settings/' . Yii::$app->params['template'] . '/'. $name;
+            $file_data = Yii::$app->params['rootUrl'] . 'uploads/cms_settings/' . Yii::$app->params['template'] . '/' . $name;
             file_put_contents($file, $file_data);
         }
         else
