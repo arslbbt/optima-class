@@ -43,7 +43,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/menu_' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $file = $webroot . '/uploads/temp/translations_' . $lang . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang);
@@ -63,7 +63,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/menu.json';
+        $file = $webroot . '/uploads/temp/menu_' . str_replace(' ', '_', strtolower($name)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name);
