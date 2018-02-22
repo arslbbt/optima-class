@@ -223,7 +223,7 @@ class Cms extends Model
         return '/uploads/temp/' .$name;  
     }
     
-    public static function favIcon($name)
+    public static function iconLogo($name)
     {
         $webroot = Yii::getAlias('@webroot');
         if(!is_dir($webroot . 'Uploads/'))
