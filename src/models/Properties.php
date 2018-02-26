@@ -100,7 +100,7 @@ class Properties extends Model {
                 $data['sale'] = $property->property->sale;
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
-                $data['sale'] = $property->property->rent;
+                $data['rent'] = $property->property->rent;
             }
             if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                 $data['bedrooms'] = $property->property->bedrooms;
