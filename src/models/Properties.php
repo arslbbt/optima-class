@@ -371,7 +371,7 @@ class Properties extends Model {
         if (isset($property->property->address_city)) {
             $return_data['city'] = $property->property->address_city;
         }
-        if (isset($property->property->address_city)) {
+        if (isset($property->property->city)) {
             $return_data['city_key'] = $property->property->city;
         }
         if (isset($property->property->location)) {
