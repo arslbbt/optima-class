@@ -133,7 +133,7 @@ class Properties extends Model {
             if (isset($property->property->plot) && $property->property->plot > 0) {
                 $data['plot'] = $property->property->plot;
             }
-            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && $property->property->terrace->value > 0) {
+            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
             if (isset($property->attachments) && count($property->attachments) > 0) {
@@ -677,6 +677,9 @@ class Properties extends Model {
         }
         if (isset($get["lt_rental"]) && $get["lt_rental"] != "") {
             $query .= '&lt_rental=1';
+        }
+        if (isset($get["ids"]) && $get["ids"] != "") {
+            $query .= '&favourite_ids='.$get["ids"];
         }
         return $query;
     }
