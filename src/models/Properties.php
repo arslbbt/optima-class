@@ -281,7 +281,7 @@ class Properties extends Model
     public static function findOne($reference)
     {
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = srttoupper(\Yii::$app->language);
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
@@ -437,7 +437,7 @@ class Properties extends Model
         if (isset($property->property->videos) && count($property->property->videos) > 0) {
             $videosArr=[];
             foreach ($property->property->videos as $video) {
-                if (isset($video->status) && $video->status == '1' && isset($video->url->$lang)) {
+                if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
                     $videosArr[] = $video->url->$lang;
                 }
             }
