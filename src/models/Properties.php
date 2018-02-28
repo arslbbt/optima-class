@@ -100,7 +100,7 @@ class Properties extends Model {
                 $data['sale'] = $property->property->sale;
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
-                $data['sale'] = $property->property->rent;
+                $data['rent'] = $property->property->rent;
             }
             if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                 $data['bedrooms'] = $property->property->bedrooms;
@@ -136,7 +136,7 @@ class Properties extends Model {
             if (isset($property->property->custom_categories)) {
                 $data['categories'] = $property->property->custom_categories;
             }
-            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && $property->property->terrace->value > 0) {
+            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
             if (isset($property->attachments) && count($property->attachments) > 0) {
@@ -675,6 +675,9 @@ class Properties extends Model {
         }
         if (isset($get["lt_rental"]) && $get["lt_rental"] != "") {
             $query .= '&lt_rental=1';
+        }
+        if (isset($get["ids"]) && $get["ids"] != "") {
+            $query .= '&favourite_ids='.$get["ids"];
         }
         return $query;
     }
