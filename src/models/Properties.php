@@ -274,10 +274,13 @@ class Properties extends Model {
         return $return_data;
     }
 
-    public static function findOne($reference) {
+    public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
         $lang = \Yii::$app->language;
-        $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        if (isset($with_booking) && $with_booking == true) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        } else
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings = Cms::settings();
@@ -285,6 +288,7 @@ class Properties extends Model {
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
+        $booked_dates = [];
 
         if (isset($property->property->_id)) {
             $return_data['_id'] = $property->property->_id;
@@ -433,6 +437,16 @@ class Properties extends Model {
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
+        }
+        if (isset($property->bookings) && count($property->bookings) > 0) {
+            foreach ($property->bookings as $booking) {
+                if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '') {
+                    for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
+                        $booked_dates[] = date("d-m-Y", $i);
+                    }
+                }
+            }
+            $return_data['booked_dates'] = $booked_dates;
         }
         $categories = [];
         $features = [];
@@ -679,7 +693,7 @@ class Properties extends Model {
             $query .= '&lt_rental=1';
         }
         if (isset($get["ids"]) && $get["ids"] != "") {
-            $query .= '&favourite_ids='.$get["ids"];
+            $query .= '&favourite_ids=' . $get["ids"];
         }
         return $query;
     }
