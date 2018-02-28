@@ -281,7 +281,7 @@ class Properties extends Model
     public static function findOne($reference)
     {
         $ref = $reference;
-        $lang = srttoupper(\Yii::$app->language);
+        $lang = strtoupper(\Yii::$app->language);
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
