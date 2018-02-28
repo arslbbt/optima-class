@@ -571,8 +571,6 @@ class Properties extends Model
         $return_data['property_features']['pool'] = $pool;
         $return_data['property_features']['furniture'] = $furniture;
         $return_data['property_features']['condition'] = $condition;
-        print_r($return_data);
-        die;
         return $return_data;
     }
 
