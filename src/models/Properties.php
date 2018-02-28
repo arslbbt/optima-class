@@ -133,6 +133,9 @@ class Properties extends Model {
             if (isset($property->property->plot) && $property->property->plot > 0) {
                 $data['plot'] = $property->property->plot;
             }
+            if (isset($property->property->custom_categories)) {
+                $data['categories'] = $property->property->custom_categories;
+            }
             if (isset($property->property->terrace) && count($property->property->terrace) > 0 && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
@@ -409,19 +412,14 @@ class Properties extends Model {
         if (isset($property->property->keywords->$lang) && $property->property->keywords->$lang != '') {
             $return_data['meta_keywords'] = $property->property->keywords->$lang;
         }
-        $whitelist = array(
-            '127.0.0.1',
-            '::1'
-        );
+        if (isset($property->property->custom_categories)) {
+            $return_data['categories'] = $property->property->custom_categories;
+        }
+
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $url = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
-                $name = $pic->file_md5_name;
-                if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-                    $attachments[] = Cms::CacheImage($url, $name);
-                } else {
-                    $attachments[] = $url;
-                }
+                $attachments[] = $url;
             }
             $return_data['attachments'] = $attachments;
         }
