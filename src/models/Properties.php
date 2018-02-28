@@ -435,6 +435,7 @@ class Properties extends Model
             $return_data['floor_plans'] = $floor_plans;
         }
         if (isset($property->property->videos) && count($property->property->videos) > 0) {
+            $videosArr=[];
             foreach ($property->property->videos as $video) {
                 if (isset($video->status) && $video->status == '1' && isset($video->url->$lang)) {
                     $videosArr[] = $video->url->$lang;
