@@ -12,9 +12,10 @@ use optima\models\Cms;
  * @property User|null $user This property is read-only.
  *
  */
-class Properties extends Model {
-
-    public static function findAll($query) {
+class Properties extends Model
+{
+    public static function findAll($query)
+    {
         $lang = \Yii::$app->language;
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
@@ -34,10 +35,10 @@ class Properties extends Model {
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
                 $rent = true;
-            } else if ($get["transaction"] == '5') {
+            } elseif ($get["transaction"] == '5') {
                 $rent = true;
                 $strent = true;
-            } else if ($get["transaction"] == '6') {
+            } elseif ($get["transaction"] == '6') {
                 $rent = true;
                 $ltrent = true;
             } else {
@@ -277,7 +278,8 @@ class Properties extends Model {
         return $return_data;
     }
 
-    public static function findOne($reference) {
+    public static function findOne($reference)
+    {
         $ref = $reference;
         $lang = \Yii::$app->language;
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
@@ -562,7 +564,8 @@ class Properties extends Model {
         return $return_data;
     }
 
-    public static function setQuery() {
+    public static function setQuery()
+    {
         $get = Yii::$app->request->get();
         $query = '';
         /*
@@ -679,16 +682,34 @@ class Properties extends Model {
         if (isset($get["ids"]) && $get["ids"] != "") {
             $query .= '&favourite_ids='.$get["ids"];
         }
+        if (isset($get['orderby']) && !empty($get['orderby'])) {
+            if ($date['orderby'] == 'dateASC') {
+                $query .= '&orderby[]=created_at&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'dateDESC') {
+                $query .= '&orderby[]=created_at&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'priceASC') {
+                $query .= '&orderby[]=currentprice&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'priceDESC') {
+                $query.= '&orderby[]=currentprice&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'bedsDESC') {
+                $query.= '&orderby[]=bedrooms&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'bedsASC') {
+                $query.= '&orderby[]=bedrooms&orderby[]=ASC';
+            }
+        }
         return $query;
     }
 
-    public static function findAllWithLatLang() {
+    public static function findAllWithLatLang()
+    {
         $webroot = Yii::getAlias('@webroot');
         $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user=' . Yii::$app->params['user'];
-        if (!is_dir($webroot . '/uploads/'))
+        if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
-        if (!is_dir($webroot . '/uploads/temp/'))
+        }
+        if (!is_dir($webroot . '/uploads/temp/')) {
             mkdir($webroot . '/uploads/temp/');
+        }
         $file = $webroot . '/uploads/temp/properties-latlong.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents($url);
@@ -696,7 +717,6 @@ class Properties extends Model {
         } else {
             $file_data = file_get_contents($file);
         }
-        return json_decode($file_data, TRUE);
+        return json_decode($file_data, true);
     }
-
 }
