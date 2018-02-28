@@ -15,7 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -276,7 +276,7 @@ class Properties extends Model {
 
     public static function findOne($reference) {
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
@@ -434,6 +434,15 @@ class Properties extends Model {
             }
             $return_data['floor_plans'] = $floor_plans;
         }
+        if (isset($property->property->videos) && count($property->property->videos) > 0) {
+            foreach ($property->property->videos as $video) {
+                if (isset($video->status) && $video->status == '1') {
+                    $videosArr[] = $video->url->$lang;
+                }
+            }
+            $return_data['videos'] = $videosArr;
+        }
+
         $categories = [];
         $features = [];
         $climate_control = [];
@@ -561,6 +570,8 @@ class Properties extends Model {
         $return_data['property_features']['pool'] = $pool;
         $return_data['property_features']['furniture'] = $furniture;
         $return_data['property_features']['condition'] = $condition;
+        print_r($return_data);
+        die;
         return $return_data;
     }
 
