@@ -12,10 +12,9 @@ use optima\models\Cms;
  * @property User|null $user This property is read-only.
  *
  */
-class Properties extends Model
-{
-    public static function findAll($query)
-    {
+class Properties extends Model {
+
+    public static function findAll($query) {
         $lang = \Yii::$app->language;
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
@@ -278,11 +277,13 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference)
-    {
+    public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
-        $lang = strtoupper(\Yii::$app->language);
-        $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        $lang = \Yii::$app->language;
+        if (isset($with_booking) && $with_booking == true) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        } else
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings = Cms::settings();
@@ -290,6 +291,7 @@ class Properties extends Model
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
+        $booked_dates = [];
 
         if (isset($property->property->_id)) {
             $return_data['_id'] = $property->property->_id;
@@ -434,8 +436,18 @@ class Properties extends Model
             }
             $return_data['floor_plans'] = $floor_plans;
         }
+        if (isset($property->bookings) && count($property->bookings) > 0) {
+            foreach ($property->bookings as $booking) {
+                if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '') {
+                    for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
+                        $booked_dates[] = date("d-m-Y", $i);
+                    }
+                }
+            }
+            $return_data['booked_dates'] = $booked_dates;
+        }
         if (isset($property->property->videos) && count($property->property->videos) > 0) {
-            $videosArr=[];
+            $videosArr = [];
             foreach ($property->property->videos as $video) {
                 if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
                     $videosArr[] = $video->url->$lang;
@@ -443,7 +455,6 @@ class Properties extends Model
             }
             $return_data['videos'] = $videosArr;
         }
-
         $categories = [];
         $features = [];
         $climate_control = [];
@@ -574,8 +585,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function setQuery()
-    {
+    public static function setQuery() {
         $get = Yii::$app->request->get();
         $query = '';
         /*
@@ -690,7 +700,7 @@ class Properties extends Model
             $query .= '&lt_rental=1';
         }
         if (isset($get["ids"]) && $get["ids"] != "") {
-            $query .= '&favourite_ids='.$get["ids"];
+            $query .= '&favourite_ids=' . $get["ids"];
         }
         if (isset($get['orderby']) && !empty($get['orderby'])) {
             if ($get['orderby'] == 'dateASC') {
@@ -700,18 +710,17 @@ class Properties extends Model
             } elseif ($get['orderby'] == 'priceASC') {
                 $query .= '&orderby[]=currentprice&orderby[]=ASC';
             } elseif ($get['orderby'] == 'priceDESC') {
-                $query.= '&orderby[]=currentprice&orderby[]=DESC';
+                $query .= '&orderby[]=currentprice&orderby[]=DESC';
             } elseif ($get['orderby'] == 'bedsDESC') {
-                $query.= '&orderby[]=bedrooms&orderby[]=DESC';
+                $query .= '&orderby[]=bedrooms&orderby[]=DESC';
             } elseif ($get['orderby'] == 'bedsASC') {
-                $query.= '&orderby[]=bedrooms&orderby[]=ASC';
+                $query .= '&orderby[]=bedrooms&orderby[]=ASC';
             }
         }
         return $query;
     }
 
-    public static function findAllWithLatLang()
-    {
+    public static function findAllWithLatLang() {
         $webroot = Yii::getAlias('@webroot');
         $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user=' . Yii::$app->params['user'];
         if (!is_dir($webroot . '/uploads/')) {
@@ -729,4 +738,5 @@ class Properties extends Model
         }
         return json_decode($file_data, true);
     }
+
 }
