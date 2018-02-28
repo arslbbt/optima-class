@@ -693,7 +693,7 @@ class Properties extends Model
             $query .= '&favourite_ids='.$get["ids"];
         }
         if (isset($get['orderby']) && !empty($get['orderby'])) {
-            if ($date['orderby'] == 'dateASC') {
+            if ($get['orderby'] == 'dateASC') {
                 $query .= '&orderby[]=created_at&orderby[]=ASC';
             } elseif ($get['orderby'] == 'dateDESC') {
                 $query .= '&orderby[]=created_at&orderby[]=DESC';
