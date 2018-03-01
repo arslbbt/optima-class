@@ -446,7 +446,7 @@ class Properties extends Model {
             }
             $return_data['booked_dates'] = $booked_dates;
         }
-        if (isset($property->property->videos) && count($property->property->videos) > 0) {
+        if (isset($property->property->videos) && count($property->property->videos) > 0 && (is_array($property->property->videos) || is_object($property->property->videos))) {
             $videosArr = [];
             foreach ($property->property->videos as $video) {
                 if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
@@ -703,7 +703,7 @@ class Properties extends Model {
             $query .= '&favourite_ids=' . $get["ids"];
         }
         if (isset($get['orderby']) && !empty($get['orderby'])) {
-            if ($date['orderby'] == 'dateASC') {
+            if ($get['orderby'] == 'dateASC') {
                 $query .= '&orderby[]=created_at&orderby[]=ASC';
             } elseif ($get['orderby'] == 'dateDESC') {
                 $query .= '&orderby[]=created_at&orderby[]=DESC';
