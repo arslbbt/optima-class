@@ -440,7 +440,7 @@ class Properties extends Model {
             foreach ($property->bookings as $booking) {
                 if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '') {
                     for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
-                        $booked_dates[] = date("d-m-Y", $i);
+                        $booked_dates[] = date("m-d-Y", $i);
                     }
                 }
             }
