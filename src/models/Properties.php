@@ -12,10 +12,9 @@ use optima\models\Cms;
  * @property User|null $user This property is read-only.
  *
  */
-class Properties extends Model
-{
-    public static function findAll($query)
-    {
+class Properties extends Model {
+
+    public static function findAll($query) {
         $lang = \Yii::$app->language;
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
@@ -28,24 +27,21 @@ class Properties extends Model
          * transaction 1 = Rental
          * transaction 4 = Resale
          */
-        $rent=false;
-        $strent=false;
-        $ltrent=false;
-        $sale=true;
+        $rent = false;
+        $strent = false;
+        $ltrent = false;
+        $sale = true;
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
-                $rent =true;
-            }
-            else if ($get["transaction"] == '5') {
-                $rent =true;
-                $strent =true;
-            }
-            else if ($get["transaction"] == '6') {
-                $rent =true;
-                $ltrent =true;
-            }
-             else {
-                $sale=true;
+                $rent = true;
+            } elseif ($get["transaction"] == '5') {
+                $rent = true;
+                $strent = true;
+            } elseif ($get["transaction"] == '6') {
+                $rent = true;
+                $ltrent = true;
+            } else {
+                $sale = true;
             }
         }
 
@@ -79,6 +75,12 @@ class Properties extends Model
             if (isset($property->property->type_one)) {
                 $data['type'] = $property->property->type_one;
             }
+            if (isset($property->property->latitude)) {
+                $data['lat'] = $property->property->latitude;
+            }
+            if (isset($property->property->longitude)) {
+                $data['lng'] = $property->property->longitude;
+            }
             if (isset($property->property->description->$lang)) {
                 $data['description'] = $property->property->description->$lang;
             }
@@ -98,7 +100,7 @@ class Properties extends Model
                 $data['sale'] = $property->property->sale;
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
-                $data['sale'] = $property->property->rent;
+                $data['rent'] = $property->property->rent;
             }
             if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                 $data['bedrooms'] = $property->property->bedrooms;
@@ -107,12 +109,12 @@ class Properties extends Model
                 $data['bathrooms'] = $property->property->bathrooms;
             }
             if ($rent) {
-                if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                    $data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
-                } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                    $data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
+                if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
+                    $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
+                } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
+                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
                 } else {
-                    $data['price']=0;
+                    $data['price'] = 0;
                 }
             } else {
                 if (isset($property->property->currentprice)) {
@@ -131,7 +133,10 @@ class Properties extends Model
             if (isset($property->property->plot) && $property->property->plot > 0) {
                 $data['plot'] = $property->property->plot;
             }
-            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && $property->property->terrace->value > 0) {
+            if (isset($property->property->custom_categories)) {
+                $data['categories'] = $property->property->custom_categories;
+            }
+            if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
             if (isset($property->attachments) && count($property->attachments) > 0) {
@@ -272,11 +277,13 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference)
-    {
+    public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
         $lang = \Yii::$app->language;
-        $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        if (isset($with_booking) && $with_booking == true) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        } else
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings = Cms::settings();
@@ -284,6 +291,7 @@ class Properties extends Model
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
+        $booked_dates = [];
 
         if (isset($property->property->_id)) {
             $return_data['_id'] = $property->property->_id;
@@ -298,13 +306,13 @@ class Properties extends Model
         } else {
             $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
-        $title='title';
-        $description='description';
-        $price='sale';
-        if (isset($property->property->rent) && $property->property->rent==true) {
-            $title='rental_title';
-            $description='rental_description';
-            $price='rent';
+        $title = 'title';
+        $description = 'description';
+        $price = 'sale';
+        if (isset($property->property->rent) && $property->property->rent == true) {
+            $title = 'rental_title';
+            $description = 'rental_description';
+            $price = 'rent';
         }
         if (isset($property->property->$title->$lang) && $property->property->$title->$lang != '') {
             $return_data['title'] = $property->property->$title->$lang;
@@ -330,13 +338,13 @@ class Properties extends Model
             $return_data['currentprice'] = $property->property->currentprice;
         }
 
-        if ($price=='rent') {
-            if (isset($property->property->lt_rental) && $property->property->lt_rental ==true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                $return_data['price']=number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.').' per month';
-            } elseif (isset($property->property->st_rental) && $property->property->st_rental==true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                $return_data['price']=number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.').' '.str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
+        if ($price == 'rent') {
+            if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
+                $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
+            } elseif (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
+                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
             } else {
-                $return_data['price']=0;
+                $return_data['price'] = 0;
             }
         } else {
             if (isset($property->property->currentprice)) {
@@ -370,7 +378,7 @@ class Properties extends Model
         if (isset($property->property->address_city)) {
             $return_data['city'] = $property->property->address_city;
         }
-        if (isset($property->property->address_city)) {
+        if (isset($property->property->city)) {
             $return_data['city_key'] = $property->property->city;
         }
         if (isset($property->property->location)) {
@@ -408,19 +416,14 @@ class Properties extends Model
         if (isset($property->property->keywords->$lang) && $property->property->keywords->$lang != '') {
             $return_data['meta_keywords'] = $property->property->keywords->$lang;
         }
-        $whitelist = array(
-            '127.0.0.1',
-            '::1'
-        );
+        if (isset($property->property->custom_categories)) {
+            $return_data['categories'] = $property->property->custom_categories;
+        }
+
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
-                $url=Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
-                $name=$pic->file_md5_name;
-                if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-                    $attachments[] = Cms::CacheImage($url, $name);
-                } else {
-                    $attachments[] = $url;
-                }
+                $url = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                $attachments[] = $url;
             }
             $return_data['attachments'] = $attachments;
         }
@@ -428,10 +431,29 @@ class Properties extends Model
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
-                    $floor_plans[] = 'https://my.optima-crm.com/uploads/properties_images/' . $pic->model_id . '/'. $pic->file_md5_name;
+                    $floor_plans[] = 'https://my.optima-crm.com/uploads/properties_images/' . $pic->model_id . '/' . $pic->file_md5_name;
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
+        }
+        if (isset($property->bookings) && count($property->bookings) > 0) {
+            foreach ($property->bookings as $booking) {
+                if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '') {
+                    for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
+                        $booked_dates[] = date("d-m-Y", $i);
+                    }
+                }
+            }
+            $return_data['booked_dates'] = $booked_dates;
+        }
+        if (isset($property->property->videos) && count($property->property->videos) > 0) {
+            $videosArr = [];
+            foreach ($property->property->videos as $video) {
+                if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
+                    $videosArr[] = $video->url->$lang;
+                }
+            }
+            $return_data['videos'] = $videosArr;
         }
         $categories = [];
         $features = [];
@@ -563,8 +585,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function setQuery()
-    {
+    public static function setQuery() {
         $get = Yii::$app->request->get();
         $query = '';
         /*
@@ -630,32 +651,32 @@ class Properties extends Model
         if (isset($get["bathrooms"]) && $get["bathrooms"] != "") {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
-        if (isset($get["transaction"]) && $get["transaction"]!='' && $get["transaction"] == '1') {
-          if (isset($get["price_from"]) && $get["price_from"] != "") {
-              $query .= '&lt_new_price[]=' . $get["price_from"];
-          }
-          if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
-              $query .= '&lt_new_price[]=0';
-          }
-          if (isset($get["price_to"]) && $get["price_to"] != "") {
-              $query .= '&lt_new_price[]=' . $get["price_to"];
-          }
-          if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
-              $query .= '&lt_new_price[]=100000000';
-          }
-        }else{
-          if (isset($get["price_from"]) && $get["price_from"] != "") {
-              $query .= '&currentprice[]=' . $get["price_from"];
-          }
-          if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
-              $query .= '&currentprice[]=0';
-          }
-          if (isset($get["price_to"]) && $get["price_to"] != "") {
-              $query .= '&currentprice[]=' . $get["price_to"];
-          }
-          if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
-              $query .= '&currentprice[]=100000000';
-          }
+        if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1') {
+            if (isset($get["price_from"]) && $get["price_from"] != "") {
+                $query .= '&lt_new_price[]=' . $get["price_from"];
+            }
+            if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
+                $query .= '&lt_new_price[]=0';
+            }
+            if (isset($get["price_to"]) && $get["price_to"] != "") {
+                $query .= '&lt_new_price[]=' . $get["price_to"];
+            }
+            if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
+                $query .= '&lt_new_price[]=100000000';
+            }
+        } else {
+            if (isset($get["price_from"]) && $get["price_from"] != "") {
+                $query .= '&currentprice[]=' . $get["price_from"];
+            }
+            if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "") {
+                $query .= '&currentprice[]=0';
+            }
+            if (isset($get["price_to"]) && $get["price_to"] != "") {
+                $query .= '&currentprice[]=' . $get["price_to"];
+            }
+            if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "") {
+                $query .= '&currentprice[]=100000000';
+            }
         }
         if (isset($get["orientation"]) && $get["orientation"] != "") {
             $query .= '&orientation[]=' . $get['orientation'];
@@ -678,6 +699,44 @@ class Properties extends Model
         if (isset($get["lt_rental"]) && $get["lt_rental"] != "") {
             $query .= '&lt_rental=1';
         }
+        if (isset($get["ids"]) && $get["ids"] != "") {
+            $query .= '&favourite_ids=' . $get["ids"];
+        }
+        if (isset($get['orderby']) && !empty($get['orderby'])) {
+            if ($get['orderby'] == 'dateASC') {
+                $query .= '&orderby[]=created_at&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'dateDESC') {
+                $query .= '&orderby[]=created_at&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'priceASC') {
+                $query .= '&orderby[]=currentprice&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'priceDESC') {
+                $query .= '&orderby[]=currentprice&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'bedsDESC') {
+                $query .= '&orderby[]=bedrooms&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'bedsASC') {
+                $query .= '&orderby[]=bedrooms&orderby[]=ASC';
+            }
+        }
         return $query;
     }
+
+    public static function findAllWithLatLang() {
+        $webroot = Yii::getAlias('@webroot');
+        $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user=' . Yii::$app->params['user'];
+        if (!is_dir($webroot . '/uploads/')) {
+            mkdir($webroot . '/uploads/');
+        }
+        if (!is_dir($webroot . '/uploads/temp/')) {
+            mkdir($webroot . '/uploads/temp/');
+        }
+        $file = $webroot . '/uploads/temp/properties-latlong.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $file_data = file_get_contents($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, true);
+    }
+
 }
