@@ -215,7 +215,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $filesaved = $webroot . '/uploads/temp/' . $name;
+        $filesaved = $webroot . '/uploads/temp/' . urlencode($name);
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $file_data = file_get_contents($url);
