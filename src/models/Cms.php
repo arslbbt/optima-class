@@ -168,7 +168,7 @@ class Cms extends Model
         ];
     }
 
-    public static function postTypes($name,$category=null)
+    public static function postTypes($name)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -176,14 +176,9 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $query='&post_type=' . $name;
-        if($category!=null){
-            $query.='&category='.$category;
-        }
-        $url=Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents($url);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . '&post_type=' . $name);
             file_put_contents($file, $file_data);
         }
         else
@@ -220,7 +215,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $filesaved = $webroot . '/uploads/temp/' . urlencode($name);
+        $filesaved = $webroot . '/uploads/temp/' . $name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $file_data = file_get_contents($url);
