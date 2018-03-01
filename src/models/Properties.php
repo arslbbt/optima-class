@@ -446,7 +446,7 @@ class Properties extends Model {
             }
             $return_data['booked_dates'] = $booked_dates;
         }
-        if (isset($property->property->videos) && count($property->property->videos) > 0) {
+        if (isset($property->property->videos) && count((array)$property->property->videos) > 0) {
             $videosArr = [];
             foreach ($property->property->videos as $video) {
                 if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
