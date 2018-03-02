@@ -385,7 +385,14 @@ class Properties extends Model {
             $return_data['location'] = $property->property->location;
         }
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '') {
-            $return_data['energy_certificate'] = $property->property->energy_certificate;
+            if ($property->property->energy_certificate == 'X' || $property->property->energy_certificate == 'x') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else if ($property->property->energy_certificate == 'Not available') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else if ($property->property->energy_certificate == 'In Process') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else
+                $return_data['energy_certificate'] = $property->property->energy_certificate;
         } else {
             $return_data['energy_certificate'] = 'In Progress';
         }
