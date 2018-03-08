@@ -112,7 +112,7 @@ class Properties extends Model {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
                 } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
+                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
                 } else {
                     $data['price'] = 0;
                 }
