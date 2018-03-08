@@ -15,7 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -113,6 +113,7 @@ class Properties extends Model {
                     $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
                 } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
                     $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                    $data['seasons'] = isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:'';
                 } else {
                     $data['price'] = 0;
                 }
@@ -279,7 +280,7 @@ class Properties extends Model {
 
     public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         if (isset($with_booking) && $with_booking == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         } else
@@ -339,11 +340,12 @@ class Properties extends Model {
         }
 
         if ($price == 'rent') {
-            if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
-            } elseif (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
+            if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
                 $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
-                $return_data['seasons'] = $property->property->{'0'}->seasons;
+                $return_data['seasons'] = $property->property->rental_seasons->{'0'}->seasons;
+            } 
+             elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
+                $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
             } else {
                 $return_data['price'] = 0;
             }
@@ -386,7 +388,14 @@ class Properties extends Model {
             $return_data['location'] = $property->property->location;
         }
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '') {
-            $return_data['energy_certificate'] = $property->property->energy_certificate;
+            if ($property->property->energy_certificate == 'X' || $property->property->energy_certificate == 'x') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else if ($property->property->energy_certificate == 'Not available') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else if ($property->property->energy_certificate == 'In Process') {
+                $return_data['energy_certificate'] = 'In Progress';
+            } else
+                $return_data['energy_certificate'] = $property->property->energy_certificate;
         } else {
             $return_data['energy_certificate'] = 'In Progress';
         }
@@ -616,13 +625,15 @@ class Properties extends Model {
                 $query .= '&sale=1';
             }
         }
-        if (isset($get["province"]) && $get["province"] != "") {
+        if (isset($get['province']) && $get['province'] != '') {
             if (is_array($get["province"]) && count($get["province"])) {
                 foreach ($get["province"] as $value) {
                     if ($value != '') {
                         $query .= '&address_province[]=' . $value;
                     }
                 }
+            } else {
+            $query .= '&address_province[]=' . $get['province'];    
             }
         }
         if (isset($get["location"]) && $get["location"] != "") {
@@ -685,8 +696,53 @@ class Properties extends Model {
         if (isset($get["usefull_area"]) && $get["usefull_area"] != "") {
             $query .= '&usefull_area=' . $get['usefull_area'];
         }
+        if (isset($get["plot"]) && $get["plot"] != "") {
+            $query .= '&plot=' . $get['plot'];
+        }
         if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"]) {
             $query .= '&pool[]=pool_communal';
+        }
+        if (isset($get["private_pool"]) && $get["private_pool"] != "" && $get["private_pool"]) {
+            $query .= '&pool[]=pool_private';
+        }
+        if (isset($get["sold"]) && $get["sold"] != '' && $get["sold"]) {
+            $query .= '&sale=true';
+        }
+        if (isset($get["rented"]) && $get["rented"] != '' && $get["rented"]) {
+            $query .= '&rent=true';
+        }
+        if (isset($get["distressed"]) && $get["distressed"] != '' && $get["distressed"]) {
+            $query .= '&categories[]=distressed';
+        }
+        if (isset($get["exclusive"]) && $get["exclusive"] != '' && $get["exclusive"]) {
+            $query .= '&exclusive=true';
+        }
+        if (isset($get["first_line_beach"]) && $get["first_line_beach"] != '' && $get["first_line_beach"]) {
+            $query .= '&categories[]=beachfront';
+        }
+        if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
+            $query .= '&categories[]=reduced';
+        }
+        if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
+            $query .= '&settings[]=close_to_sea';
+        }
+        if (isset($get["sea_view"]) && $get["sea_view"] != '' && $get["sea_view"]) {
+            $query .= '&views[]=sea';
+        }
+        if (isset($get["pool"]) && $get["pool"] != '' && $get["pool"]) {
+            $query .= '&pool[]=pool_private';
+        }
+        if (isset($get["storage_room"]) && $get["storage_room"] != '' && $get["storage_room"]) {
+            $query .= '&features[]=storage_room';
+        }
+        if (isset($get["garage"]) && $get["garage"] != '' && $get["garage"]) {
+            $query .= '&parking[]=garage';
+        }
+        if (isset($get["parking"]) && $get["parking"] != '' && $get["parking"]) {
+            $query .= '&parking[]=private';
+        }
+        if (isset($get["urbanisation"]) && $get["urbanisation"] != '') {
+            $query .= '&urbanisation='.$get['urbanisation'];
         }
         if (isset($get["new_property"]) && $get["new_property"] != "" && $get["new_property"]) {
             $query .= '&conditions[]=never_lived';
