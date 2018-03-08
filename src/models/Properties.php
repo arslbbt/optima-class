@@ -15,7 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -280,7 +280,7 @@ class Properties extends Model {
 
     public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         if (isset($with_booking) && $with_booking == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         } else
