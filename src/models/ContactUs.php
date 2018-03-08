@@ -6,8 +6,7 @@ use Yii;
 use yii\base\Model;
 use optima\models\Cms;
 
-class ContactUs extends Model
-{
+class ContactUs extends Model {
 
     public $name;
     public $first_name;
@@ -18,6 +17,7 @@ class ContactUs extends Model
     public $call_remember;
     public $message;
     public $redirect_url;
+    public $attach;
     public $reference;
     public $verifyCode;
     public $transaction;
@@ -39,21 +39,15 @@ class ContactUs extends Model
     public $accept_cookie;
     public $get_updates;
 
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['name', 'phone', 'call_remember','to_email', 'source', 'owner','lead_status', 'redirect_url', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'],'safe'],
-
-            [['first_name', 'last_name', 'email', 'message'], 'required'],
-            ['email', 'email'],
-            [['verifyCode'], 'captcha', 'when' => function($model)
-                {
-                    if ($model->verifyCode == 'null')
-                    {
-                            $return = false;
-                    }
-                    else
-                    {
+                [['name', 'phone', 'call_remember', 'to_email', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
+                [['first_name', 'last_name', 'email', 'message'], 'required'],
+                ['email', 'email'],
+                [['verifyCode'], 'captcha', 'when' => function($model) {
+                    if ($model->verifyCode == 'null') {
+                        $return = false;
+                    } else {
                         $return = true;
                     }
                     return $return;
@@ -61,71 +55,85 @@ class ContactUs extends Model
         ];
     }
 
-/**
-* @return array customized attribute labels
-*/
-public function attributeLabels()
-{
-    return [
-        'verifyCode' => 'Verification Code',
-    ];
-}
-
-public function sendMail()
-{
-    $settings = Cms::settings();
-    if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
-    {
-            Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-            ->setFrom(Yii::$app->params['from_email'])
-            ->setTo($settings['general_settings']['admin_email'])
-            ->setSubject('Fcs contact us email')
-            ->send();
-
-            Yii::$app->mailer->compose()
-            ->setFrom(Yii::$app->params['from_email'])
-            ->setTo($this->email)
-            ->setSubject('Thank you for contacting us')
-            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language])?$settings['email_response'][\Yii::$app->language]:'Thank you for contacting us')
-            ->send();
-
-        $this->saveAccount();
-        return true;
+    /**
+     * @return array customized attribute labels
+     */
+    public function attributeLabels() {
+        return [
+            'verifyCode' => 'Verification Code',
+        ];
     }
-    else
-    {
-        return false;
-    }
-}
 
-public function saveAccount()
-{
-    if($this->owner)
-    $url=Yii::$app->params['apiUrl']."owners/index&user=" . Yii::$app->params['user'];
+    public function sendMail() {
+        $settings = Cms::settings();
+        if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '') {
+            if (isset($this->attach) && $this->attach == 1) {
+                $webroot = Yii::getAlias('@webroot');
+                if (is_dir($webroot . '/uploads/pdf')) {
+                    Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                            ->setFrom(Yii::$app->params['from_email'])
+                            ->setTo($settings['general_settings']['admin_email'])
+                            ->setSubject('Fcs contact us email')
+                            ->attach($webroot . '/uploads/pdf/property.pdf')
+                            ->send();
+                    Yii::$app->mailer->compose()
+                            ->setFrom(Yii::$app->params['from_email'])
+                            ->setTo($this->email)
+                            ->setSubject('Thank you for contacting us')
+                            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                            ->attach($webroot . '/uploads/pdf/property.pdf')
+                            ->send();
+                }
+            } else {
+                Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($settings['general_settings']['admin_email'])
+                        ->setSubject('Fcs contact us email')
+                        ->send();
+                Yii::$app->mailer->compose()
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($this->email)
+                        ->setSubject('Thank you for contacting us')
+                        ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                        ->send();
+                $this->saveAccount();
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function saveAccount() {
+        if ($this->owner)
+            $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
         else
-    $url=Yii::$app->params['apiUrl']."accounts/index&user=" . Yii::$app->params['user'];
-    $fields = array(
-        'forename' => urlencode($this->first_name),
-        'surname' => urlencode($this->last_name),
-        'email' => urlencode($this->email),
-        'source' => isset($this->source)?$this->source:urlencode('web-client'),
-        'lead_status'=>isset($this->lead_status)?$this->lead_status:'1001',
-        'message' => urlencode($this->message),
-        'phone' => urlencode($this->phone),
-        'property' =>isset($this->reference)?$this->reference:null,
-        'to_email'=>isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:'',
-    );
-    $fields_string='';
-    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
-    rtrim($fields_string, '&');
+            $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
+        $fields = array(
+            'forename' => urlencode($this->first_name),
+            'surname' => urlencode($this->last_name),
+            'email' => urlencode($this->email),
+            'source' => isset($this->source) ? $this->source : urlencode('web-client'),
+            'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
+            'message' => urlencode($this->message),
+            'phone' => urlencode($this->phone),
+            'property' => isset($this->reference) ? $this->reference : null,
+            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
+        );
+        $fields_string = '';
+        foreach ($fields as $key => $value) {
+            $fields_string .= $key . '=' . $value . '&';
+        }
+        rtrim($fields_string, '&');
 
-    $ch = curl_init();
-    curl_setopt($ch,CURLOPT_URL, $url);
-    curl_setopt($ch,CURLOPT_POST, count($fields));
-    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, count($fields));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
 
-    $result = curl_exec($ch);
-    curl_close($ch);
-}
+        $result = curl_exec($ch);
+        curl_close($ch);
+    }
 
 }
