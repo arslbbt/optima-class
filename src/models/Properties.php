@@ -113,7 +113,7 @@ class Properties extends Model {
                     $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
                 } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
                     $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
-                    $data['seasons'] = isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:'';
+                    $data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
                 } else {
                     $data['price'] = 0;
                 }
@@ -341,8 +341,8 @@ class Properties extends Model {
 
         if ($price == 'rent') {
             if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
-                $return_data['seasons'] = $property->property->rental_seasons->{'0'}->seasons;
+                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                $return_data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
             } 
              elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                 $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
