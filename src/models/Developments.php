@@ -132,9 +132,9 @@ class Developments extends Model
             }
             $properties=[];
             foreach ($property->properties as $key => $value) {
-              if (isset($value->property->currentprice) && $value->property->currentprice > 0)
+            if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
-                        if (isset($value->property->type_one))
+            if (isset($value->property->type_one))
                 $data['type'] = $value->property->type_one;
             if (isset($value->property->location))
                 $data['location'] = $value->property->location;
