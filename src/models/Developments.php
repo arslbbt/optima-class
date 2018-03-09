@@ -83,12 +83,17 @@ class Developments extends Model
 
         if (isset($property->property->description->$lang))
             $return_data['description'] = $property->property->description->$lang;
-
-        if (isset($property->property->latitude))
-            $return_data['lat'] = $property->property->latitude;
-        if (isset($property->property->longitude))
-            $return_data['lng'] = $property->property->longitude;
-
+        if((isset($property->property->alternative_latitude) && $property->property->alternative_latitude!='') && (isset($property->property->alternative_longitude) && $property->property->alternative_longitude!='')){
+            if (isset($property->property->alternative_latitude))
+                $return_data['lat'] = $property->property->alternative_latitude;
+            if (isset($property->property->alternative_longitude))
+                $return_data['lng'] = $property->property->alternative_longitude;
+        }else{
+            if (isset($property->property->latitude))
+                $return_data['lat'] = $property->property->latitude;
+            if (isset($property->property->longitude))
+                $return_data['lng'] = $property->property->longitude;
+        }
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
