@@ -386,6 +386,7 @@ class Properties extends Model {
         }
         if (isset($property->property->location)) {
             $return_data['location'] = $property->property->location;
+            $return_data['location_key'] = $property->property->location_key;
         }
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '') {
             if ($property->property->energy_certificate == 'X' || $property->property->energy_certificate == 'x') {
