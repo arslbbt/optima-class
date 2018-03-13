@@ -74,6 +74,7 @@ class ContactUs extends Model {
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
                             ->setSubject('Fcs contact us email')
+                            ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                     Yii::$app->mailer->compose()
