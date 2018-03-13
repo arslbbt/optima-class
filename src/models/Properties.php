@@ -320,6 +320,9 @@ class Properties extends Model {
         } else {
             $return_data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
         }
+        if (isset($property->property->listing_agent)) {
+            $return_data['listing_agent'] = $property->property->listing_agent;
+        }        
         if (isset($property->property->property_name)) {
             $return_data['property_name'] = $property->property->property_name;
         }
@@ -386,6 +389,7 @@ class Properties extends Model {
         }
         if (isset($property->property->location)) {
             $return_data['location'] = $property->property->location;
+            $return_data['location_key'] = $property->property->location_key;
         }
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '') {
             if ($property->property->energy_certificate == 'X' || $property->property->energy_certificate == 'x') {
@@ -795,5 +799,23 @@ class Properties extends Model {
         }
         return json_decode($file_data, true);
     }
-
+    public static function getAgent($id)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . $id);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
 }
