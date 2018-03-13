@@ -175,7 +175,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)).str_replace(' ', '_', strtolower($category)) . '.json';
         $query='&post_type=' . $name;
         if($category!=null){
             $query.='&category='.$category;
