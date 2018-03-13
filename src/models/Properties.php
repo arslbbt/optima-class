@@ -15,7 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -112,8 +112,8 @@ class Properties extends Model {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
                 } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
-                    $data['seasons'] = $property->property->rental_seasons->{'0'}->seasons;
+                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                    $data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
                 } else {
                     $data['price'] = 0;
                 }
@@ -280,7 +280,7 @@ class Properties extends Model {
 
     public static function findOne($reference, $with_booking = false) {
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         if (isset($with_booking) && $with_booking == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         } else
@@ -320,6 +320,9 @@ class Properties extends Model {
         } else {
             $return_data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
         }
+        if (isset($property->property->listing_agent)) {
+            $return_data['listing_agent'] = $property->property->listing_agent;
+        }        
         if (isset($property->property->property_name)) {
             $return_data['property_name'] = $property->property->property_name;
         }
@@ -341,8 +344,8 @@ class Properties extends Model {
 
         if ($price == 'rent') {
             if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', $property->property->rental_seasons->{'0'}->period);
-                $return_data['seasons'] = $property->property->rental_seasons->{'0'}->seasons;
+                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                $return_data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
             } 
              elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                 $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
@@ -796,5 +799,23 @@ class Properties extends Model {
         }
         return json_decode($file_data, true);
     }
-
+    public static function getAgent($id)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . $id);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
 }

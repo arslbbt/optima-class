@@ -2,9 +2,9 @@
     "name": "arsl/optima-class",
     "description": "class for optima crm",
     "require-dev": {
-        "yiisoft/yii2": "2.0.13.1"
+        "yiisoft/yii2":  ">=2.0.13.1"
     },
-    "version": "1.9.4",
+    "version": "1.9.7",
     "minimum-stability": "dev",
     "authors": [
         {
@@ -22,6 +22,6 @@
        "GPL-3.0-or-later"
     ],
     "require": {
-         "yiisoft/yii2": "2.0.13.1"
+         "yiisoft/yii2": ">=2.0.13.1"
     }
 }
