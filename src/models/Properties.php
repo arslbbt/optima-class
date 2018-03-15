@@ -164,98 +164,98 @@ class Properties extends Model {
             if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0) {
                 foreach ($property->property->feet_categories as $key => $value) {
                     if ($value == true) {
-                        $categories[] = ucfirst(str_replace('_', ' ', $key));
+                        $categories[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_features) && count($property->property->feet_features) > 0) {
                 foreach ($property->property->feet_features as $key => $value) {
                     if ($value == true) {
-                        $features[] = ucfirst(str_replace('_', ' ', $key));
+                        $features[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0) {
                 foreach ($property->property->feet_climate_control as $key => $value) {
                     if ($value == true) {
-                        $climate_control[] = ucfirst(str_replace('_', ' ', $key));
+                        $climate_control[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0) {
                 foreach ($property->property->feet_kitchen as $key => $value) {
                     if ($value == true) {
-                        $kitchen[] = ucfirst(str_replace('_', ' ', $key));
+                        $kitchen[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0) {
                 foreach ($property->property->feet_setting as $key => $value) {
                     if ($value == true) {
-                        $setting[] = ucfirst(str_replace('_', ' ', $key));
+                        $setting[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0) {
                 foreach ($property->property->feet_orientation as $key => $value) {
                     if ($value == true) {
-                        $orientation[] = ucfirst(str_replace('_', ' ', $key));
+                        $orientation[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_views) && count($property->property->feet_views) > 0) {
                 foreach ($property->property->feet_views as $key => $value) {
                     if ($value == true) {
-                        $views[] = ucfirst(str_replace('_', ' ', $key));
+                        $views[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0) {
                 foreach ($property->property->feet_utilities as $key => $value) {
                     if ($value == true) {
-                        $utilities[] = ucfirst(str_replace('_', ' ', $key));
+                        $utilities[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_security) && count($property->property->feet_security) > 0) {
                 foreach ($property->property->feet_security as $key => $value) {
                     if ($value == true) {
-                        $security[] = ucfirst(str_replace('_', ' ', $key));
+                        $security[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0) {
                 foreach ($property->property->feet_furniture as $key => $value) {
                     if ($value == true) {
-                        $furniture[] = ucfirst(str_replace('_', ' ', $key));
+                        $furniture[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0) {
                 foreach ($property->property->feet_parking as $key => $value) {
                     if ($value == true) {
-                        $parking[] = ucfirst(str_replace('_', ' ', $key));
+                        $parking[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0) {
                 foreach ($property->property->feet_garden as $key => $value) {
                     if ($value == true) {
-                        $garden[] = ucfirst(str_replace('_', ' ', $key));
+                        $garden[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0) {
                 foreach ($property->property->feet_pool as $key => $value) {
                     if ($value == true) {
-                        $pool[] = ucfirst(str_replace('_', ' ', $key));
+                        $pool[] = $key;
                     }
                 }
             }
             if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0) {
                 foreach ($property->property->feet_condition as $key => $value) {
                     if ($value == true) {
-                        $condition[] = ucfirst(str_replace('_', ' ', $key));
+                        $condition[] = $key;
                     }
                 }
             }
@@ -486,98 +486,98 @@ class Properties extends Model {
         if (isset($property->property->feet_categories) && count($property->property->feet_categories) > 0) {
             foreach ($property->property->feet_categories as $key => $value) {
                 if ($value == true) {
-                    $categories[] = ucfirst(str_replace('_', ' ', $key));
+                    $categories[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_features) && count($property->property->feet_features) > 0) {
             foreach ($property->property->feet_features as $key => $value) {
                 if ($value == true) {
-                    $features[] = ucfirst(str_replace('_', ' ', $key));
+                    $features[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_climate_control) && count($property->property->feet_climate_control) > 0) {
             foreach ($property->property->feet_climate_control as $key => $value) {
                 if ($value == true) {
-                    $climate_control[] = ucfirst(str_replace('_', ' ', $key));
+                    $climate_control[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0) {
             foreach ($property->property->feet_kitchen as $key => $value) {
                 if ($value == true) {
-                    $kitchen[] = ucfirst(str_replace('_', ' ', $key));
+                    $kitchen[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_setting) && count($property->property->feet_setting) > 0) {
             foreach ($property->property->feet_setting as $key => $value) {
                 if ($value == true) {
-                    $setting[] = ucfirst(str_replace('_', ' ', $key));
+                    $setting[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_orientation) && count($property->property->feet_orientation) > 0) {
             foreach ($property->property->feet_orientation as $key => $value) {
                 if ($value == true) {
-                    $orientation[] = ucfirst(str_replace('_', ' ', $key));
+                    $orientation[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_views) && count($property->property->feet_views) > 0) {
             foreach ($property->property->feet_views as $key => $value) {
                 if ($value == true) {
-                    $views[] = ucfirst(str_replace('_', ' ', $key));
+                    $views[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_utilities) && count($property->property->feet_utilities) > 0) {
             foreach ($property->property->feet_utilities as $key => $value) {
                 if ($value == true) {
-                    $utilities[] = ucfirst(str_replace('_', ' ', $key));
+                    $utilities[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_security) && count($property->property->feet_security) > 0) {
             foreach ($property->property->feet_security as $key => $value) {
                 if ($value == true) {
-                    $security[] = ucfirst(str_replace('_', ' ', $key));
+                    $security[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_furniture) && count($property->property->feet_furniture) > 0) {
             foreach ($property->property->feet_furniture as $key => $value) {
                 if ($value == true) {
-                    $furniture[] = ucfirst(str_replace('_', ' ', $key));
+                    $furniture[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_parking) && count($property->property->feet_parking) > 0) {
             foreach ($property->property->feet_parking as $key => $value) {
                 if ($value == true) {
-                    $parking[] = ucfirst(str_replace('_', ' ', $key));
+                    $parking[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_garden) && count($property->property->feet_garden) > 0) {
             foreach ($property->property->feet_garden as $key => $value) {
                 if ($value == true) {
-                    $garden[] = ucfirst(str_replace('_', ' ', $key));
+                    $garden[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_pool) && count($property->property->feet_pool) > 0) {
             foreach ($property->property->feet_pool as $key => $value) {
                 if ($value == true) {
-                    $pool[] = ucfirst(str_replace('_', ' ', $key));
+                    $pool[] = $key;
                 }
             }
         }
         if (isset($property->property->feet_condition) && count($property->property->feet_condition) > 0) {
             foreach ($property->property->feet_condition as $key => $value) {
                 if ($value == true) {
-                    $condition[] = ucfirst(str_replace('_', ' ', $key));
+                    $condition[] = $key;
                 }
             }
         }
