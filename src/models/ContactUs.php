@@ -73,15 +73,15 @@ class ContactUs extends Model {
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
-                            ->setSubject('Fcs contact us email')
+                            ->setSubject('Property email')
                             ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                     Yii::$app->mailer->compose()
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($this->email)
-                            ->setSubject('Thank you for contacting us')
-                            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                            ->setSubject('Thank you for Sharing property')
+                            ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                 }

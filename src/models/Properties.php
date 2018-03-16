@@ -143,7 +143,7 @@ class Properties extends Model {
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 $attachments = [];
                 foreach ($property->attachments as $pic) {
-                    $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=400&name=' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
@@ -393,15 +393,15 @@ class Properties extends Model {
         }
         if (isset($property->property->energy_certificate) && $property->property->energy_certificate != '') {
             if ($property->property->energy_certificate == 'X' || $property->property->energy_certificate == 'x') {
-                $return_data['energy_certificate'] = 'In Progress';
+                $return_data['energy_certificate'] = strtolower('In Progress');
             } else if ($property->property->energy_certificate == 'Not available') {
-                $return_data['energy_certificate'] = 'In Progress';
+                $return_data['energy_certificate'] = strtolower('In Progress');
             } else if ($property->property->energy_certificate == 'In Process') {
-                $return_data['energy_certificate'] = 'In Progress';
+                $return_data['energy_certificate'] = strtolower('In Progress');
             } else
                 $return_data['energy_certificate'] = $property->property->energy_certificate;
         } else {
-            $return_data['energy_certificate'] = 'In Progress';
+            $return_data['energy_certificate'] = strtolower('In Progress');
         }
         if (isset($property->property->sale) && $property->property->sale == 1) {
             $return_data['sale'] = $property->property->sale;
@@ -436,7 +436,7 @@ class Properties extends Model {
 
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
-                $url = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=400&name=' . $pic->file_md5_name;
+                $url = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
                 $attachments[] = $url;
             }
             $return_data['attachments'] = $attachments;
