@@ -126,8 +126,12 @@ class Developments extends Model
             {
                 foreach ($property->property->general_features as $key => $value)
                 {
-                    if ($value == true)
+                    if ($key == 'furniture' && $value!='No'){
+                        $features[] =\Yii::t('app','furniture').': '.\Yii::t('app',$value);
+                    }else{
+                    if ($key == true && $key != 'furniture')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
+                    }
                 }
             }
             $properties=[];
