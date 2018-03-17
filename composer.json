@@ -2,9 +2,10 @@
     "name": "arsl/optima-class",
     "description": "class for optima crm",
     "require-dev": {
-        "yiisoft/yii2":  ">=2.0.13.1"
+        "yiisoft/yii2":  ">=2.0.13.1",
+        "linslin/yii2-curl": "*"
     },
-    "version": "1.9.9",
+    "version": "1.2.0",
     "minimum-stability": "dev",
     "authors": [
         {
