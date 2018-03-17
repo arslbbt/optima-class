@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use optima\models\Cms;
+use linslin\yii2\curl;
 
 class ContactUs extends Model {
 
