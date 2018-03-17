@@ -68,6 +68,7 @@ class ContactUs extends Model {
     public function sendMail() {
         $settings = Cms::settings();
         if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '') {
+            $this->saveAccount();
             if (isset($this->attach) && $this->attach == 1) {
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf')) {
@@ -97,8 +98,7 @@ class ContactUs extends Model {
                         ->setTo($this->email)
                         ->setSubject('Thank you for contacting us')
                         ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
-                        ->send();
-                $this->saveAccount();
+                        ->send();                
             }
 
             return true;
