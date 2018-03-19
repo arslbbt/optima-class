@@ -110,9 +110,9 @@ class Properties extends Model {
             }
             if ($rent) {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                    $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
+                    $data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month');
                 } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                    $data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:'')));
                     $data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
                 } else {
                     $data['price'] = 0;
@@ -344,11 +344,11 @@ class Properties extends Model {
 
         if ($price == 'rent') {
             if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons->{'0'}->new_price)) {
-                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:''));
+                $return_data['price'] = number_format((int) $property->property->rental_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($property->property->rental_seasons->{'0'}->period)?$property->property->rental_seasons->{'0'}->period:'')));
                 $return_data['seasons'] = isset($property->property->rental_seasons->{'0'}->seasons)?$property->property->rental_seasons->{'0'}->seasons:'';
             } 
              elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' per month';
+                $return_data['price'] = number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month');
             } else {
                 $return_data['price'] = 0;
             }
