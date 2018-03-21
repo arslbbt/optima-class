@@ -69,7 +69,7 @@ class Properties extends Model {
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '') {
                 $data['title'] = $property->property->title->$lang;
             } elseif (isset($property->property->location)) {
-                $data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                $data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
             if (isset($property->property->type_one)) {
@@ -318,7 +318,7 @@ class Properties extends Model {
         if (isset($property->property->$title->$lang) && $property->property->$title->$lang != '') {
             $return_data['title'] = $property->property->$title->$lang;
         } else {
-            $return_data['title'] = \Yii::t('app', $property->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
         }
         if (isset($property->property->listing_agent)) {
             $return_data['listing_agent'] = $property->property->listing_agent;
@@ -463,8 +463,8 @@ class Properties extends Model {
         if (isset($property->property->videos) && count($property->property->videos) > 0 && (is_array($property->property->videos) || is_object($property->property->videos))) {
             $videosArr = [];
             foreach ($property->property->videos as $video) {
-                if (isset($video->status) && $video->status == 1 && isset($video->url->$lang)) {
-                    $videosArr[] = $video->url->$lang;
+                if (isset($video->status) && $video->status == 1 && isset($video->url->Duits) && $video->url->Duits != '') {
+                    $videosArr[] = $video->url->Duits;
                 }
             }
             $return_data['videos'] = $videosArr;
@@ -700,8 +700,14 @@ class Properties extends Model {
         if (isset($get["usefull_area"]) && $get["usefull_area"] != "") {
             $query .= '&usefull_area=' . $get['usefull_area'];
         }
+        if (isset($get["min_useful_area"]) && $get["min_useful_area"] != "") {
+            $query .= '&min_useful_area=' . $get['min_useful_area'];
+        }
         if (isset($get["plot"]) && $get["plot"] != "") {
             $query .= '&plot=' . $get['plot'];
+        }
+        if (isset($get["min_plot"]) && $get["min_plot"] != "") {
+            $query .= '&min_plot=' . $get['min_plot'];
         }
         if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"]) {
             $query .= '&pool[]=pool_communal';
