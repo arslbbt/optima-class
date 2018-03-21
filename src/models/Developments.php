@@ -27,6 +27,9 @@ class Developments extends Model
         {
             $data = [];
             $features = [];
+            if (isset($property->total_properties)) {
+                $data['total_properties'] = $property->total_properties;
+            }
             if (isset($property->property->reference) && $property->property->reference != '')
                 $data['id'] = $property->property->reference;
 
@@ -67,7 +70,6 @@ class Developments extends Model
         $property = json_decode($JsonData);
         $return_data = [];
         $attachments = [];
-
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;

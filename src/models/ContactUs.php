@@ -5,7 +5,6 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use optima\models\Cms;
-use linslin\yii2\curl;
 
 class ContactUs extends Model {
 
@@ -39,10 +38,11 @@ class ContactUs extends Model {
     public $source;
     public $accept_cookie;
     public $get_updates;
+    public $html_content;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email','html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -68,22 +68,20 @@ class ContactUs extends Model {
     public function sendMail() {
         $settings = Cms::settings();
         if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '') {
-            $this->saveAccount();
             if (isset($this->attach) && $this->attach == 1) {
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf')) {
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
-                            ->setSubject('Property email')
-                            ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
+                            ->setSubject('Fcs contact us email')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                     Yii::$app->mailer->compose()
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($this->email)
-                            ->setSubject('Thank you for Sharing property')
-                            ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
+                            ->setSubject('Thank you for contacting us')
+                            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                 }
@@ -91,14 +89,15 @@ class ContactUs extends Model {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
-                        ->setSubject('Web Enquiry')
+                        ->setSubject('Fcs contact us email')
                         ->send();
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
                         ->setSubject('Thank you for contacting us')
                         ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
-                        ->send();                
+                        ->send();
+                $this->saveAccount();
             }
 
             return true;
@@ -122,11 +121,21 @@ class ContactUs extends Model {
             'phone' => urlencode($this->phone),
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
+            'html_content' => isset($this->html_content) ? $this->html_content : '',
         );
-        // POST URL form-urlencoded 
-        $curl = new curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
-        return true;
+        $fields_string = '';
+        foreach ($fields as $key => $value) {
+            $fields_string .= $key . '=' . $value . '&';
+        }
+        rtrim($fields_string, '&');
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, count($fields));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+
+        $result = curl_exec($ch);
+        curl_close($ch);
     }
 
 }
