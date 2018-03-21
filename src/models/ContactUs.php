@@ -38,10 +38,11 @@ class ContactUs extends Model {
     public $source;
     public $accept_cookie;
     public $get_updates;
+    public $html_content;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email','html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -74,7 +75,6 @@ class ContactUs extends Model {
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
                             ->setSubject('Fcs contact us email')
-                            ->setHtmlBody(isset($this->message) && $this->message != '' ? $this->message : '')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                     Yii::$app->mailer->compose()
@@ -121,6 +121,7 @@ class ContactUs extends Model {
             'phone' => urlencode($this->phone),
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
+            'html_content' => isset($this->html_content) ? $this->html_content : '',
         );
         $fields_string = '';
         foreach ($fields as $key => $value) {

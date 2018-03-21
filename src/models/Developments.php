@@ -47,7 +47,7 @@ class Developments extends Model
                 $attachments = [];
                 foreach ($property->attachments as $pic)
                 {
-                    $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['dev_img'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
@@ -100,7 +100,7 @@ class Developments extends Model
         {
             foreach ($property->attachments as $pic)
             {
-                $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                $attachments[] = Yii::$app->params['dev_img'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
             }
             $return_data['attachments'] = $attachments;
         }
@@ -128,8 +128,12 @@ class Developments extends Model
             {
                 foreach ($property->property->general_features as $key => $value)
                 {
-                    if ($value == true)
+                    if ($key == 'furniture' && $value!='No'){
+                        $features[] =\Yii::t('app','furniture').': '.\Yii::t('app',$value);
+                    }else{
+                    if ($key == true && $key != 'furniture')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
+                    }
                 }
             }
             $properties=[];
