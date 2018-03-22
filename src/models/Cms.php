@@ -73,7 +73,16 @@ class Cms extends Model
         {
             $file_data = file_get_contents($file);
         }
-        return json_decode($file_data, TRUE);
+        $dataArr=json_decode($file_data, TRUE);
+        $items= $dataArr['menu_items'];
+        $finalData=[];
+        foreach($items as $data){
+            $pageData=self::pageBySlug(null,'EN',$data['item']['id']['oid']);
+            $data['item']['slug']=$pageData['slug_all'];
+            $finalData[]=$data;
+        }
+        $dataArr['menu_items']=$finalData;
+        return $dataArr;
     }
 
     public static function menuYII($id)
@@ -135,17 +144,26 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function pageBySlug($slug, $lang_slug='EN')
+    public static function pageBySlug($slug, $lang_slug='EN',$id=null)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) . '.json';
+        if($id==null){
+            $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) . '.json';
+        }
+        else{
+            $file = $webroot . '/uploads/temp/' .$id . '.json';
+        }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] .'&lang='.$lang_slug . '&slug=' . $slug);
+            if($id==null){
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] .'&lang='.$lang_slug . '&slug=' . $slug);
+            }else{
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] .'&id='.$id);                
+            }
             file_put_contents($file, $file_data);
         }
         else
@@ -153,6 +171,7 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         $data = json_decode($file_data, TRUE);
+
         $lang = strtoupper(\Yii::$app->language);
         $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
         $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
@@ -161,6 +180,7 @@ class Cms extends Model
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
+            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
             'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
             'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
             'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
@@ -203,6 +223,7 @@ class Cms extends Model
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
+            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
             $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
             $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
             $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
