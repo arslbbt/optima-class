@@ -39,10 +39,12 @@ class ContactUs extends Model {
     public $accept_cookie;
     public $get_updates;
     public $html_content;
+    public $booking_period;
+    public $guests;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email','html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email','html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
