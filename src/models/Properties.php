@@ -69,7 +69,7 @@ class Properties extends Model {
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '') {
                 $data['title'] = $property->property->title->$lang;
             } elseif (isset($property->property->location)) {
-                $data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                $data['title'] = isset($property->property->type_one)?\Yii::t('app', strtolower($property->property->type_one)):\Yii::t('app', 'N/A') . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
             if (isset($property->property->type_one)) {
