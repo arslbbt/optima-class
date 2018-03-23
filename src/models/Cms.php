@@ -75,15 +75,15 @@ class Cms extends Model
         }
         $dataArr=json_decode($file_data, TRUE);
         $items= $dataArr['menu_items'];
-        $finalData=[];
-        foreach($items as $data){
-            if(isset($data['item']['id']['oid'])){
-            $pageData=self::pageBySlug(null,'EN',$data['item']['id']['oid']);
-            $data['item']['slug']=$pageData['slug_all'];
-            $finalData[]=$data;
-            }
-        }
-        $dataArr['menu_items']=$finalData;
+        // $finalData=[];
+        // foreach($items as $data){
+        //     if(isset($data['item']['id']['oid'])){
+        //     $pageData=self::pageBySlug(null,'EN',$data['item']['id']['oid']);
+        //     $data['item']['slug']=$pageData['slug_all'];
+        //     $finalData[]=$data;
+        //     }
+        // }
+        // $dataArr['menu_items']=$finalData;
         return $dataArr;
     }
 
