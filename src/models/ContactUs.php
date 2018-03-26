@@ -83,7 +83,7 @@ class ContactUs extends Model {
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($this->email)
                             ->setSubject('Thank you for contacting us')
-                            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                            ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                 }
