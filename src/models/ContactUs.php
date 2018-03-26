@@ -124,6 +124,7 @@ class ContactUs extends Model {
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
+            'comments' => isset($this->call_remember) ? $this->call_remember : '',
         );
         $fields_string = '';
         foreach ($fields as $key => $value) {
