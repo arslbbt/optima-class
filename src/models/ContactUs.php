@@ -44,7 +44,7 @@ class ContactUs extends Model {
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email','html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -119,19 +119,20 @@ class ContactUs extends Model {
             'email' => urlencode($this->email),
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
+            'message' => isset($this->owner) && isset($this->call_remember) ? $this->call_remember : '',
             'message' => urlencode($this->message),
             'phone' => urlencode($this->phone),
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
             'comments' => isset($this->call_remember) ? $this->call_remember : '',
+            'comments' => isset($this->guests) ? 'Number of Guests: '.$this->guests : '',
         );
         $fields_string = '';
         foreach ($fields as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
         }
         rtrim($fields_string, '&');
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, count($fields));
