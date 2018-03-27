@@ -198,7 +198,7 @@ class Cms extends Model
         ];
     }
 
-    public static function postTypes($name,$category=null)
+    public static function postTypes($name,$category=null,$forRoutes=null)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -229,7 +229,11 @@ class Cms extends Model
         {
             $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
             $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-            $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
+            if($forRoutes==true){
+                $array['featured_image'] = $url;
+            }else{
+                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
+            }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
