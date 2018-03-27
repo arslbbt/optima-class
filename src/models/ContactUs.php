@@ -83,7 +83,7 @@ class ContactUs extends Model {
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($this->email)
                             ->setSubject('Thank you for contacting us')
-                            ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                            ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                 }
@@ -97,7 +97,7 @@ class ContactUs extends Model {
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
                         ->setSubject('Thank you for contacting us')
-                        ->setHtmlBody(isset($settings['email_response'][\Yii::$app->language]) ? $settings['email_response'][\Yii::$app->language] : 'Thank you for contacting us')
+                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
             }
@@ -124,6 +124,7 @@ class ContactUs extends Model {
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
+            'comments' => isset($this->call_remember) ? $this->call_remember : '',
         );
         $fields_string = '';
         foreach ($fields as $key => $value) {
