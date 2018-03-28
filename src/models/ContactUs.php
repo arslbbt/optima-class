@@ -42,10 +42,11 @@ class ContactUs extends Model {
     public $booking_period;
     public $guests;
     public $transaction_types;
+    public $subscribe;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -88,6 +89,18 @@ class ContactUs extends Model {
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                 }
+            } else if (isset($this->subscribe) && $this->subscribe == 1) {
+                Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($settings['general_settings']['admin_email'])
+                        ->setSubject($this->email . ' would like to be added to your newsletters')
+                        ->send();
+                Yii::$app->mailer->compose()
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($this->email)
+                        ->setSubject('Thank you for contacting us')
+                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
+                        ->send();
             } else {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
@@ -113,7 +126,7 @@ class ContactUs extends Model {
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == 0) {
             $call_rememeber = '9:00 to 18:00';
-        } else if(isset($this->call_remember) && $this->call_remember == 'After 18:00') {
+        } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
             $call_rememeber = 'After 18:00';
         }
         if ($this->owner)
