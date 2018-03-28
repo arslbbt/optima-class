@@ -41,10 +41,11 @@ class ContactUs extends Model {
     public $html_content;
     public $booking_period;
     public $guests;
+    public $transaction_types;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -112,8 +113,8 @@ class ContactUs extends Model {
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == 0) {
             $call_rememeber = '9:00 to 18:00';
-        } else if (isset($this->call_remember)) {
-            $call_rememeber = $this->call_remember;
+        } else if(isset($this->call_remember) && $this->call_remember == 'After 18:00') {
+            $call_rememeber = 'After 18:00';
         }
         if ($this->owner)
             $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
@@ -125,10 +126,10 @@ class ContactUs extends Model {
             'email' => urlencode($this->email),
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
-            'message' => isset($this->owner) && isset($this->call_remember) ? $this->call_remember : '',
             'message' => urlencode($this->message),
             'phone' => urlencode($this->phone),
             'property' => isset($this->reference) ? $this->reference : null,
+            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
