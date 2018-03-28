@@ -109,6 +109,12 @@ class ContactUs extends Model {
     }
 
     public function saveAccount() {
+        $call_rememeber = '';
+        if (isset($this->call_remember) && $this->call_remember == 0) {
+            $call_rememeber = '9:00 to 18:00';
+        } else if (isset($this->call_remember)) {
+            $call_rememeber = $this->call_remember;
+        }
         if ($this->owner)
             $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
         else
@@ -125,8 +131,7 @@ class ContactUs extends Model {
             'property' => isset($this->reference) ? $this->reference : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
-            'comments' => isset($this->call_remember) ? $this->call_remember : '',
-            'comments' => isset($this->guests) ? 'Number of Guests: ' . $this->guests : '',
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
         );
         $fields_string = '';
         foreach ($fields as $key => $value) {
