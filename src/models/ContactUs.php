@@ -93,7 +93,8 @@ class ContactUs extends Model {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
-                        ->setSubject($this->email . ' would like to be added to your newsletters')
+                        ->setSubject('Subscribing newsletter Email')
+                        ->setHtmlBody($this->email . ' would like to be added to your newsletters')
                         ->send();
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
