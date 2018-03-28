@@ -206,6 +206,7 @@ class Cms extends Model
             'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
             'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
             'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
+            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
         ];
     }
 
