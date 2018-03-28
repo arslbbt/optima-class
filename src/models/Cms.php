@@ -73,25 +73,31 @@ class Cms extends Model
         {
             $file_data = file_get_contents($file);
         }
-        $dataArr=json_decode($file_data, TRUE);
-        $items= $dataArr['menu_items'];
-        $finalData=[];
-        foreach($items as $data){
-            if(isset($data['item']['id']['oid'])){
-            $pageData=self::pageBySlug(null,'EN',$data['item']['id']['oid']);
-            $data['item']['slug']=$pageData['slug_all'];
-                if(isset($data['children'])){
-                    foreach($data['children'] as $key=> $ch){
-                        $pageData=self::pageBySlug(null,'EN',$ch['item']['id']['oid']);
-                        $data['children'][$key]['item']['slug']=$pageData['slug_all'];
+        $dataArr = json_decode($file_data, TRUE);
+        $items = $dataArr['menu_items'];
+        $finalData = [];
+        foreach ($items as $data)
+        {
+            if (isset($data['item']['id']['oid']))
+            {
+                $pageData = self::pageBySlug(null, 'EN', $data['item']['id']['oid']);
+                $data['item']['slug'] = $pageData['slug_all'];
+                if (isset($data['children']))
+                {
+                    foreach ($data['children'] as $key => $ch)
+                    {
+                        $pageData = self::pageBySlug(null, 'EN', $ch['item']['id']['oid']);
+                        $data['children'][$key]['item']['slug'] = $pageData['slug_all'];
                     }
                 }
-            $finalData[]=$data;
-            }else{
-                $finalData[]=$data;
+                $finalData[] = $data;
+            }
+            else
+            {
+                $finalData[] = $data;
             }
         }
-        $dataArr['menu_items']=$finalData;
+        $dataArr['menu_items'] = $finalData;
         return $dataArr;
     }
 
@@ -154,25 +160,30 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function pageBySlug($slug, $lang_slug='EN',$id=null)
+    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        if($id==null){
+        if ($id == null)
+        {
             $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) . '.json';
         }
-        else{
-            $file = $webroot . '/uploads/temp/' .$id . '.json';
+        else
+        {
+            $file = $webroot . '/uploads/temp/' . $id . '.json';
         }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            if($id==null){
-                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] .'&lang='.$lang_slug . '&slug=' . $slug);
-            }else{
-                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] .'&id='.$id);                
+            if ($id == null)
+            {
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug);
+            }
+            else
+            {
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
             }
             file_put_contents($file, $file_data);
         }
@@ -198,19 +209,22 @@ class Cms extends Model
         ];
     }
 
-    public static function postTypes($name,$category=null,$forRoutes=null)
+    public static function postTypes($name, $category = null, $forRoutes = null)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)).str_replace(' ', '_', strtolower($category)) . '.json';
-        $query='&post_type=' . $name;
-        if($category!=null){
-            $query.='&category='.$category;
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)) . str_replace(' ', '_', strtolower($category)) . '.json';
+        $query = '&post_type=' . $name;
+        if ($name == 'page')
+            $query .= '&page-size=false';
+        if ($category != null)
+        {
+            $query .= '&category=' . $category;
         }
-        $url=Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query;
+        $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents($url);
@@ -229,9 +243,12 @@ class Cms extends Model
         {
             $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
             $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-            if($forRoutes==true){
+            if ($forRoutes == true)
+            {
                 $array['featured_image'] = $url;
-            }else{
+            }
+            else
+            {
                 $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
             }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
@@ -263,7 +280,7 @@ class Cms extends Model
         }
         return '/uploads/temp/' . $name;
     }
-    
+
     public static function iconLogo($name)
     {
         $webroot = Yii::getAlias('@webroot');
