@@ -160,7 +160,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null)
+    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page')
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -179,7 +179,7 @@ class Cms extends Model
         {
             if ($id == null)
             {
-                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug);
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type);
             }
             else
             {
