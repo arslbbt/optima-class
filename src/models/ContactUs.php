@@ -126,7 +126,6 @@ class ContactUs extends Model {
             'email' => urlencode($this->email),
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
-            'message' => isset($this->owner) && isset($this->call_remember) ? $this->call_remember : '',
             'message' => urlencode($this->message),
             'phone' => urlencode($this->phone),
             'property' => isset($this->reference) ? $this->reference : null,
