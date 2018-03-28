@@ -254,7 +254,7 @@ class Cms extends Model
         $filesaved = $webroot . '/uploads/temp/' . $name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
-            $file_data = file_get_contents($url);
+            $file_data = @file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
         return '/uploads/temp/' . $name;
