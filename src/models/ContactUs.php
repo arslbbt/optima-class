@@ -128,22 +128,8 @@ class ContactUs extends Model {
             'comments' => isset($this->call_remember) ? $this->call_remember : '',
             'comments' => isset($this->guests) ? 'Number of Guests: ' . $this->guests : '',
         );
-        $fields_string = '';
-        foreach ($fields as $key => $value) {
-            $fields_string .= $key . '=' . $value . '&';
-        }
-        rtrim($fields_string, '&');
-        try {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POST, count($fields));
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
-
-            $result = curl_exec($ch);
-            curl_close($ch);
-        } catch (\yii\web\HeadersAlreadySentException $exc) {
-            
-        }
+        $curl = new \linslin\yii2\curl\Curl();
+        $response = $curl->setPostParams($fields)->post($url);
     }
 
 }
