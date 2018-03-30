@@ -140,8 +140,7 @@ class ContactUs extends Model {
                     $call_rememeber = 'After 18:00';
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom(Yii::$app->params['from_email'])
-//                        ->setTo($settings['general_settings']['admin_email'])
+                        ->setTo($settings['general_settings']['admin_email'])
                         ->setTo('sirajulhaq363@gmail.com')
                         ->setSubject('Booking Enquiry')
                         ->setHtmlBody($html)
