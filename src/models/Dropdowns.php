@@ -57,11 +57,11 @@ class Dropdowns extends Model
             {
                 $p_q .= '&province[]=' . $province;
             }
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] . $p_q);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] .'&count=true'. $p_q);
         }
         elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'].'&count=true');
             file_put_contents($file, $file_data);
         }
         else
