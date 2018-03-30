@@ -197,6 +197,37 @@ class Cms extends Model
             'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
         ];
     }
+    public static function Slugs($name)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $url=Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'];
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents($url);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        $dataEach = json_decode($file_data, TRUE);
+        $lang = strtoupper(\Yii::$app->language);
+
+        $retdata = [];
+        $array = [];
+        foreach ($dataEach as $key => $data)
+        {
+            $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
+            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
+            $retdata[] = $array;
+        }
+        return $retdata;
+    }
 
     public static function postTypes($name,$category=null,$forRoutes=null)
     {
