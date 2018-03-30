@@ -43,10 +43,11 @@ class ContactUs extends Model {
     public $guests;
     public $transaction_types;
     public $subscribe;
+    public $booking_enquiry;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -102,6 +103,27 @@ class ContactUs extends Model {
                         ->setSubject('Thank you for contacting us')
                         ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
                         ->send();
+            } else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1) {
+                $call_rememeber = '';
+                if (isset($this->call_remember) && $this->call_remember == 0) {
+                    $call_rememeber = '9:00 to 18:00';
+                } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
+                    $call_rememeber = 'After 18:00';
+                }
+                Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(Yii::$app->params['from_email'])
+//                        ->setTo($settings['general_settings']['admin_email'])
+                        ->setTo('sirajulhaq363@gmail.com')
+                        ->setSubject('Booking Enquiry')
+                        ->setHtmlBody(isset($this->first_name) ? 'First Name: ' . $this->first_name : '' . '<br>' . isset($this->last_name) ? 'Last Name: ' . $this->last_name : '' . '<br>' . isset($this->phone) ? 'Phone: ' . $this->phone : '' . '<br>' . isset($call_rememeber) ? 'Call me back: ' . $call_rememeber : '' . '<br>' . isset($this->email) ? 'Email: ' . $this->email : '')
+                        ->send();
+                Yii::$app->mailer->compose()
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($this->email)
+                        ->setSubject('Thank you for contacting us')
+                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
+                        ->send();
+                $this->saveAccount();
             } else {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
