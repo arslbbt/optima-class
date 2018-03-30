@@ -67,6 +67,10 @@ class ContactUs extends Model {
     public function attributeLabels() {
         return [
             'verifyCode' => 'Verification Code',
+            'first_name' => Yii::t('app', strtolower('First Name')),
+            'last_name' => Yii::t('app', strtolower('Last Name')),
+            'email' => Yii::t('app', strtolower('Email')),
+            'message' => Yii::t('app', strtolower('Message')),
         ];
     }
 
@@ -104,6 +108,31 @@ class ContactUs extends Model {
                         ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
                         ->send();
             } else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1) {
+                $html = '';
+                if(isset($this->first_name) && $this->first_name != '')
+                {
+                    $html .= 'First Name: ' . $this->first_name;
+                }
+                if(isset($this->last_name) && $this->last_name != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Last Name : ' . $this->last_name;
+                }
+                if(isset($this->email) && $this->email != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Email: ' . $this->email;
+                }
+                if(isset($this->guests) && $this->guests != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Guests: ' . $this->guests;
+                }
+                if(isset($this->message) && $this->message != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Message: ' . $this->message;
+                }
                 $call_rememeber = '';
                 if (isset($this->call_remember) && $this->call_remember == 0) {
                     $call_rememeber = '9:00 to 18:00';
@@ -115,7 +144,7 @@ class ContactUs extends Model {
 //                        ->setTo($settings['general_settings']['admin_email'])
                         ->setTo('sirajulhaq363@gmail.com')
                         ->setSubject('Booking Enquiry')
-                        ->setHtmlBody(isset($this->first_name) ? 'First Name: ' . $this->first_name : '' . '<br>' . isset($this->last_name) ? 'Last Name: ' . $this->last_name : '' . '<br>' . isset($this->phone) ? 'Phone: ' . $this->phone : '' . '<br>' . isset($call_rememeber) ? 'Call me back: ' . $call_rememeber : '' . '<br>' . isset($this->email) ? 'Email: ' . $this->email : '')
+                        ->setHtmlBody($html)
                         ->send();
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
