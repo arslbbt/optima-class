@@ -287,6 +287,7 @@ class Properties extends Model {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
+
         $settings = Cms::settings();
 
         $return_data = [];
@@ -463,8 +464,8 @@ class Properties extends Model {
         if (isset($property->property->videos) && count($property->property->videos) > 0 && (is_array($property->property->videos) || is_object($property->property->videos))) {
             $videosArr = [];
             foreach ($property->property->videos as $video) {
-                if (isset($video->status) && $video->status == 1 && isset($video->url->Duits) && $video->url->Duits != '') {
-                    $videosArr[] = $video->url->Duits;
+                if (isset($video->status) && $video->status == 1 && isset($video->url->$lang) && $video->url->$lang != '') {
+                    $videosArr[] = $video->url->$lang;
                 }
             }
             $return_data['videos'] = $videosArr;
