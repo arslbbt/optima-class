@@ -75,13 +75,14 @@ class Properties extends Model {
             if (isset($property->property->type_one)) {
                 $data['type'] = $property->property->type_one;
             }
+            print_r($property->property->private_info_object);
+            die;
             if (isset($property->property->latitude) && $property->property->latitude!='') {
                 $data['lat'] = $property->property->latitude;
             }elseif(isset($property->property->private_info_object[Yii::$app->params['agency']]['latitude'])){
                 $data['lat']=$property->property->private_info_object[Yii::$app->params['agency']]['latitude'];
             }
-            print_r($property->property->private_info_object);
-            die;
+
             if (isset($property->property->longitude) && $property->property->longitude!='') {
                 $data['lng'] = $property->property->longitude;
             }elseif(isset($property->property->private_info_object[Yii::$app->params['agency']]['longitude'])){
