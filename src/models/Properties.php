@@ -77,9 +77,13 @@ class Properties extends Model {
             }
             if (isset($property->property->latitude)) {
                 $data['lat'] = $property->property->latitude;
+            }elseif(isset($property->private_info_object[Yii::$app->params['agency']]['latitude'])){
+                $data['lat']=$property->private_info_object[Yii::$app->params['agency']]['latitude'];
             }
             if (isset($property->property->longitude)) {
                 $data['lng'] = $property->property->longitude;
+            }elseif(isset($property->private_info_object[Yii::$app->params['agency']]['longitude'])){
+                $data['lng'] = $property->private_info_object[Yii::$app->params['agency']]['longitude'];
             }
             if (isset($property->property->description->$lang)) {
                 $data['description'] = $property->property->description->$lang;
