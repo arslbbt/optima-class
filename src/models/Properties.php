@@ -280,7 +280,7 @@ class Properties extends Model {
             $return_data[] = $data;
         }
         print_r($return_data);
-        die;ß
+        die;
         return $return_data;
     }
 
