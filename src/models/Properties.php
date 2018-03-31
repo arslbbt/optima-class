@@ -279,6 +279,8 @@ class Properties extends Model {
             $data['property_features']['condition'] = $condition;
             $return_data[] = $data;
         }
+        print_r($return_data);
+        die;ß
         return $return_data;
     }
 
@@ -288,7 +290,7 @@ class Properties extends Model {
         if (isset($with_booking) && $with_booking == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         } else
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+            $url = Yii::$app->paramsß['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
 
