@@ -39,13 +39,16 @@ class Dropdowns extends Model {
         if (!is_dir($webroot . '/uploads/temp/')) {
             mkdir($webroot . '/uploads/temp/');
         }
-        $file = $webroot . '/uploads/temp/locations.json';
-        if (is_array($provinces) && count($provinces)) {
+        $file = $webroot . '/uploads/temp/locations_'.implode(',',$provinces).'.json';
+
+        if (is_array($provinces) && count($provinces)&& !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] .'&count=true'. $p_q);
+            file_put_contents($file, $file_data);
+            
         }
         elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
