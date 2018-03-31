@@ -80,6 +80,8 @@ class Properties extends Model {
             }elseif(isset($property->property->private_info_object[Yii::$app->params['agency']]['latitude'])){
                 $data['lat']=$property->property->private_info_object[Yii::$app->params['agency']]['latitude'];
             }
+            print_r($property->property->private_info_object);
+            die;
             if (isset($property->property->longitude) && $property->property->longitude!='') {
                 $data['lng'] = $property->property->longitude;
             }elseif(isset($property->property->private_info_object[Yii::$app->params['agency']]['longitude'])){
@@ -279,6 +281,8 @@ class Properties extends Model {
             $data['property_features']['condition'] = $condition;
             $return_data[] = $data;
         }
+        print_r($return_data);
+        die;
         return $return_data;
     }
 
