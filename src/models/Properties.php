@@ -281,8 +281,6 @@ class Properties extends Model {
             $data['property_features']['condition'] = $condition;
             $return_data[] = $data;
         }
-        print_r($return_data);
-        die;
         return $return_data;
     }
 
