@@ -526,7 +526,7 @@ class Properties extends Model {
         }
         if (isset($property->property->feet_kitchen) && count($property->property->feet_kitchen) > 0) {
             foreach ($property->property->feet_kitchen as $key => $value) {
-                if ($value == true) {
+                if ($value == true && $key!='quantity') {
                     $kitchen[] = $key;
                 }
             }
