@@ -127,8 +127,6 @@ class Properties extends Model {
                     }
                     $data['price'] = ($st_price[0]['price']!=0)?number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:''))):'';
                     $data['seasons'] = isset($st_price[0]['seasons'])?$st_price[0]['seasons']:'';
-                } else {
-                    $data['price'] = 0;
                 }
             } else {
                 if (isset($property->property->currentprice)) {
@@ -372,8 +370,6 @@ class Properties extends Model {
                 }
                 $return_data['price'] = number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:'')));
                 $return_data['seasons'] = isset($st_price[0]['seasons'])?$st_price[0]['seasons']:'';
-            } else {
-                $return_data['price'] = 0;
             }
         } else {
             if (isset($property->property->currentprice)) {
