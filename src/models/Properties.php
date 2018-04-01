@@ -360,7 +360,7 @@ class Properties extends Model {
                 foreach($property->property->rental_seasons as $seasons){
                     $st_price[]=['price'=>isset($seasons->new_price)?$seasons->new_price:'','period'=>isset($seasons->period)?$seasons->period:'','seasons'=>isset($seasons->seasons)?$seasons->seasons:''];
                 }
-                $return_data['price'] = number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:'')));
+                $return_data['price'] = ($st_price[0]['price']!=0)?number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:''))):'';
                 $return_data['seasons'] = isset($st_price[0]['seasons'])?$st_price[0]['seasons']:'';
             } 
              elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons)) {
@@ -368,12 +368,12 @@ class Properties extends Model {
                 foreach($property->property->period_seasons as $seasons){
                     $st_price[]=['price'=>isset($seasons->new_price)?$seasons->new_price:'','period'=>isset($seasons->period)?$seasons->period:'','seasons'=>isset($seasons->seasons)?$seasons->seasons:''];
                 }
-                $return_data['price'] = number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:'')));
+                $return_data['price'] = ($st_price[0]['price']!=0)?number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period'])?$st_price[0]['period']:''))):'';
                 $return_data['seasons'] = isset($st_price[0]['seasons'])?$st_price[0]['seasons']:'';
             }
         } else {
             if (isset($property->property->currentprice)) {
-                $return_data['price'] = number_format((int) $property->property->currentprice, 0, '', '.');
+                $return_data['price'] = ($property->property->currentprice!=0)?number_format((int) $property->property->currentprice, 0, '', '.'):'';
             }
         }
         if (isset($property->property->type_one)) {
