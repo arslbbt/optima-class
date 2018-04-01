@@ -72,6 +72,9 @@ class Properties extends Model {
                 $data['title'] = isset($property->property->type_one)?\Yii::t('app', strtolower($property->property->type_one)):\Yii::t('app', 'N/A') . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
+            if (isset($property->property->status)) {
+                $data['status'] = $property->property->status;
+            }
             if (isset($property->property->type_one)) {
                 $data['type'] = $property->property->type_one;
             }
