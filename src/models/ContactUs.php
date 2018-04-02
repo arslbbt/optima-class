@@ -44,10 +44,11 @@ class ContactUs extends Model {
     public $transaction_types;
     public $subscribe;
     public $booking_enquiry;
+    public $site;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'site'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -140,8 +141,8 @@ class ContactUs extends Model {
                     $call_rememeber = 'After 18:00';
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
-                        ->setTo('sirajulhaq363@gmail.com')
                         ->setSubject('Booking Enquiry')
                         ->setHtmlBody($html)
                         ->send();
@@ -176,22 +177,22 @@ class ContactUs extends Model {
     public function saveAccount() {
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == 0) {
-            $call_rememeber = '9:00 to 18:00';
+            $call_rememeber = 'call me back:  9:00 to 18:00';
         } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
-            $call_rememeber = 'After 18:00';
+            $call_rememeber = 'call me back: After 18:00';
         }
         if ($this->owner)
             $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
         else
             $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
         $fields = array(
-            'forename' => urlencode($this->first_name),
-            'surname' => urlencode($this->last_name),
-            'email' => urlencode($this->email),
+            'forename' => $this->first_name,
+            'surname' => $this->last_name,
+            'email' => $this->email,
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
-            'message' => urlencode($this->message),
-            'phone' => urlencode($this->phone),
+            'message' => $this->message,
+            'phone' => $this->phone,
             'property' => isset($this->reference) ? $this->reference : null,
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
