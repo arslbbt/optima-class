@@ -154,7 +154,7 @@ class Properties extends Model {
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 $attachments = [];
                 foreach ($property->attachments as $pic) {
-                    $attachments[] = Yii::$app->params['img_url'] . Yii::$app->params['agency'] . '&model_id=' . $pic->model_id . '&size=1200&name=' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
