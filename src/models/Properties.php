@@ -639,13 +639,15 @@ class Properties extends Model {
             if ($get["transaction"] == '6') {
                 $query .= '&rent=1&lt_rental=1';
             }
-//            if ($get["transaction"] == '2')
+            if ($get["transaction"] == '2') {
+                $query .= '&categories[]=repossession';
+            }
 
             if ($get["transaction"] == '3') {
                 $query .= '&new_construction=1';
             }
             if ($get["transaction"] == '4') {
-                $query .= '&sale=1';
+                $query .= '&categories[]=resale';
             }
         }
         if (isset($get['province']) && $get['province'] != '') {
