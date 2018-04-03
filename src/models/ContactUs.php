@@ -175,7 +175,7 @@ class ContactUs extends Model {
 
     public function saveAccount() {
         $call_rememeber = '';
-        if (isset($this->call_remember) && $this->call_remember == 0) {
+        if (isset($this->call_remember) && $this->call_remember == '9:00 to 18:00') {
             $call_rememeber = 'call me back:  9:00 to 18:00';
         } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
             $call_rememeber = 'call me back: After 18:00';
