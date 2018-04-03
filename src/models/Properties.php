@@ -647,7 +647,7 @@ class Properties extends Model {
                 $query .= '&new_construction=1';
             }
             if ($get["transaction"] == '4') {
-                $query .= '&categories[]=resale';
+                $query .= '&sale=1';
             }
         }
         if (isset($get['province']) && $get['province'] != '') {
@@ -805,6 +805,7 @@ class Properties extends Model {
                 $query .= '&orderby[]=bedrooms&orderby[]=ASC';
             }
         }
+        echo $query;
         return $query;
     }
 
