@@ -805,7 +805,6 @@ class Properties extends Model {
                 $query .= '&orderby[]=bedrooms&orderby[]=ASC';
             }
         }
-        echo $query;
         return $query;
     }
 
