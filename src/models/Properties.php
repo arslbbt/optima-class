@@ -628,6 +628,7 @@ class Properties extends Model {
          * transaction 4 = Resale
          * transaction 5 = short term rental
          * transaction 6 = long term rental
+         * transaction 7 = Resale in Categories
          */
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
@@ -648,6 +649,9 @@ class Properties extends Model {
             }
             if ($get["transaction"] == '4') {
                 $query .= '&sale=1';
+            }
+            if ($get["transaction"] == '7') {
+                $query .= '&categories[]=resale';
             }
         }
         if (isset($get['province']) && $get['province'] != '') {
