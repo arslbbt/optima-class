@@ -207,8 +207,8 @@ class ContactUs extends Model {
     public function saveSenderAccount() {
         $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
         $fields = array(
-            'sender_first_name' => isset($this->sender_first_name) ? $this->sender_first_name : '',
-            'sender_last_name' => isset($this->sender_last_name) ? $this->sender_last_name : '',
+            'forename' => isset($this->sender_first_name) ? $this->sender_first_name : '',
+            'surname' => isset($this->sender_last_name) ? $this->sender_last_name : '',
             'email' => isset($this->sender_email) ? $this->sender_email : '',
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
