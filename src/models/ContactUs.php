@@ -44,10 +44,14 @@ class ContactUs extends Model {
     public $transaction_types;
     public $subscribe;
     public $booking_enquiry;
+    public $sender_first_name;
+    public $sender_last_name;
+    public $sender_email;
+    public $sender_phone;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -93,6 +97,9 @@ class ContactUs extends Model {
                             ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
+                    $this->saveAccount();
+                    if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
+                    $this->saveSenderAccount();
                 }
             } else if (isset($this->subscribe) && $this->subscribe == 1) {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
@@ -109,27 +116,22 @@ class ContactUs extends Model {
                         ->send();
             } else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1) {
                 $html = '';
-                if(isset($this->first_name) && $this->first_name != '')
-                {
+                if (isset($this->first_name) && $this->first_name != '') {
                     $html .= 'First Name: ' . $this->first_name;
                 }
-                if(isset($this->last_name) && $this->last_name != '')
-                {
+                if (isset($this->last_name) && $this->last_name != '') {
                     $html .= '<br>';
                     $html .= 'Last Name : ' . $this->last_name;
                 }
-                if(isset($this->email) && $this->email != '')
-                {
+                if (isset($this->email) && $this->email != '') {
                     $html .= '<br>';
                     $html .= 'Email: ' . $this->email;
                 }
-                if(isset($this->guests) && $this->guests != '')
-                {
+                if (isset($this->guests) && $this->guests != '') {
                     $html .= '<br>';
                     $html .= 'Guests: ' . $this->guests;
                 }
-                if(isset($this->message) && $this->message != '')
-                {
+                if (isset($this->message) && $this->message != '') {
                     $html .= '<br>';
                     $html .= 'Message: ' . $this->message;
                 }
@@ -192,6 +194,26 @@ class ContactUs extends Model {
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
+            'property' => isset($this->reference) ? $this->reference : null,
+            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
+            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
+            'html_content' => isset($this->html_content) ? $this->html_content : '',
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
+        );
+        $curl = new \linslin\yii2\curl\Curl();
+        $response = $curl->setPostParams($fields)->post($url);
+    }
+
+    public function saveSenderAccount() {
+        $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
+        $fields = array(
+            'sender_first_name' => isset($this->sender_first_name) ? $this->sender_first_name : '',
+            'sender_last_name' => isset($this->sender_last_name) ? $this->sender_last_name : '',
+            'email' => isset($this->sender_email) ? $this->sender_email : '',
+            'source' => isset($this->source) ? $this->source : urlencode('web-client'),
+            'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
+            'message' => $this->message,
+            'phone' => isset($this->sender_phone) ? $this->sender_phone : '',
             'property' => isset($this->reference) ? $this->reference : null,
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
