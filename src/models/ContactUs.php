@@ -87,7 +87,7 @@ class ContactUs extends Model {
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
-                            ->setSubject('Fcs contact us email')
+                            ->setSubject('Web enquiry')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
                     Yii::$app->mailer->compose()
@@ -158,7 +158,7 @@ class ContactUs extends Model {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
-                        ->setSubject('Fcs contact us email')
+                        ->setSubject(isset($setting['email_response_subject'][0])?$setting['email_response_subject'][0]['key']:'Web enquiry')
                         ->send();
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
