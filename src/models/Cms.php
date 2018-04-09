@@ -194,7 +194,7 @@ class Cms extends Model
         $data = json_decode($file_data, TRUE);
 
         $lang = strtoupper(\Yii::$app->language);
-        $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'].'/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
         $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
@@ -273,7 +273,7 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data)
         {
-            $url = isset($data['featured_image'][$lang]['name']) ? 'https://my.optima-crm.com/uploads/cms_pages/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'].'/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
             $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
             if ($forRoutes == true)
             {
