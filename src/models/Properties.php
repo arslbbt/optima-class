@@ -758,6 +758,9 @@ class Properties extends Model {
         if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
             $query .= '&categories[]=reduced';
         }
+        if (isset($get["golf"]) && $get["golf"] != '' && $get["golf"]) {
+            $query .= '&categories[]=golf';
+        }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
             $query .= '&settings[]=close_to_sea';
         }
