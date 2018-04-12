@@ -305,7 +305,6 @@ class Properties extends Model {
         $attachments = [];
         $floor_plans = [];
         $booked_dates = [];
-        $distances = [];
 
         if (isset($property->property->_id)) {
             $return_data['_id'] = $property->property->_id;
@@ -354,6 +353,7 @@ class Properties extends Model {
         if (isset($property->property->currentprice)) {
             $return_data['currentprice'] = $property->property->currentprice;
         }
+
         if ($price == 'rent') {
             if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
                 $st_price=[];
@@ -600,27 +600,6 @@ class Properties extends Model {
                 }
             }
         }
-        if(isset($property->property->distance_airport) && $property->property->distance_airport > 0) {
-            $distances['distance_airport'] = $property->property->distance_airport;
-        }
-        if(isset($property->property->distance_beach) && $property->property->distance_beach > 0) {
-            $distances['distance_beach'] = $property->property->distance_beach;
-        }
-        if(isset($property->property->distance_golf) && $property->property->distance_golf > 0) {
-            $distances['distance_golf'] = $property->property->distance_golf;
-        }
-        if(isset($property->property->distance_restaurant) && $property->property->distance_restaurant > 0) {
-            $distances['distance_restaurant'] = $property->property->distance_restaurant;
-        }
-        if(isset($property->property->distance_sea) && $property->property->distance_sea > 0) {
-            $distances['distance_sea'] = $property->property->distance_sea;
-        }
-        if(isset($property->property->distance_supermarket) && $property->property->distance_supermarket > 0) {
-            $distances['distance_supermarket'] = $property->property->distance_supermarket;
-        }
-        if(isset($property->property->distance_next_town) && $property->property->distance_next_town > 0) {
-            $distances['distance_next_town'] = $property->property->distance_next_town;
-        }
         $return_data['property_features'] = [];
         $return_data['property_features']['features'] = $features;
         $return_data['property_features']['categories'] = $categories;
@@ -636,7 +615,6 @@ class Properties extends Model {
         $return_data['property_features']['pool'] = $pool;
         $return_data['property_features']['furniture'] = $furniture;
         $return_data['property_features']['condition'] = $condition;
-        $return_data['property_features']['distances'] = $distances;
         return $return_data;
     }
 
@@ -673,7 +651,7 @@ class Properties extends Model {
                 $query .= '&sale=1';
             }
             if ($get["transaction"] == '7') {
-                $query .= '&categories[]=resale';
+                $query .= '&not_new_construction=1';
             }
         }
         if (isset($get['province']) && $get['province'] != '') {
@@ -779,9 +757,6 @@ class Properties extends Model {
         }
         if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
             $query .= '&categories[]=reduced';
-        }
-        if (isset($get["golf"]) && $get["golf"] != '' && $get["golf"]) {
-            $query .= '&categories[]=golf';
         }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
             $query .= '&settings[]=close_to_sea';
