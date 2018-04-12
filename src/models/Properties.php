@@ -644,15 +644,15 @@ class Properties extends Model {
                 $query .= '&categories[]=repossession';
             }
 
-            if ($get["transaction"] == '3') {
+            if ($get["transaction"] == '3' || $get["transaction"] == '7') {
                 $query .= '&new_construction=1';
             }
             if ($get["transaction"] == '4') {
                 $query .= '&sale=1';
             }
-            if ($get["transaction"] == '7') {
-                $query .= '&categories[]=resale';
-            }
+            // if ($get["transaction"] == '7') {
+            //     $query .= '&categories[]=resale';
+            // }
         }
         if (isset($get['province']) && $get['province'] != '') {
             if (is_array($get["province"]) && count($get["province"])) {
