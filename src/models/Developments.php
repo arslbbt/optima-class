@@ -174,23 +174,7 @@ class Developments extends Model
     {
         $get = Yii::$app->request->get();
         $query = '';
-        /*
-         * transaction 1 = Rental
-         * transaction 2 = Bank repossessions
-         * transaction 3 = New homes
-         * transaction 4 = Resale
-         */
-        if (isset($get["transaction"]) && $get["transaction"] != "")
-        {
-            if ($get["transaction"] == '1')
-                $query .= '&rent=1';
-//            if ($get["transaction"] == '2')
 
-            if ($get["transaction"] == '3')
-                $query .= '&new_construction=1';
-            if ($get["transaction"] == '4')
-                $query .= '&sale=1';
-        }
         if (isset($get["province"]) && $get["province"] != "")
         {
             if (is_array($get["province"]) && count($get["province"]))
@@ -218,7 +202,7 @@ class Developments extends Model
             foreach ($get["type"] as $key => $value)
             {
                 if ($value != '')
-                    $query .= '&type_one[]=' . $value;
+                    $query .= '&type[]=' . $value;
             }
         }
         if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"]) > 0)
@@ -238,19 +222,19 @@ class Developments extends Model
         }
         if (isset($get["price_from"]) && $get["price_from"] != "")
         {
-            $query .= '&currentprice[]=' . $get["price_from"];
+            $query .= '&phase_low_price_from=' . $get["price_from"];
         }
-        if (isset($get["price_from"]) && $get["price_from"] == "" && $get["price_to"] != "")
+        if (isset($get["price_from"]) && $get["price_from"] == "" && isset($get["price_to"]) && $get["price_to"] != "")
         {
-            $query .= '&currentprice[]=0';
+            $query .= '&phase_low_price_from=0';
         }
         if (isset($get["price_to"]) && $get["price_to"] != "")
         {
-            $query .= '&currentprice[]=' . $get["price_to"];
+            $query .= '&phase_heigh_price_from=' . $get["price_to"];
         }
         if (isset($get["price_to"]) && $get["price_to"] == "" && $get["price_from"] != "")
         {
-            $query .= '&currentprice[]=100000000';
+            $query .= '&phase_heigh_price_from=100000000';
         }
         if (isset($get["orientation"]) && $get["orientation"] != "")
         {

@@ -190,14 +190,8 @@ class Dropdowns extends Model
                     'value' => str_replace(',', '.', (number_format((int) $value))) . ' €'
                 ];
             }
-            if ($value > 10000 && $value <50000 && $value % 10000 == 0) {
-                $data[] = [
-                    'key' => $value,
-                    'value' => str_replace(',', '.', (number_format((int) $value))) . ' €'
-                ];
-            }
-            if ($value > 25000 && $value % 25000 == 0) {
-
+            if ($value > 25000 && $value % 25000 == 0)
+            {
                 $data[] = [
                     'key' => $value,
                     'value' => str_replace(',', '.', (number_format((int) $value))) . ' €'

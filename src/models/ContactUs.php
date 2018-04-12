@@ -167,6 +167,8 @@ class ContactUs extends Model {
                         ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
+                if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
+                    $this->saveSenderAccount();
             }
 
             return true;
