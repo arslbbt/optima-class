@@ -651,7 +651,7 @@ class Properties extends Model {
                 $query .= '&sale=1';
             }
             if ($get["transaction"] == '7') {
-                $query .= '&categories[]=resale';
+                $query .= '&not_new_construction=1';
             }
         }
         if (isset($get['province']) && $get['province'] != '') {
@@ -757,9 +757,6 @@ class Properties extends Model {
         }
         if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
             $query .= '&categories[]=reduced';
-        }
-        if (isset($get["golf"]) && $get["golf"] != '' && $get["golf"]) {
-            $query .= '&categories[]=golf';
         }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
             $query .= '&settings[]=close_to_sea';
