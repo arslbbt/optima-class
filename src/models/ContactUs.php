@@ -176,7 +176,6 @@ class ContactUs extends Model {
                 $this->saveAccount();
                 if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
-                die;
             }
 
             return true;
