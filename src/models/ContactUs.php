@@ -148,6 +148,7 @@ class ContactUs extends Model {
                 } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
                     $call_rememeber = 'After 18:00';
                 }
+                
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
@@ -162,6 +163,12 @@ class ContactUs extends Model {
                         ->send();
                 $this->saveAccount();
             } else {
+                if(isset($settings['email_response'][strtoupper(\Yii::$app->language)])){
+                    $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
+                    if($this->reference != ''){
+                        $htmlBody = '<br>Enquiry about property (Ref : '. $this->reference . ')<br><br>'. $htmlBody;
+                    }
+                }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
@@ -171,13 +178,13 @@ class ContactUs extends Model {
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
                         ->setSubject('Thank you for contacting us')
-                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
+                        ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
                 if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
             }
-
+                
             return true;
         } else {
             return false;
