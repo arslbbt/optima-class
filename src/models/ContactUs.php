@@ -85,11 +85,10 @@ class ContactUs extends Model {
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf')) {
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                            ->setFrom(Yii::$app->params['from_email'])
-                            ->setTo($settings['general_settings']['admin_email'])
-                            ->setSubject('Web enquiry')
-                            ->attach($webroot . '/uploads/pdf/property.pdf')
-                            ->send();
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($settings['general_settings']['admin_email'])
+                        ->setSubject(isset($setting['email_response_subject'][0])?$setting['email_response_subject'][0]['key']:'Web enquiry')
+                        ->send();
                     Yii::$app->mailer->compose()
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($this->email)
@@ -99,7 +98,15 @@ class ContactUs extends Model {
                             ->send();
                     $this->saveAccount();
                     if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
-                    $this->saveSenderAccount();
+                    {
+                        Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setTo($this->sender_email)
+                        ->setSubject('Suggested property')
+                        ->attach($webroot . '/uploads/pdf/property.pdf')
+                        ->send();
+                        $this->saveSenderAccount();
+                    }                   
                 }
             } else if (isset($this->subscribe) && $this->subscribe == 1) {
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
@@ -169,6 +176,7 @@ class ContactUs extends Model {
                 $this->saveAccount();
                 if(isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
+                die;
             }
 
             return true;
