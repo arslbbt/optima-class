@@ -305,6 +305,7 @@ class Properties extends Model {
         $attachments = [];
         $floor_plans = [];
         $booked_dates = [];
+        $distances = [];
 
         if (isset($property->property->_id)) {
             $return_data['_id'] = $property->property->_id;
@@ -375,6 +376,9 @@ class Properties extends Model {
             if (isset($property->property->currentprice)) {
                 $return_data['price'] = ($property->property->currentprice!=0)?number_format((int) $property->property->currentprice, 0, '', '.'):'';
             }
+        }
+        if (isset($property->property->type_two)) {
+            $return_data['type_two'] = $property->property->type_two;
         }
         if (isset($property->property->type_one)) {
             $return_data['type'] = $property->property->type_one;
@@ -600,6 +604,27 @@ class Properties extends Model {
                 }
             }
         }
+        if(isset($property->property->distance_airport) && $property->property->distance_airport > 0) {
+            $distances['distance_airport'] = $property->property->distance_airport;
+        }
+        if(isset($property->property->distance_beach) && $property->property->distance_beach > 0) {
+            $distances['distance_beach'] = $property->property->distance_beach;
+        }
+        if(isset($property->property->distance_golf) && $property->property->distance_golf > 0) {
+            $distances['distance_golf'] = $property->property->distance_golf;
+        }
+        if(isset($property->property->distance_restaurant) && $property->property->distance_restaurant > 0) {
+            $distances['distance_restaurant'] = $property->property->distance_restaurant;
+        }
+        if(isset($property->property->distance_sea) && $property->property->distance_sea > 0) {
+            $distances['distance_sea'] = $property->property->distance_sea;
+        }
+        if(isset($property->property->distance_supermarket) && $property->property->distance_supermarket > 0) {
+            $distances['distance_supermarket'] = $property->property->distance_supermarket;
+        }
+        if(isset($property->property->distance_next_town) && $property->property->distance_next_town > 0) {
+            $distances['distance_next_town'] = $property->property->distance_next_town;
+        }
         $return_data['property_features'] = [];
         $return_data['property_features']['features'] = $features;
         $return_data['property_features']['categories'] = $categories;
@@ -615,6 +640,7 @@ class Properties extends Model {
         $return_data['property_features']['pool'] = $pool;
         $return_data['property_features']['furniture'] = $furniture;
         $return_data['property_features']['condition'] = $condition;
+        $return_data['property_features']['distances'] = $distances;
         return $return_data;
     }
 
@@ -678,6 +704,13 @@ class Properties extends Model {
             foreach ($get["type"] as $key => $value) {
                 if ($value != '') {
                     $query .= '&type_one[]=' . $value;
+                }
+            }
+        }
+        if (isset($get["type2"]) && is_array($get["type2"]) && $get["type2"] != "") {
+            foreach ($get["type2"] as $key => $value) {
+                if ($value != '') {
+                    $query .= '&type_two[]=' . $value;
                 }
             }
         }
