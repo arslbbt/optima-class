@@ -70,7 +70,7 @@ class ContactUs extends Model {
      */
     public function attributeLabels() {
         return [
-            'verifyCode' => 'Verification Code',
+            'verifyCode' => Yii::t('app', strtolower('Verification Code')),
             'first_name' => Yii::t('app', strtolower('First Name')),
             'last_name' => Yii::t('app', strtolower('Last Name')),
             'email' => Yii::t('app', strtolower('Email')),
