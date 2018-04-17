@@ -56,7 +56,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function menu($name)
+    public static function menu($name,$getUrlsFromPage=true)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -78,7 +78,7 @@ class Cms extends Model
         $finalData = [];
         foreach ($items as $data)
         {
-            if (isset($data['item']['id']['oid']))
+            if (isset($data['item']['id']['oid']) && $getUrlsFromPage)
             {
                 $pageData = self::pageBySlug(null, 'EN', $data['item']['id']['oid']);
                 $data['item']['slug'] = $pageData['slug_all'];
@@ -86,8 +86,10 @@ class Cms extends Model
                 {
                     foreach ($data['children'] as $key => $ch)
                     {
-                        $pageData = self::pageBySlug(null, 'EN', $ch['item']['id']['oid']);
-                        $data['children'][$key]['item']['slug'] = $pageData['slug_all'];
+                        if(isset($ch['item']['id']['oid'])){
+                            $pageData = self::pageBySlug(null, 'EN', $ch['item']['id']['oid']);
+                            $data['children'][$key]['item']['slug'] = $pageData['slug_all'];
+                        }
                     }
                 }
                 $finalData[] = $data;
