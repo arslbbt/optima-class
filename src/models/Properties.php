@@ -873,7 +873,7 @@ class Properties extends Model {
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . $id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
             file_put_contents($file, $file_data);
         }
         else
