@@ -534,32 +534,44 @@ class Properties extends Model {
             foreach ($property->property->videos as $video) {
                 if ($lang == 'EN') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->EN) && $video->url->EN != '') {
-                        $videosArr_gogo[] = $video->url->EN;
+                        if (filter_var($video->url->EN, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->EN;
+                        }
                     }
                 }
                 if ($lang == 'ES') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->ES) && $video->url->ES != '') {
-                        $videosArr_gogo[] = $video->url->ES;
+                        if (filter_var($video->url->ES, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->ES;
+                        }
                     }
                 }
                 if ($lang == 'DE') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->Duits) && $video->url->Duits != '') {
-                        $videosArr_gogo[] = $video->url->Duits;
+                        if (filter_var($video->url->Duits, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->Duits;
+                        }
                     }
                 }
                 if ($lang == 'FR') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->Frans) && $video->url->Frans != '') {
-                        $videosArr_gogo[] = $video->url->Frans;
+                        if (filter_var($video->url->Frans, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->Frans;
+                        }
                     }
                 }
                 if ($lang == 'NL') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->Nederlands) && $video->url->Nederlands != '') {
-                        $videosArr_gogo[] = $video->url->Nederlands;
+                        if (filter_var($video->url->Nederlands, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->Nederlands;
+                        }
                     }
                 }
                 if ($lang == 'RU') {
                     if (isset($video->status) && $video->status == 1 && isset($video->url->RUC) && $video->url->RUC != '') {
-                        $videosArr_gogo[] = $video->url->RUC;
+                        if (filter_var($video->url->RUC, FILTER_VALIDATE_URL)) {
+                            $videosArr_gogo[] = $video->url->RUC;
+                        }
                     }
                 }
                 if (isset($video->status) && $video->status == 1 && isset($video->url->$lang) && $video->url->$lang != '') {
