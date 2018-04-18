@@ -315,7 +315,6 @@ class Properties extends Model {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
-
         $settings = Cms::settings();
 
         $return_data = [];
@@ -499,14 +498,76 @@ class Properties extends Model {
             }
             $return_data['booked_dates'] = $booked_dates;
         }
+        if ($lang == 'EN') {
+            if (isset($property->property->description->ES)) {
+                $return_data['description_gogo'] = $property->property->description->ES;
+            }
+        }
+        if ($lang == 'DE') {
+            if (isset($property->property->description->Duits)) {
+                $return_data['description_gogo'] = $property->property->description->Duits;
+            }
+        }
+        if ($lang == 'NL') {
+            if (isset($property->property->description->Nederlands)) {
+                $return_data['description_gogo'] = $property->property->description->Nederlands;
+            }
+        }
+        if ($lang == 'FR') {
+            if (isset($property->property->description->Frans)) {
+                $return_data['description_gogo'] = $property->property->description->Frans;
+            }
+        }
+        if ($lang == 'RU') {
+            if (isset($property->property->description->RUC)) {
+                $return_data['description_gogo'] = $property->property->description->RUC;
+            }
+        }
+        if ($lang == 'ES') {
+            if (isset($property->property->description->ES)) {
+                $return_data['description_gogo'] = $property->property->description->ES;
+            }
+        }
         if (isset($property->property->videos) && count($property->property->videos) > 0 && (is_array($property->property->videos) || is_object($property->property->videos))) {
             $videosArr = [];
+            $videosArr_gogo = [];
             foreach ($property->property->videos as $video) {
+                if ($lang == 'EN') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->EN) && $video->url->EN != '') {
+                        $videosArr_gogo[] = $video->url->EN;
+                    }
+                }
+                if ($lang == 'ES') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->ES) && $video->url->ES != '') {
+                        $videosArr_gogo[] = $video->url->ES;
+                    }
+                }
+                if ($lang == 'DE') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->Duits) && $video->url->Duits != '') {
+                        $videosArr_gogo[] = $video->url->Duits;
+                    }
+                }
+                if ($lang == 'FR') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->Frans) && $video->url->Frans != '') {
+                        $videosArr_gogo[] = $video->url->Frans;
+                    }
+                }
+                if ($lang == 'NL') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->Nederlands) && $video->url->Nederlands != '') {
+                        $videosArr_gogo[] = $video->url->Nederlands;
+                    }
+                }
+                if ($lang == 'RU') {
+                    if (isset($video->status) && $video->status == 1 && isset($video->url->RUC) && $video->url->RUC != '') {
+                        $videosArr_gogo[] = $video->url->RUC;
+                    }
+                }
                 if (isset($video->status) && $video->status == 1 && isset($video->url->$lang) && $video->url->$lang != '') {
                     $videosArr[] = $video->url->$lang;
                 }
             }
             $return_data['videos'] = $videosArr;
+            $return_data['videos_gogo'] = $videosArr_gogo;
         }
         $categories = [];
         $features = [];
