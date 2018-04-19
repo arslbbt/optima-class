@@ -499,8 +499,8 @@ class Properties extends Model {
             $return_data['booked_dates'] = $booked_dates;
         }
         if ($lang == 'EN') {
-            if (isset($property->property->description->ES)) {
-                $return_data['description_gogo'] = $property->property->description->ES;
+            if (isset($property->property->description->EN)) {
+                $return_data['description_gogo'] = $property->property->description->EN;
             }
         }
         if ($lang == 'DE') {
