@@ -502,30 +502,60 @@ class Properties extends Model {
             if (isset($property->property->description->EN)) {
                 $return_data['description_gogo'] = $property->property->description->EN;
             }
+            if (isset($property->property->title->EN)) {
+                $return_data['title_gogo'] = $property->property->title->EN;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            }
         }
         if ($lang == 'DE') {
             if (isset($property->property->description->Duits)) {
                 $return_data['description_gogo'] = $property->property->description->Duits;
+            }
+            if (isset($property->property->title->Duits)) {
+                $return_data['title_gogo'] = $property->property->title->Duits;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
         }
         if ($lang == 'NL') {
             if (isset($property->property->description->Nederlands)) {
                 $return_data['description_gogo'] = $property->property->description->Nederlands;
             }
+            if (isset($property->property->title->Nederlands)) {
+                $return_data['title_gogo'] = $property->property->title->Nederlands;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            }
         }
         if ($lang == 'FR') {
             if (isset($property->property->description->Frans)) {
                 $return_data['description_gogo'] = $property->property->description->Frans;
+            }
+            if (isset($property->property->title->Frans)) {
+                $return_data['title_gogo'] = $property->property->title->Frans;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
         }
         if ($lang == 'RU') {
             if (isset($property->property->description->RUC)) {
                 $return_data['description_gogo'] = $property->property->description->RUC;
             }
+            if (isset($property->property->title->RUC)) {
+                $return_data['title_gogo'] = $property->property->title->RUC;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            }
         }
         if ($lang == 'ES') {
             if (isset($property->property->description->ES)) {
                 $return_data['description_gogo'] = $property->property->description->ES;
+            }
+            if (isset($property->property->title->ES)) {
+                $return_data['title_gogo'] = $property->property->title->ES;
+            } else {
+                $return_data['title_gogo'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
         }
         if (isset($property->property->videos) && count($property->property->videos) > 0 && (is_array($property->property->videos) || is_object($property->property->videos))) {
