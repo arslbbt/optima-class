@@ -48,10 +48,11 @@ class ContactUs extends Model {
     public $sender_last_name;
     public $sender_email;
     public $sender_phone;
+    public $assigned_to;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -70,7 +71,7 @@ class ContactUs extends Model {
      */
     public function attributeLabels() {
         return [
-            'verifyCode' => 'Verification Code',
+            'verifyCode' => Yii::t('app', strtolower('Verification Code')),
             'first_name' => Yii::t('app', strtolower('First Name')),
             'last_name' => Yii::t('app', strtolower('Last Name')),
             'email' => Yii::t('app', strtolower('Email')),
@@ -211,6 +212,7 @@ class ContactUs extends Model {
             'message' => $this->message,
             'phone' => $this->phone,
             'property' => isset($this->reference) ? $this->reference : null,
+            'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',

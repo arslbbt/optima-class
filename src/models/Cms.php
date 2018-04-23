@@ -181,7 +181,6 @@ class Cms extends Model
         }
         return json_decode($file_data, TRUE);
     }
-
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page')
     {
         $webroot = Yii::getAlias('@webroot');
