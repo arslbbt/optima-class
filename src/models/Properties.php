@@ -357,6 +357,9 @@ class Properties extends Model {
         } else {
             $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
         }
+        if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
+            $return_data['slug'] = $property->property->$title->$contentLang;
+        }
         if (isset($property->property->listing_agent)) {
             $return_data['listing_agent'] = $property->property->listing_agent;
         }
