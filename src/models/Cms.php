@@ -162,6 +162,26 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
+    public static function Categories()
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/categories.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/categories&user=' . Yii::$app->params['user'] . '&name=gogo');
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
+
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page')
     {
         $webroot = Yii::getAlias('@webroot');
@@ -250,7 +270,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower($name)) . str_replace(' ', '_', strtolower($category)) . '.json';
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
         $query = '&post_type=' . $name;
         if ($name == 'page')
             $query .= '&page-size=false';
@@ -334,5 +354,10 @@ class Cms extends Model
         }
         return $file_data;
     }
-
+    public static function clean($string) {
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+     
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+     }
+     
 }
