@@ -312,7 +312,7 @@ class Properties extends Model {
         $contentLang=$lang;
         foreach($langugesSystem as $sysLang){
             if((isset($sysLang['internal_key']) && $sysLang['internal_key']!='') && $lang==$sysLang['internal_key']){
-                $contentLang= $sysLang['internal_key'];
+                $contentLang= $sysLang['key'];
             }
         }
         $ref = $reference;
