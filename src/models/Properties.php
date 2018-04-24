@@ -352,6 +352,14 @@ class Properties extends Model {
             $description = 'rental_description';
             $price = 'rent';
         }
+        foreach($property->property->$title as $key=> $title){
+            foreach($langugesSystem as $sysLang){
+                if($key==$sysLang['key']){
+                  $slugs[$sysLang['internal_key']]= $title;  
+                }
+            }
+        }
+        $return_data['slug_all'] = $slugs;
         if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
             $return_data['title'] = $property->property->$title->$contentLang;
         } else {
