@@ -352,16 +352,26 @@ class Properties extends Model {
             $description = 'rental_description';
             $price = 'rent';
         }
-        foreach ($property->property->$title as $key => $title) {
-            foreach ($langugesSystem as $sysLang) {
-                if ($key == $sysLang['key'] && $title != '') {
-                    $slugs[$sysLang['internal_key']] = $title;
-                } else {
-                    if(isset($property->property->type_one) && $property->property->type_one != '')
-                    $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if(isset($property->property->location) && $property->property->location != '')
-                    $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
+        if (isset($property->property->$title)) {
+            foreach ($property->property->$title as $key => $title) {
+                foreach ($langugesSystem as $sysLang) {
+                    if ($key == $sysLang['key'] && $title != '') {
+                        $slugs[$sysLang['internal_key']] = $title;
+                    } else {
+                        if (isset($property->property->type_one) && $property->property->type_one != '')
+                            $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
+                        if (isset($property->property->location) && $property->property->location != '')
+                            $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
+                    }
                 }
+            }
+        }
+        else {
+            foreach ($langugesSystem as $sysLang) {
+                if (isset($property->property->type_one) && $property->property->type_one != '')
+                    $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
+                if (isset($property->property->location) && $property->property->location != '')
+                    $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
             }
         }
         $return_data['slug_all'] = $slugs;
