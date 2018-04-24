@@ -307,16 +307,16 @@ class Properties extends Model {
     }
 
     public static function findOne($reference, $with_booking = false) {
-        $langugesSystem=Cms::SystemLanguages();
+        $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
-        $contentLang=$lang;
-        foreach($langugesSystem as $sysLang){
-            if((isset($sysLang['internal_key']) && $sysLang['internal_key']!='') && $lang==$sysLang['internal_key']){
-                $contentLang= $sysLang['key'];
+        $contentLang = $lang;
+        foreach ($langugesSystem as $sysLang) {
+            if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
+                $contentLang = $sysLang['key'];
             }
         }
         $ref = $reference;
-        
+
         if (isset($with_booking) && $with_booking == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         } else
@@ -352,10 +352,15 @@ class Properties extends Model {
             $description = 'rental_description';
             $price = 'rent';
         }
-        foreach($property->property->$title as $key=> $title){
-            foreach($langugesSystem as $sysLang){
-                if($key==$sysLang['key']){
-                  $slugs[$sysLang['internal_key']]= $title;  
+        foreach ($property->property->$title as $key => $title) {
+            foreach ($langugesSystem as $sysLang) {
+                if ($key == $sysLang['key'] && $title != '') {
+                    $slugs[$sysLang['internal_key']] = $title;
+                } else {
+                    if(isset($property->property->type_one) && $property->property->type_one != '')
+                    $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
+                    if(isset($property->property->location) && $property->property->location != '')
+                    $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
                 }
             }
         }
