@@ -517,7 +517,7 @@ class Properties extends Model {
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
-                    $floor_plans[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                    $floor_plans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
