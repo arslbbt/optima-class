@@ -353,15 +353,10 @@ class Properties extends Model {
             $price = 'rent';
         }
         if (isset($property->property->$title)) {
-            foreach ($property->property->$title as $key => $title) {
+            foreach ($property->property->$title as $key => $value) {
                 foreach ($langugesSystem as $sysLang) {
-                    if ($key == $sysLang['key'] && $title != '') {
-                        $slugs[$sysLang['internal_key']] = $title;
-                    } else {
-                        if (isset($property->property->type_one) && $property->property->type_one != '')
-                            $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
-                        if (isset($property->property->location) && $property->property->location != '')
-                            $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
+                    if ($key == $sysLang['key'] && $value != '') {
+                        $slugs[$sysLang['internal_key']] = $value;
                     }
                 }
             }
