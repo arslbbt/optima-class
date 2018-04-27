@@ -352,23 +352,22 @@ class Properties extends Model {
             $description = 'rental_description';
             $price = 'rent';
         }
-        if (isset($property->property->$title)) {
-            foreach ($property->property->$title as $key => $value) {
-                foreach ($langugesSystem as $sysLang) {
-                    if ($key == $sysLang['key'] && $value != '') {
-                        $slugs[$sysLang['internal_key']] = $value;
-                    }
-                }
-            }
-        }
-        else {
-            foreach ($langugesSystem as $sysLang) {
+//        start slug_all
+        foreach ($langugesSystem as $lang_sys) {
+            $lang_sys_key = $lang_sys['key'];
+            $lang_sys_internal_key = $lang_sys['internal_key'];
+            if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+            } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
+            } else {
                 if (isset($property->property->type_one) && $property->property->type_one != '')
-                    $slugs[$sysLang['internal_key']] = $property->property->type_one . ' ' . 'in' . ' ';
+                    $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
                 if (isset($property->property->location) && $property->property->location != '')
-                    $slugs[$sysLang['internal_key']] = $slugs[$sysLang['internal_key']] . $property->property->location;
+                    $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
             }
         }
+//        end slug_all
         $return_data['slug_all'] = $slugs;
         if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
             $return_data['title'] = $property->property->$title->$contentLang;
@@ -512,8 +511,8 @@ class Properties extends Model {
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
-                    if(isset(Yii::$app->params['floor_plans_url']))
-                    $floor_plans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                    if (isset(Yii::$app->params['floor_plans_url']))
+                        $floor_plans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
