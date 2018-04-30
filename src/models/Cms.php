@@ -338,6 +338,7 @@ class Cms extends Model
             $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
             $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
             $array['custom_settings'] = isset($data['custom_settings']) ? $data['custom_settings'] : '';
+            $array['categories'] = isset($data['categories']) ? $data['categories'] : [];
             $retdata[] = $array;
         }
         return $retdata;
