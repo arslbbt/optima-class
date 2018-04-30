@@ -56,7 +56,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function menu($name,$getUrlsFromPage=true)
+    public static function menu($name, $getUrlsFromPage = true)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -76,27 +76,31 @@ class Cms extends Model
         $dataArr = json_decode($file_data, TRUE);
         $items = $dataArr['menu_items'];
         $finalData = [];
-        foreach ($items as $data)
+        if ($items)
         {
-            if (isset($data['item']['id']['oid']) && $getUrlsFromPage)
+            foreach ($items as $data)
             {
-                $pageData = self::pageBySlug(null, 'EN', $data['item']['id']['oid']);
-                $data['item']['slug'] = $pageData['slug_all'];
-                if (isset($data['children']))
+                if (isset($data['item']['id']['oid']) && $getUrlsFromPage)
                 {
-                    foreach ($data['children'] as $key => $ch)
+                    $pageData = self::pageBySlug(null, 'EN', $data['item']['id']['oid']);
+                    $data['item']['slug'] = $pageData['slug_all'];
+                    if (isset($data['children']))
                     {
-                        if(isset($ch['item']['id']['oid'])){
-                            $pageData = self::pageBySlug(null, 'EN', $ch['item']['id']['oid']);
-                            $data['children'][$key]['item']['slug'] = $pageData['slug_all'];
+                        foreach ($data['children'] as $key => $ch)
+                        {
+                            if (isset($ch['item']['id']['oid']))
+                            {
+                                $pageData = self::pageBySlug(null, 'EN', $ch['item']['id']['oid']);
+                                $data['children'][$key]['item']['slug'] = $pageData['slug_all'];
+                            }
                         }
                     }
+                    $finalData[] = $data;
                 }
-                $finalData[] = $data;
-            }
-            else
-            {
-                $finalData[] = $data;
+                else
+                {
+                    $finalData[] = $data;
+                }
             }
         }
         $dataArr['menu_items'] = $finalData;
@@ -161,6 +165,7 @@ class Cms extends Model
         }
         return json_decode($file_data, TRUE);
     }
+
     public static function SystemLanguages()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -180,6 +185,7 @@ class Cms extends Model
         }
         return json_decode($file_data, TRUE);
     }
+
     public static function Categories()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -199,6 +205,7 @@ class Cms extends Model
         }
         return json_decode($file_data, TRUE);
     }
+
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page')
     {
         $webroot = Yii::getAlias('@webroot');
@@ -233,7 +240,7 @@ class Cms extends Model
         $data = json_decode($file_data, TRUE);
 
         $lang = strtoupper(\Yii::$app->language);
-        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'].'/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
         $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
@@ -248,6 +255,7 @@ class Cms extends Model
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
         ];
     }
+
     public static function Slugs($name)
     {
         $webroot = Yii::getAlias('@webroot');
@@ -256,7 +264,7 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $url=Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'];
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents($url);
@@ -312,7 +320,7 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data)
         {
-            $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'].'/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
             $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
             if ($forRoutes == true)
             {
@@ -371,10 +379,12 @@ class Cms extends Model
         }
         return $file_data;
     }
-    public static function clean($string) {
+
+    public static function clean($string)
+    {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-     
+
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-     }
-     
+    }
+
 }
