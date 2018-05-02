@@ -779,6 +779,13 @@ class Properties extends Model {
                 }
             }
         }
+        if (isset($get["style"]) && is_array($get["style"]) && $get["style"] != "") {
+            foreach ($get["style"] as $key => $value) {
+                if ($value != '') {
+                    $query .= '&p_style[]=' . $value;
+                }
+            }
+        }
         if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"]) > 0) {
             foreach ($get["location_group"] as $key => $value) {
                 $query .= '&location_group[]=' . $value;
@@ -855,6 +862,9 @@ class Properties extends Model {
         }
         if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
             $query .= '&categories[]=reduced';
+        }
+        if (isset($get["golf"]) && $get["golf"] != '' && $get["golf"]) {
+            $query .= '&categories[]=golf';
         }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
             $query .= '&settings[]=close_to_sea';
