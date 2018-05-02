@@ -15,6 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
+        $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
@@ -168,6 +169,23 @@ class Properties extends Model {
             if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
+            //        start slug_all
+        foreach ($langugesSystem as $lang_sys) {
+            $lang_sys_key = $lang_sys['key'];
+            $lang_sys_internal_key = $lang_sys['internal_key'];
+            if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+            } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
+            } else {
+                if (isset($property->property->type_one) && $property->property->type_one != '')
+                    $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
+                if (isset($property->property->location) && $property->property->location != '')
+                    $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
+            }
+        }
+//        end slug_all
+        $data['slug_all'] = $slugs;
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 $attachments = [];
                 foreach ($property->attachments as $pic) {
