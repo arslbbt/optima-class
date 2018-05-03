@@ -169,6 +169,10 @@ class Properties extends Model {
             if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
+            if(isset($property->property->updated_at) && $property->property->updated_at != '')
+            {
+                $data['updated_at'] = $property->property->updated_at;
+            }
             $title = 'title';
             //        start slug_all
         foreach ($langugesSystem as $lang_sys) {
