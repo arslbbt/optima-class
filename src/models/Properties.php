@@ -154,7 +154,7 @@ class Properties extends Model {
                     foreach ($property->property->rental_seasons as $seasons) {
                         $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                     }
-                    $data['stprice'] = ($st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 }
             }
             if (isset($property->property->built) && $property->property->built > 0) {
@@ -177,7 +177,7 @@ class Properties extends Model {
             //        start slug_all
         foreach ($langugesSystem as $lang_sys) {
             $lang_sys_key = $lang_sys['key'];
-            $lang_sys_internal_key = $lang_sys['internal_key'];
+            $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
             if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '') {
                 $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
             } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
