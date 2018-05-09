@@ -15,6 +15,7 @@ use optima\models\Cms;
 class Properties extends Model {
 
     public static function findAll($query) {
+        $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
@@ -153,7 +154,7 @@ class Properties extends Model {
                     foreach ($property->property->rental_seasons as $seasons) {
                         $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                     }
-                    $data['stprice'] = ($st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 }
             }
             if (isset($property->property->built) && $property->property->built > 0) {
@@ -168,6 +169,28 @@ class Properties extends Model {
             if (isset($property->property->terrace) && count($property->property->terrace) > 0 && isset($property->property->terrace->value) && $property->property->terrace->value > 0) {
                 $data['terrace'] = $property->property->terrace->value;
             }
+            if(isset($property->property->updated_at) && $property->property->updated_at != '')
+            {
+                $data['updated_at'] = $property->property->updated_at;
+            }
+            $title = 'title';
+            //        start slug_all
+        foreach ($langugesSystem as $lang_sys) {
+            $lang_sys_key = $lang_sys['key'];
+            $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
+            if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+            } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
+                $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
+            } else {
+                if (isset($property->property->type_one) && $property->property->type_one != '')
+                    $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
+                if (isset($property->property->location) && $property->property->location != '')
+                    $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
+            }
+        }
+//        end slug_all
+        $data['slug_all'] = $slugs;
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 $attachments = [];
                 foreach ($property->attachments as $pic) {
@@ -760,6 +783,13 @@ class Properties extends Model {
                 }
             }
         }
+        if (isset($get["style"]) && is_array($get["style"]) && $get["style"] != "") {
+            foreach ($get["style"] as $key => $value) {
+                if ($value != '') {
+                    $query .= '&p_style[]=' . $value;
+                }
+            }
+        }
         if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"]) > 0) {
             foreach ($get["location_group"] as $key => $value) {
                 $query .= '&location_group[]=' . $value;
@@ -836,6 +866,9 @@ class Properties extends Model {
         }
         if (isset($get["price_reduced"]) && $get["price_reduced"] != '' && $get["price_reduced"]) {
             $query .= '&categories[]=reduced';
+        }
+        if (isset($get["golf"]) && $get["golf"] != '' && $get["golf"]) {
+            $query .= '&categories[]=golf';
         }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"]) {
             $query .= '&settings[]=close_to_sea';
