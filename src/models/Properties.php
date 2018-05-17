@@ -140,9 +140,9 @@ class Properties extends Model {
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
             }
-            if (isset($property->property->sale) && $property->property->sale == 1) {
+            if (isset($property->property->sale) && $property->property->sale == 1 || isset($property->property->transfer) && $property->property->transfer == 1) {
                 if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
-                    $data['saleprice'] = $property->property->currentprice;
+                    $data['saleprice'] = str_replace(',', '.', (number_format((int) ($property->property->currentprice))));
                 }
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
