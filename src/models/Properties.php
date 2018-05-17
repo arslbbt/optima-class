@@ -174,7 +174,7 @@ class Properties extends Model {
                 $data['updated_at'] = $property->property->updated_at;
             }
             $title = 'title';
-            //        start slug_all
+            $slugs=[];
         foreach ($langugesSystem as $lang_sys) {
             $lang_sys_key = $lang_sys['key'];
             $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
@@ -183,9 +183,9 @@ class Properties extends Model {
             } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
                 $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
             } else {
-                if (isset($property->property->type_one) && $property->property->type_one != '')
+                if (isset($slugs[$lang_sys_internal_key]) && isset($property->property->type_one) && $property->property->type_one != '')
                     $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                if (isset($property->property->location) && $property->property->location != '')
+                if (isset($slugs[$lang_sys_internal_key]) && isset($property->property->location) && $property->property->location != '')
                     $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
             }
         }
