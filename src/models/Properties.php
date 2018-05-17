@@ -919,6 +919,8 @@ class Properties extends Model {
                 $query .= '&orderby[]=bedrooms&orderby[]=DESC';
             } elseif ($get['orderby'] == 'bedsASC') {
                 $query .= '&orderby[]=bedrooms&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'statusDESC') {
+                $query .= '&orderby[]=status&orderby[]=DESC';
             }
         }
         return $query;

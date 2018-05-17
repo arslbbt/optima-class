@@ -4,6 +4,7 @@ namespace optima\models;
 
 use Yii;
 use yii\base\Model;
+use optima\models\Cms;
 
 /**
  * LoginForm is the model behind the login form.
@@ -17,6 +18,7 @@ class Developments extends Model
     public static function findAll($query)
     {
         $lang = \Yii::$app->language;
+        $langugesSystem = Cms::SystemLanguages();
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -27,7 +29,8 @@ class Developments extends Model
         {
             $data = [];
             $features = [];
-            if (isset($property->total_properties)) {
+            if (isset($property->total_properties))
+            {
                 $data['total_properties'] = $property->total_properties;
             }
             if (isset($property->property->reference) && $property->property->reference != '')
@@ -54,7 +57,22 @@ class Developments extends Model
                 }
                 $data['attachments'] = $attachments;
             }
-
+//        start slug_all
+            foreach ($langugesSystem as $lang_sys)
+            {
+                $lang_sys_key = $lang_sys['key'];
+                $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
+                if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
+                {
+                    $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+                }
+                else if (isset($property->property->title->$lang_sys_key) && $property->property->title->$lang_sys_key != '')
+                {
+                    $slugs[$lang_sys_internal_key] = $property->property->title->$lang_sys_key;
+                }
+            }
+//        end slug_all
+            $data['slug_all'] = $slugs;
             $return_data[] = $data;
         }
 
@@ -63,6 +81,7 @@ class Developments extends Model
 
     public static function findOne($reference)
     {
+        $langugesSystem = Cms::SystemLanguages();
         $ref = $reference;
         $lang = \Yii::$app->language;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
@@ -85,12 +104,14 @@ class Developments extends Model
 
         if (isset($property->property->description->$lang))
             $return_data['description'] = $property->property->description->$lang;
-        if((isset($property->property->alternative_latitude) && $property->property->alternative_latitude!='') && (isset($property->property->alternative_longitude) && $property->property->alternative_longitude!='')){
+        if ((isset($property->property->alternative_latitude) && $property->property->alternative_latitude != '') && (isset($property->property->alternative_longitude) && $property->property->alternative_longitude != ''))
+        {
             if (isset($property->property->alternative_latitude))
                 $return_data['lat'] = $property->property->alternative_latitude;
             if (isset($property->property->alternative_longitude))
                 $return_data['lng'] = $property->property->alternative_longitude;
-        }else{
+        }else
+        {
             if (isset($property->property->latitude))
                 $return_data['lat'] = $property->property->latitude;
             if (isset($property->property->longitude))
@@ -105,39 +126,43 @@ class Developments extends Model
             $return_data['attachments'] = $attachments;
         }
 
-            $features=[];
-            $setting=[];
-            $views=[];
-            if (isset($property->property->setting) && count($property->property->setting) > 0)
+        $features = [];
+        $setting = [];
+        $views = [];
+        if (isset($property->property->setting) && count($property->property->setting) > 0)
+        {
+            foreach ($property->property->setting as $key => $value)
             {
-                foreach ($property->property->setting as $key => $value)
-                {
-                    if ($value == true)
-                        $setting[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $setting[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->views) && count($property->property->views) > 0)
+        }
+        if (isset($property->property->views) && count($property->property->views) > 0)
+        {
+            foreach ($property->property->views as $key => $value)
             {
-                foreach ($property->property->views as $key => $value)
-                {
-                    if ($value == true)
-                        $views[] = ucfirst(str_replace('_', ' ', $key));
-                }
+                if ($value == true)
+                    $views[] = ucfirst(str_replace('_', ' ', $key));
             }
-            if (isset($property->property->general_features) && count($property->property->general_features) > 0)
+        }
+        if (isset($property->property->general_features) && count($property->property->general_features) > 0)
+        {
+            foreach ($property->property->general_features as $key => $value)
             {
-                foreach ($property->property->general_features as $key => $value)
+                if ($key == 'furniture' && $value != 'No')
                 {
-                    if ($key == 'furniture' && $value!='No'){
-                        $features[] =\Yii::t('app','furniture').': '.\Yii::t('app',$value);
-                    }else{
+                    $features[] = \Yii::t('app', 'furniture') . ': ' . \Yii::t('app', $value);
+                }
+                else
+                {
                     if ($key == true && $key != 'furniture')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
-                    }
                 }
             }
-            $properties=[];
-            foreach ($property->properties as $key => $value) {
+        }
+        $properties = [];
+        foreach ($property->properties as $key => $value)
+        {
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
             if (isset($value->property->type_one))
@@ -150,23 +175,39 @@ class Developments extends Model
                 $data['title'] = $value->property->title->$lang;
             else if (isset($value->property->location))
                 $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
-                if (isset($value->attachments) && count($value->attachments) > 0)
+            if (isset($value->attachments) && count($value->attachments) > 0)
+            {
+                $attachments = [];
+                foreach ($value->attachments as $pic)
                 {
-                    $attachments = [];
-                    foreach ($value->attachments as $pic)
-                    {
-                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
-                    }
-                    $data['attachments'] = $attachments;
+                    $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 }
-                $properties[]=$data;
+                $data['attachments'] = $attachments;
             }
-
-            $return_data['property_features']=[];
-            $return_data['property_features']['features'] = $features;
-            $return_data['property_features']['setting']=$setting;
-            $return_data['property_features']['views']=$views;
-            $return_data['properties']=$properties;
+            $properties[] = $data;
+        }
+//        start slug_all
+        $slugs = [];
+        foreach ($langugesSystem as $lang_sys)
+        {
+            $lang_sys_key = $lang_sys['key'];
+            $lang_sys_internal_key = $lang_sys['internal_key'];
+            if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
+            {
+                $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+            }
+            else if (isset($property->property->title->$lang_sys_key) && $property->property->title->$lang_sys_key != '')
+            {
+                $slugs[$lang_sys_internal_key] = $property->property->title->$lang_sys_key;
+            }
+        }
+        $return_data['slug_all'] = $slugs;
+//        end slug_all
+        $return_data['property_features'] = [];
+        $return_data['property_features']['features'] = $features;
+        $return_data['property_features']['setting'] = $setting;
+        $return_data['property_features']['views'] = $views;
+        $return_data['properties'] = $properties;
         return $return_data;
     }
 
