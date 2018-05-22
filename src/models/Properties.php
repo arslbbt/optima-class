@@ -58,7 +58,7 @@ class Properties extends Model
         }
 
         $return_data = [];
-        
+
         foreach ($apiData as $property)
         {
             $data = [];
@@ -227,9 +227,9 @@ class Properties extends Model
             {
                 $data['categories'] = $property->property->custom_categories;
             }
-            if (isset($property->property->terrace->value) && $property->property->terrace->value > 0)
+            if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0)
             {
-                $data['terrace'] = $property->property->terrace->value;
+                $data['terrace'] = $property->property->terrace->{0}->terrace;
             }
             if (isset($property->property->updated_at) && $property->property->updated_at != '')
             {
@@ -556,6 +556,14 @@ class Properties extends Model
         if (isset($property->property->bathrooms))
         {
             $return_data['bathrooms'] = $property->property->bathrooms;
+        }
+        if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0)
+        {
+            $return_data['terrace'] = $property->property->terrace->{0}->terrace;
+        }
+        if (isset($property->property->sleeps) && $property->property->sleeps > 0)
+        {
+            $return_data['sleeps'] = $property->property->sleeps;
         }
         if (isset($property->property->currentprice))
         {
