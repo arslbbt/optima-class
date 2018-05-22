@@ -1003,7 +1003,7 @@ class Properties extends Model
             }
             if ($get["transaction"] == '7')
             {
-                $query .= '&not_new_construction=1';
+                $query .= '&sale=1';
             }
         }
         if (isset($get['province']) && $get['province'] != '')
