@@ -565,7 +565,7 @@ class Properties extends Model
         {
             $return_data['sleeps'] = $property->property->sleeps;
         }
-        if (isset($property->property->currentprice))
+        if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale==true)
         {
             $return_data['currentprice'] = $property->property->currentprice;
         }
