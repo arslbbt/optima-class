@@ -20,6 +20,14 @@ class Properties extends Model
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
+        $contentLang = $lang;
+        foreach ($langugesSystem as $sysLang)
+        {
+            if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key'])
+            {
+                $contentLang = $sysLang['key'];
+            }
+        }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -85,9 +93,9 @@ class Properties extends Model
                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
 
-            if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
+            if (isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '')
             {
-                $data['title'] = $property->property->title->$lang;
+                $data['title'] = $property->property->title->$contentLang;
             }
             elseif (isset($property->property->location))
             {
@@ -570,7 +578,7 @@ class Properties extends Model
         {
             $return_data['sleeps'] = $property->property->sleeps;
         }
-        if (isset($property->property->currentprice))
+        if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale==true)
         {
             $return_data['currentprice'] = $property->property->currentprice;
         }
