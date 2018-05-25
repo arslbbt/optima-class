@@ -464,7 +464,6 @@ class Properties extends Model
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings = Cms::settings();
-
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
@@ -492,11 +491,17 @@ class Properties extends Model
         $title = 'title';
         $description = 'description';
         $price = 'sale';
+        $seo_title = 'seo_title';
+        $seo_description = 'seo_description';
+        $keywords = 'keywords';
         if (isset($property->property->rent) && $property->property->rent == true)
         {
             $title = 'rental_title';
             $description = 'rental_description';
             $price = 'rent';
+            $seo_title = 'rental_seo_title';
+            $seo_description = 'rental_seo_description';
+            $keywords = 'rental_keywords';
         }
 //        start slug_all
         foreach ($langugesSystem as $lang_sys)
@@ -581,6 +586,7 @@ class Properties extends Model
                 }
                 $return_data['price'] = ($st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 $return_data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
+                $return_data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
             }
             elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons))
             {
@@ -591,6 +597,7 @@ class Properties extends Model
                 }
                 $return_data['price'] = ($st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 $return_data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
+                $return_data['season_data'] = ArrayHelper::toArray($property->property->period_seasons);
             }
         }
         else
@@ -693,23 +700,26 @@ class Properties extends Model
         {
             $return_data['new_construction'] = $property->property->new_construction;
         }
-        if (isset($property->property->seo_title->$contentLang) && $property->property->seo_title->$contentLang != '')
+        if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '')
         {
-            $return_data['meta_title'] = $property->property->seo_title->$contentLang;
+            $return_data['meta_title'] = $property->property->$seo_title->$contentLang;
         }
-        if (isset($property->property->seo_description->$contentLang) && $property->property->seo_description->$contentLang != '')
+        if (isset($property->property->$seo_description->$contentLang) && $property->property->$seo_description->$contentLang != '')
         {
-            $return_data['meta_desc'] = $property->property->seo_description->$contentLang;
+            $return_data['meta_desc'] = $property->property->$seo_description->$contentLang;
         }
-        if (isset($property->property->keywords->$contentLang) && $property->property->keywords->$contentLang != '')
+        if (isset($property->property->$keywords->$contentLang) && $property->property->$keywords->$contentLang != '')
         {
-            $return_data['meta_keywords'] = $property->property->keywords->$contentLang;
+            $return_data['meta_keywords'] = $property->property->$keywords->$contentLang;
         }
         if (isset($property->property->custom_categories))
         {
             $return_data['categories'] = $property->property->custom_categories;
         }
-
+        if (isset($property->property->value_of_custom->basic_info))
+        {
+            $return_data['basic_info'] = ArrayHelper::toArray($property->property->value_of_custom->basic_info);
+        }
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
@@ -732,6 +742,10 @@ class Properties extends Model
             }
             $return_data['floor_plans'] = $floor_plans;
         }
+        if (isset($property->bookings_extras) && count($property->bookings_extras) > 0)
+        {
+            $return_data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
+        }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
             foreach ($property->bookings as $booking)
@@ -740,7 +754,7 @@ class Properties extends Model
                 {
                     for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
                     {
-                        $booked_dates[] = date("m-d-Y", $i);
+                        $booked_dates[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
                 }
             }
@@ -1066,6 +1080,10 @@ class Properties extends Model
                 }
             }
         }
+        if (isset($get["location_group"]) && is_string($get["location_group"]) && $get["location_group"] != '')
+        {
+            $query .= '&location_group[]=' . $get["location_group"];
+        }
         if (isset($get["location_group"]) && is_array($get["location_group"]) && count($get["location_group"]) > 0)
         {
             foreach ($get["location_group"] as $key => $value)
@@ -1080,6 +1098,32 @@ class Properties extends Model
         if (isset($get["bathrooms"]) && $get["bathrooms"] != "")
         {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
+        }
+        if (isset($get["st_date_from"]) && $get["st_date_from"] != "" && $get["st_date_from"] != "Arrival" && isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "")
+        {
+            $stdf = new \DateTime($get["st_date_from_submit"]);
+            $query .= '&st_period_from[]=' . $stdf->getTimestamp();
+        }
+        if (isset($get["st_date_to"]) && $get["st_date_to"] != "" && $get["st_date_to"] != "Return" && isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "")
+        {
+            $stdt = new \DateTime($get["st_date_to_submit"]);
+            $query .= '&st_period_to[]=' . $stdt->getTimestamp();
+        }
+        if (isset($get["st_from"]) && $get["st_from"] != "")
+        {
+            $query .= '&st_new_price[]=' . $get["st_from"];
+        }
+        if (isset($get["st_from"]) && $get["st_from"] == "" && $get["st_to"] != "")
+        {
+            $query .= '&st_new_price[]=0';
+        }
+        if (isset($get["st_to"]) && $get["st_to"] != "")
+        {
+            $query .= '&st_new_price[]=' . $get["st_to"];
+        }
+        if (isset($get["st_to"]) && $get["st_to"] == "" && $get["st_from"] != "")
+        {
+            $query .= '&st_new_price[]=100000000';
         }
         if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1')
         {
