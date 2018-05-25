@@ -69,6 +69,21 @@ class Properties extends Model
 
         foreach ($apiData as $property)
         {
+            $title = 'title';
+            $description = 'description';
+            $price = 'sale';
+            $seo_title = 'seo_title';
+            $seo_description = 'seo_description';
+            $keywords = 'keywords';
+            if (isset($property->property->rent) && $property->property->rent == true)
+            {
+                $title = 'rental_title';
+                $description = 'rental_description';
+                $price = 'rent';
+                $seo_title = 'rental_seo_title';
+                $seo_description = 'rental_seo_description';
+                $keywords = 'rental_keywords';
+            }
             $data = [];
             $features = [];
             if (isset($property->total_properties))
@@ -93,9 +108,9 @@ class Properties extends Model
                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
 
-            if (isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '')
+            if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '')
             {
-                $data['title'] = $property->property->title->$contentLang;
+                $data['title'] = $property->property->$title->$contentLang;
             }
             elseif (isset($property->property->location))
             {
@@ -128,9 +143,9 @@ class Properties extends Model
             {
                 $data['lng'] = $property->property->private_info_object->$agency->longitude;
             }
-            if (isset($property->property->description->$lang))
+            if (isset($property->property->$description->$lang))
             {
-                $data['description'] = $property->property->description->$lang;
+                $data['description'] = $property->property->$description->$lang;
             }
             if (isset($property->property->location))
             {
@@ -248,7 +263,7 @@ class Properties extends Model
             foreach ($langugesSystem as $lang_sys)
             {
                 $lang_sys_key = $lang_sys['key'];
-                $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
+                $lang_sys_internal_key = $lang_sys['internal_key'];
                 if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
                 {
                     $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
@@ -259,9 +274,9 @@ class Properties extends Model
                 }
                 else
                 {
-                    if (isset($slugs[$lang_sys_internal_key]) && isset($property->property->type_one) && $property->property->type_one != '')
+                    if (isset($property->property->type_one) && $property->property->type_one != '')
                         $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if (isset($slugs[$lang_sys_internal_key]) && isset($property->property->location) && $property->property->location != '')
+                    if (isset($property->property->location) && $property->property->location != '')
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
@@ -578,7 +593,7 @@ class Properties extends Model
         {
             $return_data['sleeps'] = $property->property->sleeps;
         }
-        if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale==true)
+        if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale == true)
         {
             $return_data['currentprice'] = $property->property->currentprice;
         }
@@ -753,6 +768,10 @@ class Properties extends Model
         if (isset($property->bookings_extras) && count($property->bookings_extras) > 0)
         {
             $return_data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
+        }
+        if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0)
+        {
+            $return_data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
         }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
