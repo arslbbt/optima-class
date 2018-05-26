@@ -640,6 +640,10 @@ class Properties extends Model
         {
             $return_data['type_two'] = $property->property->type_two;
         }
+        if (isset($property->property->security_deposit))
+        {
+            $return_data['security_deposit'] = $property->property->security_deposit;
+        }
         if (isset($property->property->type_one))
         {
             $return_data['type'] = $property->property->type_one;
