@@ -30,6 +30,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+        
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -1297,6 +1298,10 @@ class Properties extends Model
         if (isset($get["reference"]) && $get["reference"] != "")
         {
             $query .= '&reference=' . $get['reference'];
+        }
+        if (isset($get["agency_reference"]) && $get["agency_reference"] != "")
+        {
+            $query .= '&agency_reference=' . $get['agency_reference'];
         }
         if (isset($get["st_rental"]) && $get["st_rental"] != "")
         {
