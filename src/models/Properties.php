@@ -29,8 +29,8 @@ class Properties extends Model
             }
         }
         $query .= self::setQuery();
-        $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
-        
+        echo $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+        die;
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
