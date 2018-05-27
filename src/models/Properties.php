@@ -265,7 +265,7 @@ class Properties extends Model
             {
                 $data['updated_at'] = $property->property->updated_at;
             }
-            $title = 'title';
+
             $slugs = [];
             foreach ($langugesSystem as $lang_sys)
             {
