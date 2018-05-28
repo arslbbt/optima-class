@@ -30,7 +30,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
-        
+
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -249,11 +249,12 @@ class Properties extends Model
             }
             if (isset($property->property->custom_categories) && is_array($property->property->custom_categories))
             {
-                $cats=self::Categories();
-                $catsArr=[];
-                foreach($property->property->custom_categories as $catdata){
-                    if(isset($cats[$catdata]))
-                    $catsArr[]=$cats[$catdata];
+                $cats = self::Categories();
+                $catsArr = [];
+                foreach ($property->property->custom_categories as $catdata)
+                {
+                    if (isset($cats[$catdata]))
+                        $catsArr[] = $cats[$catdata];
                 }
                 $data['categories'] = $catsArr;
             }
@@ -748,11 +749,12 @@ class Properties extends Model
         }
         if (isset($property->property->custom_categories))
         {
-            $cats=self::Categories();
-            $catsArr=[];
-            foreach($property->property->custom_categories as $catdata){
-                if(isset($cats[$catdata]))
-                $catsArr[]=$cats[$catdata];
+            $cats = self::Categories();
+            $catsArr = [];
+            foreach ($property->property->custom_categories as $catdata)
+            {
+                if (isset($cats[$catdata]))
+                    $catsArr[] = $cats[$catdata];
             }
             $return_data['categories'] = $catsArr;
         }
@@ -793,6 +795,14 @@ class Properties extends Model
         if (isset($property->property->security_deposit) && $property->property->security_deposit != '')
         {
             $return_data['security_deposit'] = $property->property->security_deposit;
+        }
+        if (isset($property->property->vt_ids[0]))
+        {
+            $return_data['vt'] = 'https://my.optima-crm.com/yiiapp/frontend/web/index.php?r=virtualtours&user=' . Yii::$app->params['user'] . '&id=' . $property->property->vt_ids[0];
+        }
+        if (isset($property->property->license_number))
+        {
+            $return_data['license_number'] = $property->property->license_number;
         }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
@@ -1401,6 +1411,7 @@ class Properties extends Model
         }
         return json_decode($file_data, TRUE);
     }
+
     public static function Categories()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -1418,12 +1429,14 @@ class Properties extends Model
         {
             $file_data = file_get_contents($file);
         }
-        $Arr=json_decode($file_data, TRUE);
-        $return_data=[];
-        foreach($Arr as $data){
-            if(isset($data['value']['en']))
-                $return_data[$data['key']]=$data['value']['en'];
+        $Arr = json_decode($file_data, TRUE);
+        $return_data = [];
+        foreach ($Arr as $data)
+        {
+            if (isset($data['value']['en']))
+                $return_data[$data['key']] = $data['value']['en'];
         }
         return $return_data;
     }
+
 }
