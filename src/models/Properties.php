@@ -30,6 +30,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+        
         $JsonData = file_get_contents($url);
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -246,9 +247,15 @@ class Properties extends Model
             {
                 $data['plot'] = $property->property->plot;
             }
-            if (isset($property->property->custom_categories))
+            if (isset($property->property->custom_categories) && is_array($property->property->custom_categories))
             {
-                $data['categories'] = $property->property->custom_categories;
+                $cats=self::Categories();
+                $catsArr=[];
+                foreach($property->property->custom_categories as $catdata){
+                    if(isset($cats[$catdata]))
+                    $catsArr[]=$cats[$catdata];
+                }
+                $data['categories'] = $catsArr;
             }
             if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0)
             {
@@ -258,7 +265,7 @@ class Properties extends Model
             {
                 $data['updated_at'] = $property->property->updated_at;
             }
-            $title = 'title';
+
             $slugs = [];
             foreach ($langugesSystem as $lang_sys)
             {
@@ -634,6 +641,10 @@ class Properties extends Model
         {
             $return_data['type_two'] = $property->property->type_two;
         }
+        if (isset($property->property->security_deposit))
+        {
+            $return_data['security_deposit'] = $property->property->security_deposit;
+        }
         if (isset($property->property->type_one))
         {
             $return_data['type'] = $property->property->type_one;
@@ -737,7 +748,13 @@ class Properties extends Model
         }
         if (isset($property->property->custom_categories))
         {
-            $return_data['categories'] = $property->property->custom_categories;
+            $cats=self::Categories();
+            $catsArr=[];
+            foreach($property->property->custom_categories as $catdata){
+                if(isset($cats[$catdata]))
+                $catsArr[]=$cats[$catdata];
+            }
+            $return_data['categories'] = $catsArr;
         }
         if (isset($property->property->value_of_custom->basic_info))
         {
@@ -1286,6 +1303,10 @@ class Properties extends Model
         {
             $query .= '&reference=' . $get['reference'];
         }
+        if (isset($get["agency_reference"]) && $get["agency_reference"] != "")
+        {
+            $query .= '&agency_reference=' . $get['agency_reference'];
+        }
         if (isset($get["st_rental"]) && $get["st_rental"] != "")
         {
             $query .= '&st_rental=1';
@@ -1380,5 +1401,29 @@ class Properties extends Model
         }
         return json_decode($file_data, TRUE);
     }
-
+    public static function Categories()
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/property_categories.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        $Arr=json_decode($file_data, TRUE);
+        $return_data=[];
+        foreach($Arr as $data){
+            if(isset($data['value']['en']))
+                $return_data[$data['key']]=$data['value']['en'];
+        }
+        return $return_data;
+    }
 }
