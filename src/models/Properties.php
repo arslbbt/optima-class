@@ -790,10 +790,6 @@ class Properties extends Model
         {
             $return_data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
         }
-        if (isset($property->property->security_deposit) && $property->property->security_deposit != '')
-        {
-            $return_data['security_deposit'] = $property->property->security_deposit;
-        }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
             foreach ($property->bookings as $booking)
