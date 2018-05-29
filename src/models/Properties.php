@@ -673,6 +673,8 @@ class Properties extends Model
         if (isset($property->property->$description->$contentLang))
         {
             $return_data['description'] = $property->property->$description->$contentLang;
+        }else if(isset($property->property->$description->EN)){
+            $return_data['description'] = $property->property->$description->EN;
         }
         if (isset($property->property->address_province))
         {
