@@ -673,7 +673,9 @@ class Properties extends Model
         if (isset($property->property->$description->$contentLang))
         {
             $return_data['description'] = $property->property->$description->$contentLang;
-        }else if(isset($property->property->$description->EN)){
+        }
+        else if (isset($property->property->$description->EN))
+        {
             $return_data['description'] = $property->property->$description->EN;
         }
         if (isset($property->property->address_province))
@@ -1173,7 +1175,7 @@ class Properties extends Model
         {
             $query .= '&st_new_price[]=' . $get["st_from"];
         }
-        if (isset($get["st_from"]) && $get["st_from"] == "" && $get["st_to"] != "")
+        if (isset($get["st_from"]) && $get["st_from"] == "")
         {
             $query .= '&st_new_price[]=0';
         }
@@ -1181,9 +1183,13 @@ class Properties extends Model
         {
             $query .= '&st_new_price[]=' . $get["st_to"];
         }
-        if (isset($get["st_to"]) && $get["st_to"] == "" && $get["st_from"] != "")
+        if (isset($get["st_to"]) && $get["st_to"] == "")
         {
             $query .= '&st_new_price[]=100000000';
+        }
+        if (isset($get["guest"]) && $get["guest"] != "")
+        {
+            $query .= '&sleeps=' . $get["guest"];
         }
         if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1')
         {
