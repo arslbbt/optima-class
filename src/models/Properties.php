@@ -216,9 +216,9 @@ class Properties extends Model {
                 } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
                     $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
                 } else {
-                    if (isset($property->property->type_one) && $property->property->type_one != '')
+                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]) )
                         $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if (isset($property->property->location) && $property->property->location != '')
+                    if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
