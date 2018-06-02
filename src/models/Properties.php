@@ -901,8 +901,8 @@ class Properties extends Model {
         if (isset($get["st_to"]) && $get["st_to"] == "") {
             $query .= '&st_new_price[]=100000000';
         }
-        if (isset($get["guest"]) && $get["guest"] != "") {
-            $query .= '&sleeps=' . $get["guest"];
+        if (isset($get["sleeps"]) && $get["sleeps"] != "") {
+            $query .= '&sleeps=' . $get["sleeps"];
         }
         if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1') {
             if (isset($get["price_from"]) && $get["price_from"] != "") {
