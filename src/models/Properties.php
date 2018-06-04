@@ -382,6 +382,7 @@ class Properties extends Model {
         $settings = Cms::settings();
         $return_data = [];
         $attachments = [];
+        $attachment_descriptions = [];
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
@@ -589,8 +590,10 @@ class Properties extends Model {
             foreach ($property->attachments as $pic) {
                 $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 $attachments[] = $url;
+                $attachment_descriptions[] = isset($pic->description->$contentLang)?$pic->description->$contentLang:'';
             }
             $return_data['attachments'] = $attachments;
+            $return_data['attachment_desc'] = $attachment_descriptions;
         }
 
         if (isset($property->documents) && count($property->documents) > 0) {
