@@ -216,9 +216,9 @@ class Properties extends Model {
                 } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
                     $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
                 } else {
-                    if (isset($property->property->type_one) && $property->property->type_one != '')
+                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]) )
                         $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if (isset($property->property->location) && $property->property->location != '')
+                    if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
@@ -904,8 +904,8 @@ class Properties extends Model {
         if (isset($get["st_to"]) && $get["st_to"] == "") {
             $query .= '&st_new_price[]=100000000';
         }
-        if (isset($get["guest"]) && $get["guest"] != "") {
-            $query .= '&sleeps=' . $get["guest"];
+        if (isset($get["sleeps"]) && $get["sleeps"] != "") {
+            $query .= '&sleeps=' . $get["sleeps"];
         }
         if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1') {
             if (isset($get["price_from"]) && $get["price_from"] != "") {
