@@ -216,7 +216,7 @@ class Properties extends Model {
                 } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
                     $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
                 } else {
-                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]) )
+                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
                     if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
@@ -463,6 +463,9 @@ class Properties extends Model {
         if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
             $return_data['sleeps'] = $property->property->sleeps;
         }
+        if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
+            $return_data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
+        }
         if (isset($property->property->oldprice->price_on_demand) && $property->property->oldprice->price_on_demand == true) {
             $return_data['price_on_demand'] = true;
         }
@@ -590,7 +593,7 @@ class Properties extends Model {
             foreach ($property->attachments as $pic) {
                 $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 $attachments[] = $url;
-                $attachment_descriptions[] = isset($pic->description->$contentLang)?$pic->description->$contentLang:'';
+                $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
             }
             $return_data['attachments'] = $attachments;
             $return_data['attachment_desc'] = $attachment_descriptions;
