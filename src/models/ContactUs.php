@@ -51,10 +51,12 @@ class ContactUs extends Model {
     public $sender_phone;
     public $assigned_to;
     public $news_letter;
+    public $arrival_date;
+    public $departure_date;
 
     public function rules() {
         return [
-                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter'], 'safe'],
+                [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date'], 'safe'],
                 [['first_name', 'last_name', 'email', 'message'], 'required'],
                 ['email', 'email'],
                 [['verifyCode'], 'captcha', 'when' => function($model) {
@@ -136,6 +138,18 @@ class ContactUs extends Model {
                 if (isset($this->email) && $this->email != '') {
                     $html .= '<br>';
                     $html .= 'Email: ' . $this->email;
+                }
+                if (isset($this->reference) && $this->reference != '') {
+                    $html .= '<br>';
+                    $html .= 'Prop. Ref : ' . $this->reference;
+                }
+                if (isset($this->arrival_date) && $this->arrival_date != '') {
+                    $html .= '<br>';
+                    $html .= 'Arrival Date : ' . $this->arrival_date;
+                }
+                if (isset($this->departure_date) && $this->departure_date != '') {
+                    $html .= '<br>';
+                    $html .= 'Departure Date : ' . $this->departure_date;
                 }
                 if (isset($this->guests) && $this->guests != '') {
                     $html .= '<br>';
