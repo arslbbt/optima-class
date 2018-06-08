@@ -887,6 +887,9 @@ class Properties extends Model {
         if (isset($get["bathrooms"]) && $get["bathrooms"] != "") {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
+        if (isset($get["booking_data"]) && $get["booking_data"] != "") {
+            $query .= '&booking_data=' . $get["booking_data"];
+        }
         if (isset($get["st_date_from"]) && $get["st_date_from"] != "" && $get["st_date_from"] != "Arrival" && isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
             $stdf = new \DateTime($get["st_date_from_submit"]);
             $query .= '&booking_from=' . $stdf->getTimestamp();
