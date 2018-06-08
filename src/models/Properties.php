@@ -206,7 +206,12 @@ class Properties extends Model {
             if (isset($property->property->updated_at) && $property->property->updated_at != '') {
                 $data['updated_at'] = $property->property->updated_at;
             }
-
+            if (isset($property->bookings_extras) && count($property->bookings_extras) > 0) {
+                $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
+            }
+            if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0) {
+                $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
+            }
             $slugs = [];
             foreach ($langugesSystem as $lang_sys) {
                 $lang_sys_key = $lang_sys['key'];
