@@ -531,7 +531,10 @@ class Properties extends Model
         if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
         {
             $ref = $settings['general_settings']['reference'];
-            $return_data['reference'] = $property->property->$ref;
+            if(isset($property->property->$ref))
+                $return_data['reference'] = $property->property->$ref;
+            else
+                $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
         else
         {
