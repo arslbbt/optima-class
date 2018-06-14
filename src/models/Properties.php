@@ -888,6 +888,14 @@ class Properties extends Model {
                 $query .= '&location_group[]=' . $value;
             }
         }
+        if (isset($get["lg_by_key"]) && is_string($get["lg_by_key"]) && $get["lg_by_key"] != '') {
+            $query .= '&lg_by_key[]=' . $get["lg_by_key"];
+        }
+        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0) {
+            foreach ($get["lg_by_key"] as $key => $value) {
+                $query .= '&lg_by_key[]=' . $value;
+            }
+        }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "") {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
