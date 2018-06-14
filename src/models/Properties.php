@@ -284,6 +284,10 @@ class Properties extends Model
             {
                 $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
             }
+            if (isset($property->property->location_group))
+            {
+                $data['location_group'] = $property->property->location_group;
+            }
             $slugs = [];
             foreach ($langugesSystem as $lang_sys)
             {
