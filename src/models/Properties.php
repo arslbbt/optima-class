@@ -497,7 +497,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false)
+    public static function findOne($reference, $with_booking = false,$with_locationgroup=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -514,6 +514,8 @@ class Properties extends Model
         if (isset($with_booking) && $with_booking == true)
         {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        }elseif($with_locationgroup==true){
+            echo $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref.'&with_locationgroup=true';
         }
         else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
@@ -730,6 +732,10 @@ class Properties extends Model
         if (isset($property->property->city))
         {
             $return_data['city_key'] = $property->property->city;
+        }
+        if (isset($property->property->location_group) && $property->property->location_group!='N/A')
+        {
+            $return_data['location_group'] = $property->property->location_group;
         }
         if (isset($property->property->location))
         {
