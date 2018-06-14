@@ -284,7 +284,7 @@ class Properties extends Model
             {
                 $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
             }
-            if (isset($property->property->location_group))
+            if (isset($property->property->location_group) && $property->property->location_group!='N/A')
             {
                 $data['location_group'] = $property->property->location_group;
             }
