@@ -117,13 +117,9 @@ class Properties extends Model
             {
                 $data['title'] = $property->property->$title->$contentLang;
             }
-            elseif (isset($property->property->location))
+            elseif (isset($property->property->location) && isset($property->property->type_one))
             {
-                if(isset($property->property->location) && $property->property->location!=''){
-                    $data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-                }else{
-                    $data['title'] = \Yii::t('app', strtolower($property->property->type_one));
-                }            
+                $data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
             if (isset($property->property->status))
