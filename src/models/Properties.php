@@ -288,6 +288,10 @@ class Properties extends Model
             {
                 $data['location_group'] = $property->property->location_group;
             }
+            if (isset($property->property->address_province))
+            {
+                $data['province'] = $property->property->address_province;
+            }
             $slugs = [];
             foreach ($langugesSystem as $lang_sys)
             {
