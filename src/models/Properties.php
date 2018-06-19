@@ -525,6 +525,7 @@ class Properties extends Model
         $return_data = [];
         $attachments = [];
         $attachment_descriptions = [];
+        $attachment_alt_descriptions=[];
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
