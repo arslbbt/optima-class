@@ -825,7 +825,7 @@ class Properties extends Model
             }
             $return_data['attachments'] = $attachments;
             $return_data['attachment_desc'] = $attachment_descriptions;
-            $return_data['attachment_alt_desc'] = $attachment_alt_desc;
+            $return_data['attachment_alt_desc'] = $attachment_alt_descriptions;
         }
 
         if (isset($property->documents) && count($property->documents) > 0)
