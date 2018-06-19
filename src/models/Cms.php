@@ -37,6 +37,7 @@ class Cms extends Model
 
     public static function getTranslations()
     {
+
         $lang = strtoupper(\Yii::$app->language);
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
