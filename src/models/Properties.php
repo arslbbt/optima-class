@@ -115,7 +115,7 @@ class Properties extends Model
             }
             elseif (isset($property->property->location))
             {
-                $data['title'] = isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A') . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
             if (isset($property->property->status))
