@@ -102,7 +102,11 @@ class Properties extends Model
             if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
             {
                 $ref = $settings['general_settings']['reference'];
-                $data['reference'] = $property->property->$ref;
+                if(isset($property->property->$ref))
+                    $data['reference'] = $property->property->$ref;
+                else
+                    $data['reference'] = $property->agency_code . '-' . $property->property->reference;
+
             }
             else
             {
@@ -113,7 +117,7 @@ class Properties extends Model
             {
                 $data['title'] = $property->property->$title->$contentLang;
             }
-            elseif (isset($property->property->location))
+            elseif (isset($property->property->location) && isset($property->property->type_one))
             {
                 $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
@@ -216,6 +220,10 @@ class Properties extends Model
             {
                 $data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
             }
+            if (isset($property->property->oldprice->price_on_demand) && $property->property->oldprice->price_on_demand == true)
+            {
+                $data['price_on_demand'] = true;
+            }
             if (isset($property->property->sale) && $property->property->sale == 1 || isset($property->property->transfer) && $property->property->transfer == 1)
             {
                 if (isset($property->property->currentprice) && $property->property->currentprice > 0)
@@ -225,9 +233,9 @@ class Properties extends Model
             }
             if (isset($property->property->rent) && $property->property->rent == 1)
             {
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price))
+                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons[0]->new_price))
                 {
-                    $data['ltprice'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int) $property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
+                    $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
                 }
                 if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons))
                 {
@@ -236,7 +244,9 @@ class Properties extends Model
                     {
                         $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                     }
-                    $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') : '';
+                    $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
+                    $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 }
             }
             if (isset($property->property->built) && $property->property->built > 0)
@@ -266,7 +276,22 @@ class Properties extends Model
             {
                 $data['updated_at'] = $property->property->updated_at;
             }
-
+            if (isset($property->bookings_extras) && count($property->bookings_extras) > 0)
+            {
+                $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
+            }
+            if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0)
+            {
+                $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
+            }
+            if (isset($property->property->location_group) && $property->property->location_group!='N/A')
+            {
+                $data['location_group'] = $property->property->location_group;
+            }
+            if (isset($property->property->address_province))
+            {
+                $data['province'] = $property->property->address_province;
+            }
             $slugs = [];
             foreach ($langugesSystem as $lang_sys)
             {
@@ -282,9 +307,9 @@ class Properties extends Model
                 }
                 else
                 {
-                    if (isset($property->property->type_one) && $property->property->type_one != '')
+                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if (isset($property->property->location) && $property->property->location != '')
+                    if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key]))
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
@@ -472,7 +497,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false)
+    public static function findOne($reference, $with_booking = false,$with_locationgroup=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -489,6 +514,8 @@ class Properties extends Model
         if (isset($with_booking) && $with_booking == true)
         {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        }elseif($with_locationgroup==true){
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref.'&with_locationgroup=true';
         }
         else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
@@ -497,6 +524,8 @@ class Properties extends Model
         $settings = Cms::settings();
         $return_data = [];
         $attachments = [];
+        $attachment_descriptions = [];
+        $attachment_alt_descriptions=[];
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
@@ -513,7 +542,10 @@ class Properties extends Model
         if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
         {
             $ref = $settings['general_settings']['reference'];
-            $return_data['reference'] = $property->property->$ref;
+            if(isset($property->property->$ref))
+                $return_data['reference'] = $property->property->$ref;
+            else
+                $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
         else
         {
@@ -563,7 +595,11 @@ class Properties extends Model
         }
         else
         {
-            $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            if(isset($property->property->location) && $property->property->location!=''){
+                $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            }else{
+                $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one));
+            }
         }
         if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '')
         {
@@ -600,6 +636,14 @@ class Properties extends Model
         if (isset($property->property->sleeps) && $property->property->sleeps > 0)
         {
             $return_data['sleeps'] = $property->property->sleeps;
+        }
+        if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0)
+        {
+            $return_data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
+        }
+        if (isset($property->property->oldprice->price_on_demand) && $property->property->oldprice->price_on_demand == true)
+        {
+            $return_data['price_on_demand'] = true;
         }
         if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale == true)
         {
@@ -690,6 +734,10 @@ class Properties extends Model
         {
             $return_data['city_key'] = $property->property->city;
         }
+        if (isset($property->property->location_group) && $property->property->location_group!='N/A')
+        {
+            $return_data['location_group'] = $property->property->location_group;
+        }
         if (isset($property->property->location))
         {
             $return_data['location'] = $property->property->location;
@@ -772,8 +820,12 @@ class Properties extends Model
             {
                 $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 $attachments[] = $url;
+                $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
+                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
             }
             $return_data['attachments'] = $attachments;
+            $return_data['attachment_desc'] = $attachment_descriptions;
+            $return_data['attachment_alt_desc'] = $attachment_alt_descriptions;
         }
 
         if (isset($property->documents) && count($property->documents) > 0)
@@ -1153,6 +1205,14 @@ class Properties extends Model
                 $query .= '&location_group[]=' . $value;
             }
         }
+        if (isset($get["lg_by_key"]) && is_string($get["lg_by_key"]) && $get["lg_by_key"] != '') {
+            $query .= '&lg_by_key[]=' . $get["lg_by_key"];
+        }
+        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0) {
+            foreach ($get["lg_by_key"] as $key => $value) {
+                $query .= '&lg_by_key[]=' . $value;
+            }
+        }
         if (isset($get["bedrooms"]) && $get["bedrooms"] != "")
         {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
@@ -1161,15 +1221,19 @@ class Properties extends Model
         {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
+        if (isset($get["booking_data"]) && $get["booking_data"] != "")
+        {
+            $query .= '&booking_data=' . $get["booking_data"];
+        }
         if (isset($get["st_date_from"]) && $get["st_date_from"] != "" && $get["st_date_from"] != "Arrival" && isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "")
         {
             $stdf = new \DateTime($get["st_date_from_submit"]);
-            $query .= '&st_period_from[]=' . $stdf->getTimestamp();
+            $query .= '&booking_from=' . $stdf->getTimestamp();
         }
         if (isset($get["st_date_to"]) && $get["st_date_to"] != "" && $get["st_date_to"] != "Return" && isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "")
         {
             $stdt = new \DateTime($get["st_date_to_submit"]);
-            $query .= '&st_period_to[]=' . $stdt->getTimestamp();
+            $query .= '&booking_to=' . $stdt->getTimestamp();
         }
         if (isset($get["st_from"]) && $get["st_from"] != "")
         {
@@ -1187,9 +1251,9 @@ class Properties extends Model
         {
             $query .= '&st_new_price[]=100000000';
         }
-        if (isset($get["guest"]) && $get["guest"] != "")
+        if (isset($get["sleeps"]) && $get["sleeps"] != "")
         {
-            $query .= '&sleeps=' . $get["guest"];
+            $query .= '&sleeps=' . $get["sleeps"];
         }
         if (isset($get["transaction"]) && $get["transaction"] != '' && $get["transaction"] == '1')
         {
@@ -1317,6 +1381,27 @@ class Properties extends Model
         {
             $query .= '&conditions[]=never_lived';
         }
+        if (isset($get["conditions"]) && is_array($get["conditions"]) && $get["conditions"] != "")
+        {
+            foreach ($get["conditions"] as $condition)
+            {
+                $query .= '&conditions[]=' . $condition;
+            }
+        }
+        if (isset($get["features"]) && is_array($get["features"]) && $get["features"] != "")
+        {
+            foreach ($get["features"] as $feature)
+            {
+                $query .= '&features[]=' . $feature;
+            }
+        }
+        if (isset($get["climate_control"]) && is_array($get["climate_control"]) && $get["climate_control"] != "")
+        {
+            foreach ($get["climate_control"] as $climate_control)
+            {
+                $query .= '&climate_control[]=' . $climate_control;
+            }
+        }
         if (isset($get["reference"]) && $get["reference"] != "")
         {
             $query .= '&reference=' . $get['reference'];
@@ -1336,6 +1421,10 @@ class Properties extends Model
         if (isset($get["ids"]) && $get["ids"] != "")
         {
             $query .= '&favourite_ids=' . $get["ids"];
+        }
+        if (isset($get["keywords"]) && $get["keywords"] != "")
+        {
+            $query .= '&keywords=' . $get["keywords"];
         }
         if (isset($get['orderby']) && !empty($get['orderby']))
         {
