@@ -119,7 +119,7 @@ class Properties extends Model
             }
             elseif (isset($property->property->location) && isset($property->property->type_one))
             {
-                $data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
             }
 
             if (isset($property->property->status))
@@ -525,6 +525,7 @@ class Properties extends Model
         $return_data = [];
         $attachments = [];
         $attachment_descriptions = [];
+        $attachment_alt_descriptions=[];
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
@@ -820,9 +821,11 @@ class Properties extends Model
                 $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 $attachments[] = $url;
                 $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
+                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
             }
             $return_data['attachments'] = $attachments;
             $return_data['attachment_desc'] = $attachment_descriptions;
+            $return_data['attachment_alt_desc'] = $attachment_alt_descriptions;
         }
 
         if (isset($property->documents) && count($property->documents) > 0)

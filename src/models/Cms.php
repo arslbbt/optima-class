@@ -37,7 +37,6 @@ class Cms extends Model
 
     public static function getTranslations()
     {
-
         $lang = strtoupper(\Yii::$app->language);
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -135,7 +134,17 @@ class Cms extends Model
                 $childArr = [];
                 foreach ($value['children'] as $childkey => $child)
                 {
-                    $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? $child['item']['slug'][$lang] : 'slug-not-set'];
+                    if(isset($child['children']) && count($child['children']) > 0){
+                        $childArrNested = [];
+                        foreach ($child['children'] as $childkeyNested => $childNested)
+                        {
+                            $childArrNested[] = ['label' => (isset($childNested['item']['title'][$lang]) && $childNested['item']['title'][$lang] != '') ? $childNested['item']['title'][$lang] : 'please set menu label', 'url' => (isset($childNested['item']['slug'][$lang]) && $childNested['item']['slug'][$lang] != '') ? $childNested['item']['slug'][$lang] : 'slug-not-set'];
+                        }
+                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'items' => $childArrNested];
+                    }
+                    else{
+                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? $child['item']['slug'][$lang] : 'slug-not-set'];
+                    }
                 }
                 $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'items' => $childArr];
             }
