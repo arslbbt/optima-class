@@ -55,6 +55,8 @@ class Cms extends Model
         else
         {
             $file_data = file_get_contents($file);
+            print_r($file_data);
+            die;
         }
         return json_decode($file_data, TRUE);
     }
