@@ -49,14 +49,10 @@ class Cms extends Model
         {
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
-            print_r($file_data);
-            die;
         }
         else
         {
             $file_data = file_get_contents($file);
-            print_r($file_data);
-            die;
         }
         return json_decode($file_data, TRUE);
     }
