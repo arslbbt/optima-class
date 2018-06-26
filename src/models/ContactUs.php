@@ -258,10 +258,6 @@ class ContactUs extends Model
 
     public function saveAccount()
     {
-        $this->validate();
-        echo '<pre>';
-        print_r($this->errors);
-        die;
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == '9:00 to 18:00')
         {
