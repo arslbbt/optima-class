@@ -65,7 +65,7 @@ class ContactUs extends Model
             [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3','cv_file'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
-            [['cv_file'], 'file', 'skipOnEmpty' => false],
+            [['cv_file'], 'file', 'skipOnEmpty' => true],
             [['verifyCode'], 'captcha', 'when' => function($model)
                 {
                     if ($model->verifyCode == 'null')
@@ -234,7 +234,7 @@ class ContactUs extends Model
                     }
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom(Yii::$app->params['from_email'])
+                        ->setFrom($this->email)
                         ->setTo($settings['general_settings']['admin_email'])
                         ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
                         ->send();
