@@ -870,9 +870,15 @@ class Properties extends Model
                     {
                         $booked_dates[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
+                    // booking dates for costa - last day available - OPT-3533
+                    for ($i = $booking->date_from; $i < $booking->date_until; $i += 86400)
+                    {
+                        $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                    }
                 }
             }
             $return_data['booked_dates'] = $booked_dates;
+            $return_data['booked_dates_costa'] = $booked_dates_costa;
         }
 
         if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos)))
