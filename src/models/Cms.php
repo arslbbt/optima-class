@@ -44,9 +44,10 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/translations_' . $lang . '.json';
+        $url=Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
@@ -166,7 +167,7 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/languages.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user'] . '&name=gogo');
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
         }
         else
