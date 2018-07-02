@@ -497,7 +497,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false,$with_locationgroup=false)
+    public static function findOne($reference, $with_booking = false,$with_locationgroup=false,$rent=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -557,7 +557,7 @@ class Properties extends Model
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if (isset($property->property->rent) && $property->property->rent == true)
+        if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == false || $rent==true) 
         {
             $title = 'rental_title';
             $description = 'rental_description';
@@ -566,7 +566,7 @@ class Properties extends Model
             $seo_description = 'rental_seo_description';
             $keywords = 'rental_keywords';
         }
-//        start slug_all
+    //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
