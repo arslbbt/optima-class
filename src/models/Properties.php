@@ -499,7 +499,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false,$with_locationgroup=false)
+    public static function findOne($reference, $with_booking = false,$with_locationgroup=false,$rent=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -559,7 +559,7 @@ class Properties extends Model
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if (isset($property->property->rent) && $property->property->rent == true)
+        if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == false || $rent==true) 
         {
             $title = 'rental_title';
             $description = 'rental_description';
@@ -568,7 +568,7 @@ class Properties extends Model
             $seo_description = 'rental_seo_description';
             $keywords = 'rental_keywords';
         }
-//        start slug_all
+    //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
@@ -872,9 +872,15 @@ class Properties extends Model
                     {
                         $booked_dates[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
+                    // booking dates for costa - last day available - OPT-3533
+                    for ($i = $booking->date_from; $i < $booking->date_until; $i += 86400)
+                    {
+                        $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                    }
                 }
             }
             $return_data['booked_dates'] = $booked_dates;
+            $return_data['booked_dates_costa'] = $booked_dates_costa;
         }
 
         if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos)))
