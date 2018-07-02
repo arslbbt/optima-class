@@ -568,7 +568,16 @@ class Properties extends Model
             $seo_description = 'rental_seo_description';
             $keywords = 'rental_keywords';
         }
-    //    start slug_all
+        if (isset($property->property->sale) && $property->property->sale == true || $rent==false) 
+        {
+            $title = 'rental_title';
+            $description = 'rental_description';
+            $price = 'rent';
+            $seo_title = 'rental_seo_title';
+            $seo_description = 'rental_seo_description';
+            $keywords = 'rental_keywords';
+        }
+        //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
