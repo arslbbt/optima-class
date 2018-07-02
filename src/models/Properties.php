@@ -579,8 +579,7 @@ class Properties extends Model
                 $keywords = 'rental_keywords';
             }
         }
-        echo $title;
-        die;
+
         //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
