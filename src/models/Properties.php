@@ -570,12 +570,12 @@ class Properties extends Model
         }
         if (isset($property->property->sale) && $property->property->sale == true || $rent==false) 
         {
-            $title = 'rental_title';
-            $description = 'rental_description';
-            $price = 'rent';
-            $seo_title = 'rental_seo_title';
-            $seo_description = 'rental_seo_description';
-            $keywords = 'rental_keywords';
+            $title = 'title';
+            $description = 'description';
+            $price = 'sale';
+            $seo_title = 'seo_title';
+            $seo_description = 'seo_description';
+            $keywords = 'keywords';
         }
         //    start slug_all
         foreach ($langugesSystem as $lang_sys)
