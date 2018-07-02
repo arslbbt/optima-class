@@ -559,7 +559,7 @@ class Properties extends Model
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == false || $rent==true) 
+        if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && !$property->property->sale || $rent==true) 
         {
             $title = 'rental_title';
             $description = 'rental_description';
