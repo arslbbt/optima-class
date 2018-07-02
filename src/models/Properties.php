@@ -561,7 +561,7 @@ class Properties extends Model
             $seo_title = 'rental_seo_title';
             $seo_description = 'rental_seo_description';
             $keywords = 'rental_keywords';
-            
+
         }else{
             $title = 'title';
             $description = 'description';
@@ -569,7 +569,7 @@ class Properties extends Model
             $seo_title = 'seo_title';
             $seo_description = 'seo_description';
             $keywords = 'keywords';
-            if ((isset($property->property->rent) && $property->property->rent == true)) 
+            if ((isset($property->property->rent) && $property->property->rent == true) && (isset($property->property->sale) && $property->property->sale == false)) 
             {
                 $title = 'rental_title';
                 $description = 'rental_description';
@@ -579,6 +579,8 @@ class Properties extends Model
                 $keywords = 'rental_keywords';
             }
         }
+        echo $title;
+        die;
         //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
