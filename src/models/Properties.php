@@ -76,6 +76,7 @@ class Properties extends Model
             $seo_title = 'seo_title';
             $seo_description = 'seo_description';
             $keywords = 'keywords';
+            $perma_link = 'perma_link';
             if (isset($property->property->rent) && $property->property->rent == true)
             {
                 $title = 'rental_title';
@@ -84,6 +85,7 @@ class Properties extends Model
                 $seo_title = 'rental_seo_title';
                 $seo_description = 'rental_seo_description';
                 $keywords = 'rental_keywords';
+                $perma_link = 'rental_perma_link';
             }
             $data = [];
             $features = [];
@@ -297,9 +299,9 @@ class Properties extends Model
             {
                 $lang_sys_key = $lang_sys['key'];
                 $lang_sys_internal_key = $lang_sys['internal_key'];
-                if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
+                if (isset($property->property->$perma_link->$lang_sys_key) && $property->property->$perma_link->$lang_sys_key != '')
                 {
-                    $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+                    $slugs[$lang_sys_internal_key] = $property->property->$perma_link->$lang_sys_key;
                 }
                 else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '')
                 {
@@ -497,7 +499,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false,$with_locationgroup=false)
+    public static function findOne($reference, $with_booking = false,$with_locationgroup=false,$rent=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -551,13 +553,23 @@ class Properties extends Model
         {
             $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
+        $sale_rent = "sale";
+        if(isset($property->property->rent) && $property->property->rent == true){
+            $sale_rent = "rent";
+        }
+        if(isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == true){
+            $sale_rent = "sale";
+        }
+        if($rent==true){
+            $sale_rent = "rent";
+        }
         $title = 'title';
         $description = 'description';
         $price = 'sale';
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if (isset($property->property->rent) && $property->property->rent == true)
+        if ($sale_rent=='rent')
         {
             $title = 'rental_title';
             $description = 'rental_description';
@@ -566,7 +578,7 @@ class Properties extends Model
             $seo_description = 'rental_seo_description';
             $keywords = 'rental_keywords';
         }
-//        start slug_all
+        //    start slug_all
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
