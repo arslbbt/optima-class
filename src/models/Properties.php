@@ -1282,6 +1282,14 @@ class Properties extends Model
         }
         else
         {
+            if (isset($get["price_range"]) && $get["price_range"] != "")
+            {
+                $from = substr($get["price_range"],0, strrpos($get["price_range"], '-'));
+                $to = substr($get["price_range"], strrpos($get["price_range"], '-') + 1);
+
+                $query .= '&currentprice[]=' . $from;
+                $query .= '&currentprice[]=' . $to;
+            }
             if (isset($get["price_from"]) && $get["price_from"] != "")
             {
                 $query .= '&currentprice[]=' . $get["price_from"];
