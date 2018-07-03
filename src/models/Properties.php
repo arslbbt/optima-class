@@ -553,13 +553,23 @@ class Properties extends Model
         {
             $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
+        $sale_rent = "sale";
+        if(isset($property->property->rent) && $property->property->rent == true){
+            $sale_rent = "rent";
+        }
+        if(isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == true){
+            $sale_rent = "sale";
+        }
+        if($rent==true){
+            $sale_rent = "rent";
+        }
         $title = 'title';
         $description = 'description';
         $price = 'sale';
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if (isset($property->property->rent) && $property->property->rent == true)
+        if ($sale_rent=='rent')
         {
             $title = 'rental_title';
             $description = 'rental_description';
