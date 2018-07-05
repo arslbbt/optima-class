@@ -104,11 +104,10 @@ class Properties extends Model
             if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
             {
                 $ref = $settings['general_settings']['reference'];
-                if(isset($property->property->$ref))
+                if (isset($property->property->$ref))
                     $data['reference'] = $property->property->$ref;
                 else
                     $data['reference'] = $property->agency_code . '-' . $property->property->reference;
-
             }
             else
             {
@@ -177,6 +176,10 @@ class Properties extends Model
             if (isset($property->property->rent) && $property->property->rent == 1)
             {
                 $data['rent'] = $property->property->rent;
+                if (isset($property->property->st_rental) && $property->property->st_rental == 1)
+                    $data['st_rental'] = $property->property->st_rental;
+                if (isset($property->property->lt_rental) && $property->property->lt_rental == 1)
+                    $data['lt_rental'] = $property->property->lt_rental;
             }
             if (isset($property->property->bedrooms) && $property->property->bedrooms > 0)
             {
@@ -286,7 +289,7 @@ class Properties extends Model
             {
                 $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
             }
-            if (isset($property->property->location_group) && $property->property->location_group!='N/A')
+            if (isset($property->property->location_group) && $property->property->location_group != 'N/A')
             {
                 $data['location_group'] = $property->property->location_group;
             }
@@ -499,7 +502,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false,$with_locationgroup=false,$rent=false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -516,8 +519,10 @@ class Properties extends Model
         if (isset($with_booking) && $with_booking == true)
         {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
-        }elseif($with_locationgroup==true){
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref.'&with_locationgroup=true';
+        }
+        elseif ($with_locationgroup == true)
+        {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true';
         }
         else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
@@ -527,7 +532,7 @@ class Properties extends Model
         $return_data = [];
         $attachments = [];
         $attachment_descriptions = [];
-        $attachment_alt_descriptions=[];
+        $attachment_alt_descriptions = [];
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
@@ -544,7 +549,7 @@ class Properties extends Model
         if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference')
         {
             $ref = $settings['general_settings']['reference'];
-            if(isset($property->property->$ref))
+            if (isset($property->property->$ref))
                 $return_data['reference'] = $property->property->$ref;
             else
                 $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
@@ -554,13 +559,16 @@ class Properties extends Model
             $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
         }
         $sale_rent = "sale";
-        if(isset($property->property->rent) && $property->property->rent == true){
+        if (isset($property->property->rent) && $property->property->rent == true)
+        {
             $sale_rent = "rent";
         }
-        if(isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == true){
+        if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == true)
+        {
             $sale_rent = "sale";
         }
-        if($rent==true){
+        if ($rent == true)
+        {
             $sale_rent = "rent";
         }
         $title = 'title';
@@ -569,7 +577,7 @@ class Properties extends Model
         $seo_title = 'seo_title';
         $seo_description = 'seo_description';
         $keywords = 'keywords';
-        if ($sale_rent=='rent')
+        if ($sale_rent == 'rent')
         {
             $title = 'rental_title';
             $description = 'rental_description';
@@ -607,9 +615,12 @@ class Properties extends Model
         }
         else
         {
-            if(isset($property->property->location) && $property->property->location!=''){
+            if (isset($property->property->location) && $property->property->location != '')
+            {
                 $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-            }else{
+            }
+            else
+            {
                 $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one));
             }
         }
@@ -746,7 +757,7 @@ class Properties extends Model
         {
             $return_data['city_key'] = $property->property->city;
         }
-        if (isset($property->property->location_group) && $property->property->location_group!='N/A')
+        if (isset($property->property->location_group) && $property->property->location_group != 'N/A')
         {
             $return_data['location_group'] = $property->property->location_group;
         }
@@ -1224,11 +1235,14 @@ class Properties extends Model
                 $query .= '&location_group[]=' . $value;
             }
         }
-        if (isset($get["lg_by_key"]) && is_string($get["lg_by_key"]) && $get["lg_by_key"] != '') {
+        if (isset($get["lg_by_key"]) && is_string($get["lg_by_key"]) && $get["lg_by_key"] != '')
+        {
             $query .= '&lg_by_key[]=' . $get["lg_by_key"];
         }
-        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0) {
-            foreach ($get["lg_by_key"] as $key => $value) {
+        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0)
+        {
+            foreach ($get["lg_by_key"] as $key => $value)
+            {
                 $query .= '&lg_by_key[]=' . $value;
             }
         }
@@ -1297,7 +1311,7 @@ class Properties extends Model
         {
             if (isset($get["price_range"]) && $get["price_range"] != "")
             {
-                $from = substr($get["price_range"],0, strrpos($get["price_range"], '-'));
+                $from = substr($get["price_range"], 0, strrpos($get["price_range"], '-'));
                 $to = substr($get["price_range"], strrpos($get["price_range"], '-') + 1);
 
                 $query .= '&currentprice[]=' . $from;
@@ -1343,6 +1357,10 @@ class Properties extends Model
         if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"])
         {
             $query .= '&pool[]=pool_communal';
+        }
+        if (isset($get["pool"]) && $get["pool"] != '')
+        {
+            $query .= '&pool[]=' . $get["pool"];
         }
         if (isset($get["private_pool"]) && $get["private_pool"] != "" && $get["private_pool"])
         {
@@ -1436,6 +1454,14 @@ class Properties extends Model
         if (isset($get["agency_reference"]) && $get["agency_reference"] != "")
         {
             $query .= '&agency_reference=' . $get['agency_reference'];
+        }
+        if (isset($get["sale"]) && $get["sale"] != "")
+        {
+            $query .= '&sale=1';
+        }
+        if (isset($get["rent"]) && $get["rent"] != "")
+        {
+            $query .= '&rent=1';
         }
         if (isset($get["st_rental"]) && $get["st_rental"] != "")
         {
