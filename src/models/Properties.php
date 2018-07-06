@@ -1375,6 +1375,10 @@ class Properties extends Model
         {
             $query .= '&categories[]=golf';
         }
+        if (isset($get["luxury"]) && $get["luxury"] != '' && $get["luxury"])
+        {
+            $query .= '&categories[]=luxury';
+        }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"])
         {
             $query .= '&settings[]=close_to_sea';
@@ -1382,6 +1386,10 @@ class Properties extends Model
         if (isset($get["sea_view"]) && $get["sea_view"] != '' && $get["sea_view"])
         {
             $query .= '&views[]=sea';
+        }
+        if (isset($get["panoramic"]) && $get["panoramic"] != '' && $get["panoramic"])
+        {
+            $query .= '&views[]=panoramic';
         }
         if (isset($get["pool"]) && $get["pool"] != '' && $get["pool"])
         {
