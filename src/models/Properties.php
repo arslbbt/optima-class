@@ -1214,16 +1214,7 @@ class Properties extends Model
                 }
             }
         }
-        if (isset($get["style"]) && is_array($get["style"]) && $get["style"] != "")
-        {
-            foreach ($get["style"] as $key => $value)
-            {
-                if ($value != '')
-                {
-                    $query .= '&p_style[]=' . $value;
-                }
-            }
-        }
+
         if (isset($get["location_group"]) && is_string($get["location_group"]) && $get["location_group"] != '')
         {
             $query .= '&location_group[]=' . $get["location_group"];
