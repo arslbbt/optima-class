@@ -226,7 +226,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         if ($id == null)
         {
-            $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) . '.json';
+            $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) .'-'.$type. '.json';
         }
         else
         {
