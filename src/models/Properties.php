@@ -1214,16 +1214,7 @@ class Properties extends Model
                 }
             }
         }
-        if (isset($get["style"]) && is_array($get["style"]) && $get["style"] != "")
-        {
-            foreach ($get["style"] as $key => $value)
-            {
-                if ($value != '')
-                {
-                    $query .= '&p_style[]=' . $value;
-                }
-            }
-        }
+
         if (isset($get["location_group"]) && is_string($get["location_group"]) && $get["location_group"] != '')
         {
             $query .= '&location_group[]=' . $get["location_group"];
@@ -1394,6 +1385,10 @@ class Properties extends Model
         {
             $query .= '&categories[]=golf';
         }
+        if (isset($get["luxury"]) && $get["luxury"] != '' && $get["luxury"])
+        {
+            $query .= '&categories[]=luxury';
+        }
         if (isset($get["close_to_sea"]) && $get["close_to_sea"] != '' && $get["close_to_sea"])
         {
             $query .= '&settings[]=close_to_sea';
@@ -1401,6 +1396,10 @@ class Properties extends Model
         if (isset($get["sea_view"]) && $get["sea_view"] != '' && $get["sea_view"])
         {
             $query .= '&views[]=sea';
+        }
+        if (isset($get["panoramic"]) && $get["panoramic"] != '' && $get["panoramic"])
+        {
+            $query .= '&views[]=panoramic';
         }
         if (isset($get["pool"]) && $get["pool"] != '' && $get["pool"])
         {
