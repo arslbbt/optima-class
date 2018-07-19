@@ -168,7 +168,7 @@ class Developments extends Model {
         }
         if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
             foreach ($property->property->general_features as $key => $value) {
-                if ($key == 'kitchens' && $value != 'No') {
+                if ($key == 'kitchens' && $value != '') {
                     $kitchen[] = \Yii::t('app', $value);
                 } 
                 if ($key == 'floors' && $value != '') {
