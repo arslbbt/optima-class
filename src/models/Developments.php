@@ -126,6 +126,10 @@ class Developments extends Model {
         {
             $return_data['bathrooms'] = $property->property->bathrooms_from;
         }
+        if(isset($property->property->built_size_from) && $property->property->built_size_from > 0)
+        {
+            $return_data['built'] = $property->property->built_size_from;
+        }
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
@@ -136,6 +140,10 @@ class Developments extends Model {
         $features = [];
         $setting = [];
         $views = [];
+        $kitchen = [];
+        $floor = [];
+
+     
         if (isset($property->property->setting) && count($property->property->setting) > 0) {
             foreach ($property->property->setting as $key => $value) {
                 if ($value == true)
@@ -156,6 +164,16 @@ class Developments extends Model {
                     if ($key == true && $key != 'furniture')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
+            }
+        }
+        if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
+            foreach ($property->property->general_features as $key => $value) {
+                if ($key == 'kitchens' && $value != 'No') {
+                    $kitchen[] = \Yii::t('app', $value);
+                } 
+                if ($key == 'floors' && $value != '') {
+                    $floor[] = \Yii::t('app', $value);
+                } 
             }
         }
         $properties = [];
@@ -198,6 +216,8 @@ class Developments extends Model {
         $return_data['property_features']['features'] = $features;
         $return_data['property_features']['setting'] = $setting;
         $return_data['property_features']['views'] = $views;
+        $return_data['property_features']['kitchens'] = $kitchen;
+        $return_data['property_features']['floors'] = $floor;
         $return_data['properties'] = $properties;
         return $return_data;
     }
