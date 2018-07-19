@@ -885,7 +885,9 @@ class Properties extends Model
         }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
-            foreach ($property->bookings as $booking)
+            $group_booked = [];
+
+            foreach ($property->bookings as $key => $booking)
             {
                 if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '')
                 {
@@ -899,8 +901,17 @@ class Properties extends Model
                     {
                         $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
+                    /*
+                     * grouping logic dates
+                     */
+                    $group_booked[$key] = [];
+                    for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
+                    {
+                        $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                    }
                 }
             }
+            $return_data['group_booked'] = $group_booked;
             $return_data['booked_dates'] = $booked_dates;
             $return_data['booked_dates_costa'] = $booked_dates_costa;
         }
@@ -1214,16 +1225,7 @@ class Properties extends Model
                 }
             }
         }
-        if (isset($get["style"]) && is_array($get["style"]) && $get["style"] != "")
-        {
-            foreach ($get["style"] as $key => $value)
-            {
-                if ($value != '')
-                {
-                    $query .= '&p_style[]=' . $value;
-                }
-            }
-        }
+
         if (isset($get["location_group"]) && is_string($get["location_group"]) && $get["location_group"] != '')
         {
             $query .= '&location_group[]=' . $get["location_group"];
