@@ -126,6 +126,10 @@ class Developments extends Model {
         {
             $return_data['bathrooms'] = $property->property->bathrooms_from;
         }
+        if(isset($property->property->built_size_from) && $property->property->built_size_from > 0)
+        {
+            $return_data['built'] = $property->property->built_size_from;
+        }
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
@@ -150,10 +154,16 @@ class Developments extends Model {
         }
         if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
             foreach ($property->property->general_features as $key => $value) {
+                if ($key == 'kitchens' && $value != '') {
+                    $features[] = \Yii::t('app', 'kitchens') . ': '. \Yii::t('app', strtolower($value));
+                }
+                if ($key == 'floors' && $value != '') {
+                    $features[] = \Yii::t('app', 'floors') . ': '. \Yii::t('app', strtolower($value));
+                }
                 if ($key == 'furniture' && $value != 'No') {
-                    $features[] = \Yii::t('app', 'furniture') . ': ' . \Yii::t('app', $value);
+                    $features[] = \Yii::t('app', 'furniture') . ': '. \Yii::t('app', strtolower($value));
                 } else {
-                    if ($key == true && $key != 'furniture')
+                    if ($key == true && $key != 'furniture' &&  $key != 'kitchens' &&  $key != 'floors' )
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
@@ -199,6 +209,8 @@ class Developments extends Model {
         $return_data['property_features']['setting'] = $setting;
         $return_data['property_features']['views'] = $views;
         $return_data['properties'] = $properties;
+
+        
         return $return_data;
     }
 
