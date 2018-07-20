@@ -318,7 +318,7 @@ class Properties extends Model
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
-            //    end slug_all
+//        end slug_all
             $data['slug_all'] = $slugs;
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
@@ -885,9 +885,7 @@ class Properties extends Model
         }
         if (isset($property->bookings) && count($property->bookings) > 0)
         {
-            $group_booked = [];
-
-            foreach ($property->bookings as $key => $booking)
+            foreach ($property->bookings as $booking)
             {
                 if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '')
                 {
@@ -901,17 +899,8 @@ class Properties extends Model
                     {
                         $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
-                    /*
-                     * grouping logic dates
-                     */
-                    $group_booked[$key] = [];
-                    for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
-                    {
-                        $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
-                    }
                 }
             }
-            $return_data['group_booked'] = $group_booked;
             $return_data['booked_dates'] = $booked_dates;
             $return_data['booked_dates_costa'] = $booked_dates_costa;
         }
