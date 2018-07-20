@@ -318,7 +318,7 @@ class Properties extends Model
                         $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
                 }
             }
-//        end slug_all
+            //    end slug_all
             $data['slug_all'] = $slugs;
             if (isset($property->attachments) && count($property->attachments) > 0)
             {

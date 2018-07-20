@@ -140,10 +140,6 @@ class Developments extends Model {
         $features = [];
         $setting = [];
         $views = [];
-        $kitchen = [];
-        $floor = [];
-
-     
         if (isset($property->property->setting) && count($property->property->setting) > 0) {
             foreach ($property->property->setting as $key => $value) {
                 if ($value == true)
@@ -158,22 +154,18 @@ class Developments extends Model {
         }
         if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
             foreach ($property->property->general_features as $key => $value) {
+                if ($key == 'kitchens' && $value != '') {
+                    $features[] = \Yii::t('app', 'kitchens') . ': '. \Yii::t('app', strtolower($value));
+                }
+                if ($key == 'floors' && $value != '') {
+                    $features[] = \Yii::t('app', 'floors') . ': '. \Yii::t('app', strtolower($value));
+                }
                 if ($key == 'furniture' && $value != 'No') {
-                    $features[] = \Yii::t('app', 'furniture') . ': ' . \Yii::t('app', $value);
+                    $features[] = \Yii::t('app', 'furniture') . ': '. \Yii::t('app', strtolower($value));
                 } else {
-                    if ($key == true && $key != 'furniture')
+                    if ($key == true && $key != 'furniture' &&  $key != 'kitchens' &&  $key != 'floors' )
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
-            }
-        }
-        if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
-            foreach ($property->property->general_features as $key => $value) {
-                if ($key == 'kitchens' && $value != 'No') {
-                    $kitchen[] = \Yii::t('app', $value);
-                } 
-                if ($key == 'floors' && $value != '') {
-                    $floor[] = \Yii::t('app', $value);
-                } 
             }
         }
         $properties = [];
@@ -216,9 +208,9 @@ class Developments extends Model {
         $return_data['property_features']['features'] = $features;
         $return_data['property_features']['setting'] = $setting;
         $return_data['property_features']['views'] = $views;
-        $return_data['property_features']['kitchens'] = $kitchen;
-        $return_data['property_features']['floors'] = $floor;
         $return_data['properties'] = $properties;
+
+        
         return $return_data;
     }
 
