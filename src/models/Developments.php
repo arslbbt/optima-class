@@ -151,7 +151,6 @@ class Developments extends Model {
             }
             $return_data['attachments'] = $attachments;
         }
-
         $features = [];
         $setting = [];
         $views = [];
