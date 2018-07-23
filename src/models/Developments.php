@@ -100,6 +100,9 @@ class Developments extends Model {
         if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
             $return_data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
 
+        if (isset($property->property->phase_heigh_price_from) && $property->property->phase_heigh_price_from != '')
+           $return_data['price_to'] = number_format((int) $property->property->phase_heigh_price_from, 0, '', '.');
+
         if (isset($property->property->description->$lang))
             $return_data['description'] = $property->property->description->$lang;
         if ((isset($property->property->alternative_latitude) && $property->property->alternative_latitude != '') && (isset($property->property->alternative_longitude) && $property->property->alternative_longitude != '')) {
@@ -120,15 +123,27 @@ class Developments extends Model {
         }
         if(isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0)
         {
-            $return_data['bedrooms'] = $property->property->bedrooms_from;
+            $return_data['bedrooms_from'] = $property->property->bedrooms_from;
+        }
+        if(isset($property->property->bedrooms_to) && $property->property->bedrooms_to > 0)
+        {
+            $return_data['bedrooms_to'] = $property->property->bedrooms_to;
         }
         if(isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
         {
-            $return_data['bathrooms'] = $property->property->bathrooms_from;
+            $return_data['bathrooms_from'] = $property->property->bathrooms_from;
+        }
+        if(isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0)
+        {
+            $return_data['bathrooms_to'] = $property->property->bathrooms_to;
         }
         if(isset($property->property->built_size_from) && $property->property->built_size_from > 0)
         {
-            $return_data['built'] = $property->property->built_size_from;
+            $return_data['built_size_from'] = $property->property->built_size_from;
+        }
+        if(isset($property->property->built_size_to) && $property->property->built_size_to > 0)
+        {
+            $return_data['built_size_to'] = $property->property->built_size_to;
         }
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
@@ -209,8 +224,6 @@ class Developments extends Model {
         $return_data['property_features']['setting'] = $setting;
         $return_data['property_features']['views'] = $views;
         $return_data['properties'] = $properties;
-
-        
         return $return_data;
     }
 
