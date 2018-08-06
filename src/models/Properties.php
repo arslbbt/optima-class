@@ -897,16 +897,17 @@ class Properties extends Model
                     }
                     // booking dates for costa - last day available - OPT-3533
                     // Revert above-booking dates for costa - CA search calendar update (OPT-3561)
-                    for ($i = $booking->date_from; $i < $booking->date_until; $i += 86400)
-                    {
-                        $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
-                    }
+//                    for ($i = $booking->date_from; $i < $booking->date_until; $i += 86400)
+//                    {
+//                        $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+//                    }
                     /*
                      * grouping logic dates
                      */
                     $group_booked[$key] = [];
                     for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
                     {
+                        $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                         $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                     }
                 }
@@ -916,7 +917,7 @@ class Properties extends Model
             $return_data['booked_dates_costa'] = $booked_dates_costa;
         }
 
-        
+
 
         if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos)))
         {
@@ -1085,31 +1086,31 @@ class Properties extends Model
                 }
             }
         }
-        if (isset($property->property->distance_airport) && count($property->property->distance_airport) > 0 && isset($property->property->distance_airport->value) && $property->property->distance_airport->value > 0)
+        if (isset($property->property->distance_airport) && count((array) $property->property->distance_airport) > 0 && isset($property->property->distance_airport->value) && $property->property->distance_airport->value > 0)
         {
             $distances['distance_airport'] = $property->property->distance_airport->value . ' ' . (isset($property->property->distance_airport->unit) ? $property->property->distance_airport->unit : 'km');
         }
-        if (isset($property->property->distance_beach) && count($property->property->distance_beach) > 0 && isset($property->property->distance_beach->value) && $property->property->distance_beach->value > 0)
+        if (isset($property->property->distance_beach) && count((array) $property->property->distance_beach) > 0 && isset($property->property->distance_beach->value) && $property->property->distance_beach->value > 0)
         {
             $distances['distance_beach'] = $property->property->distance_beach->value . ' ' . (isset($property->property->distance_beach->unit) ? $property->property->distance_beach->unit : 'km');
         }
-        if (isset($property->property->distance_golf) && count($property->property->distance_golf) > 0 && isset($property->property->distance_golf->value) && $property->property->distance_golf->value > 0)
+        if (isset($property->property->distance_golf) && count((array) $property->property->distance_golf) > 0 && isset($property->property->distance_golf->value) && $property->property->distance_golf->value > 0)
         {
             $distances['distance_golf'] = $property->property->distance_golf->value . ' ' . (isset($property->property->distance_golf->unit) ? $property->property->distance_golf->unit : 'km');
         }
-        if (isset($property->property->distance_restaurant) && count($property->property->distance_restaurant) > 0 && isset($property->property->distance_restaurant->value) && $property->property->distance_restaurant->value > 0)
+        if (isset($property->property->distance_restaurant) && count((array) $property->property->distance_restaurant) > 0 && isset($property->property->distance_restaurant->value) && $property->property->distance_restaurant->value > 0)
         {
             $distances['distance_restaurant'] = $property->property->distance_restaurant->value . ' ' . (isset($property->property->distance_restaurant->unit) ? $property->property->distance_restaurant->unit : 'km');
         }
-        if (isset($property->property->distance_sea) && count($property->property->distance_sea) > 0 && isset($property->property->distance_sea->value) && $property->property->distance_sea->value > 0)
+        if (isset($property->property->distance_sea) && count((array) $property->property->distance_sea) > 0 && isset($property->property->distance_sea->value) && $property->property->distance_sea->value > 0)
         {
             $distances['distance_sea'] = $property->property->distance_sea->value . ' ' . (isset($property->property->distance_sea->unit) ? $property->property->distance_sea->unit : 'km');
         }
-        if (isset($property->property->distance_supermarket) && count($property->property->distance_supermarket) > 0 && isset($property->property->distance_supermarket->value) && $property->property->distance_supermarket->value > 0)
+        if (isset($property->property->distance_supermarket) && count((array) $property->property->distance_supermarket) > 0 && isset($property->property->distance_supermarket->value) && $property->property->distance_supermarket->value > 0)
         {
             $distances['distance_supermarket'] = $property->property->distance_supermarket->value . ' ' . (isset($property->property->distance_supermarket->unit) ? $property->property->distance_supermarket->unit : 'km');
         }
-        if (isset($property->property->distance_next_town) && count($property->property->distance_next_town) > 0 && isset($property->property->distance_next_town->value) && $property->property->distance_next_town->value > 0)
+        if (isset($property->property->distance_next_town) && count((array) $property->property->distance_next_town) > 0 && isset($property->property->distance_next_town->value) && $property->property->distance_next_town->value > 0)
         {
             $distances['distance_next_town'] = $property->property->distance_next_town->value . ' ' . (isset($property->property->distance_next_town->unit) ? $property->property->distance_next_town->unit : 'km');
         }
@@ -1174,7 +1175,7 @@ class Properties extends Model
             }
             if ($get["transaction"] == '7')
             {
-                $query .= '&sale=1';
+                $query .= '&sale=1&not_new_construction=1';
             }
         }
         if (isset($get['province']) && $get['province'] != '')
