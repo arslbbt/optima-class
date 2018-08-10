@@ -258,12 +258,11 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         $data = json_decode($file_data, TRUE);
-
         $lang = strtoupper(\Yii::$app->language);
         $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
         $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::getImageUrl($url, $name) : '',
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -348,7 +347,7 @@ class Cms extends Model
             }
             else
             {
-                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::getImageUrl($url, $name) : '';
+                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
             }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
@@ -366,7 +365,7 @@ class Cms extends Model
 
     public static function CacheImage($url, $name)
     {
-
+        $settings = self::settings();
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
@@ -375,6 +374,10 @@ class Cms extends Model
         $filesaved = $webroot . '/uploads/temp/' . $name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
+            $handle = @fopen($url, 'r');
+            if (!$handle) {
+                $url='https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/1200/' . $name;
+            }
             $file_data = @file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
@@ -406,15 +409,5 @@ class Cms extends Model
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-    }
-    public static function getImageUrl($url, $name)
-    {
-        $settings = self::settings();
-        $handle = @fopen($url, 'r');
-        if (!$handle) {
-            return 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/1200/' . $name;
-        } else {
-            return $url;
-        }
     }
 }
