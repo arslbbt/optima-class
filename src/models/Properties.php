@@ -518,14 +518,14 @@ class Properties extends Model
 
         if (isset($with_booking) && $with_booking == true)
         {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
         }
         elseif ($with_locationgroup == true)
         {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true';
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         }
         else
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $settings = Cms::settings();
