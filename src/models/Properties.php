@@ -536,7 +536,9 @@ class Properties extends Model
         $floor_plans = [];
         $booked_dates = [];
         $distances = [];
-
+        if(!isset($property->property)){
+            throw new \yii\web\NotFoundHttpException();
+        }
         if (isset($property->property->_id))
         {
             $return_data['_id'] = $property->property->_id;
