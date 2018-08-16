@@ -502,7 +502,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -523,6 +523,10 @@ class Properties extends Model
         elseif ($with_locationgroup == true)
         {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true&ip=' . \Yii::$app->getRequest()->getUserIP();
+        }
+        elseif($with_construction == true)
+        {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_construction=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         }
         else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
