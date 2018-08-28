@@ -43,7 +43,7 @@ class Dropdowns extends Model {
         }
         $file = $webroot . '/uploads/temp/urbanisations.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["key" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
+            $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
             $curl = new curl\Curl();
             $response = $curl->setRequestBody(json_encode($post_data))
                     ->setHeaders([
