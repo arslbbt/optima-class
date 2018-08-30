@@ -1014,6 +1014,15 @@ class Properties extends Model {
                 }
             }
         }
+        if (isset($get["city"]) && $get["city"] != "") {
+            if (is_array($get["city"]) && count($get["city"])) {
+                foreach ($get["city"] as $value) {
+                    if ($value != '') {
+                        $query .= '&address_city[]=' . $value;
+                    }
+                }
+            }
+        }
         if (isset($get["type"]) && is_array($get["type"]) && $get["type"] != "") {
             foreach ($get["type"] as $key => $value) {
                 if ($value != '') {
