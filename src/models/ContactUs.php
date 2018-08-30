@@ -15,7 +15,6 @@ class ContactUs extends Model
     public $lead_status;
     public $email;
     public $phone;
-    public $language;
     public $call_remember;
     public $message;
     public $redirect_url;
@@ -63,7 +62,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name', 'phone','language', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3','cv_file', 'gdpr_status'], 'safe'],
+            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3','cv_file', 'gdpr_status'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
@@ -144,6 +143,16 @@ class ContactUs extends Model
             }
             else if (isset($this->subscribe) && $this->subscribe == 1)
             {
+                
+                $subscribe_msg ='';
+                $logo = 'https://my.optima-crm.com/uploads/cms_settings/'.$settings['_id'].'/' . $settings['header']['logo']['name'];
+                foreach($settings['custom_settings'] as $setting){
+                    if($setting['key'] == 'subscribe'){
+                        $subscribe_msg = \Yii::t('app', strtolower($setting['value']));
+                    }
+                }
+                $htmlBody = $subscribe_msg.'<br><br><br><br> <img style="width:40%" src='.$logo.'> ';
+                $email_response =  isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing';
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
@@ -154,7 +163,7 @@ class ContactUs extends Model
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
                         ->setSubject('Thank you for contacting us')
-                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
+                        ->setHtmlBody($subscribe_msg != '' ? $htmlBody : $email_response)
                         ->send();
                 $this->saveAccount();
             }
@@ -174,16 +183,6 @@ class ContactUs extends Model
                 {
                     $html .= '<br>';
                     $html .= 'Email: ' . $this->email;
-                }
-                if (isset($this->phone) && $this->phone != '')
-                {
-                    $html .= '<br>';
-                    $html .= 'Phone: ' . $this->phone;
-                }
-                if (isset($this->language) && $this->language != '')
-                {
-                    $html .= '<br>';
-                    $html .= 'Language: ' . $this->language;
                 }
                 if (isset($this->reference) && $this->reference != '')
                 {
@@ -291,7 +290,6 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
-            'language' => isset($this->language) ? $this->language : '',
             'property' => isset($this->reference) ? $this->reference : null,
             'newsletter' => isset($this->news_letter) && $this->news_letter == true ? $this->news_letter : false,
             'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
@@ -316,7 +314,6 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => isset($this->sender_phone) ? $this->sender_phone : '',
-            'language' => isset($this->language) ? $this->language : '',
             'property' => isset($this->reference) ? $this->reference : null,
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
