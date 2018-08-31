@@ -113,9 +113,11 @@ class ContactUs extends Model
         {
             if (isset($this->attach) && $this->attach == 1)
             {
+               
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf'))
-                {
+                {   
+
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
@@ -144,11 +146,16 @@ class ContactUs extends Model
             else if (isset($this->subscribe) && $this->subscribe == 1)
             {
                 
+                
                 $subscribe_msg ='';
+                $subscribe_subject ='';
                 $logo = 'https://my.optima-crm.com/uploads/cms_settings/'.$settings['_id'].'/' . $settings['header']['logo']['name'];
                 foreach($settings['custom_settings'] as $setting){
                     if($setting['key'] == 'subscribe'){
                         $subscribe_msg = \Yii::t('app', $setting['value']);
+                    }
+                    if($setting['key'] == 'newsletter_subject'){
+                        $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
                 }
                 $htmlBody = $subscribe_msg.'<br><br><br><br> <img style="width:40%" src='.$logo.'> ';
@@ -162,13 +169,15 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
-                        ->setSubject('Thank you for contacting us')
+                        ->setSubject( $subscribe_subject !=''? $subscribe_subject:'Thank you for contacting us')
                         ->setHtmlBody($subscribe_msg != '' ? $htmlBody : $email_response)
                         ->send();
                 $this->saveAccount();
             }
             else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1)
             {
+                
+                
                 $html = '';
                 if (isset($this->first_name) && $this->first_name != '')
                 {
@@ -235,6 +244,13 @@ class ContactUs extends Model
             }
             else
             {
+                $subscribe_subject ='';
+                    foreach($settings['custom_settings'] as $setting){
+                        if($setting['key'] == 'enquiry_subject'){
+                            $subscribe_subject = \Yii::t('app', $setting['value']);
+                        }
+                    }
+               
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)]))
                 {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
@@ -251,7 +267,7 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
-                        ->setSubject('Thank you for contacting us')
+                        ->setSubject($subscribe_subject !=''? $subscribe_subject:'Thank you for contacting us')
                         ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
