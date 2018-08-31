@@ -148,7 +148,7 @@ class ContactUs extends Model
                 $logo = 'https://my.optima-crm.com/uploads/cms_settings/'.$settings['_id'].'/' . $settings['header']['logo']['name'];
                 foreach($settings['custom_settings'] as $setting){
                     if($setting['key'] == 'subscribe'){
-                        $subscribe_msg = \Yii::t('app', strtolower($setting['value']));
+                        $subscribe_msg = \Yii::t('app', $setting['value']);
                     }
                 }
                 $htmlBody = $subscribe_msg.'<br><br><br><br> <img style="width:40%" src='.$logo.'> ';
