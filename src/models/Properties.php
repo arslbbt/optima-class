@@ -268,8 +268,9 @@ class Properties extends Model {
             }
             $slugs = [];
             foreach ($langugesSystem as $lang_sys) {
+                
                 $lang_sys_key = $lang_sys['key'];
-                $lang_sys_internal_key = $lang_sys['internal_key'];
+                $lang_sys_internal_key = isset($lang_sys['internal_key']) && $lang_sys['internal_key'] !='' ? $lang_sys['internal_key']:'';
                 if (isset($property->property->$perma_link->$lang_sys_key) && $property->property->$perma_link->$lang_sys_key != '') {
                     $slugs[$lang_sys_internal_key] = $property->property->$perma_link->$lang_sys_key;
                 } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
