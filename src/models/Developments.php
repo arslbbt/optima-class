@@ -12,9 +12,11 @@ use optima\models\Cms;
  * @property User|null $user This property is read-only.
  *
  */
-class Developments extends Model {
+class Developments extends Model
+{
 
-    public static function findAll($query) {
+    public static function findAll($query)
+    {
         $lang = \Yii::$app->language;
         $langugesSystem = Cms::SystemLanguages();
         $query .= self::setQuery();
@@ -42,7 +44,7 @@ class Developments extends Model {
                 $data['type'] = implode(', ', $property->property->type);
 
             if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
-                $data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
+                $data['price_from'] = number_format((int)$property->property->phase_low_price_from, 0, '', '.');
 
             if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
                 $data['bedrooms'] = $property->property->bedrooms_from;
@@ -78,15 +80,18 @@ class Developments extends Model {
         return $return_data;
     }
 
-    public static function findOne($reference) {
+    public static function findOne($reference)
+    {
         $langugesSystem = Cms::SystemLanguages();
         $ref = $reference;
-        $lang = \Yii::$app->language;
+        $lang = strtoupper(\Yii::$app->language);
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         $return_data = [];
         $attachments = [];
+        $floor_plans = [];
+        $quality_specifications = [];
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;
@@ -98,10 +103,10 @@ class Developments extends Model {
         else
             $return_data['title'] = 'N/A';
         if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
-            $return_data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
+            $return_data['price_from'] = number_format((int)$property->property->phase_low_price_from, 0, '', '.');
 
         if (isset($property->property->phase_heigh_price_from) && $property->property->phase_heigh_price_from != '')
-           $return_data['price_to'] = number_format((int) $property->property->phase_heigh_price_from, 0, '', '.');
+            $return_data['price_to'] = number_format((int)$property->property->phase_heigh_price_from, 0, '', '.');
 
         if (isset($property->property->description->$lang))
             $return_data['description'] = $property->property->description->$lang;
@@ -110,39 +115,32 @@ class Developments extends Model {
                 $return_data['lat'] = $property->property->alternative_latitude;
             if (isset($property->property->alternative_longitude))
                 $return_data['lng'] = $property->property->alternative_longitude;
-        }else {
+        } else {
             if (isset($property->property->latitude))
                 $return_data['lat'] = $property->property->latitude;
             if (isset($property->property->longitude))
                 $return_data['lng'] = $property->property->longitude;
         }
-        if (isset($property->property->location))
-        {
+        if (isset($property->property->location)) {
             $return_data['location'] = $property->property->location;
             $return_data['location_key'] = isset($property->property->location_key) ? $property->property->location_key : '';
         }
-        if(isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0)
-        {
+        if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
             $return_data['bedrooms_from'] = $property->property->bedrooms_from;
         }
-        if(isset($property->property->bedrooms_to) && $property->property->bedrooms_to > 0)
-        {
+        if (isset($property->property->bedrooms_to) && $property->property->bedrooms_to > 0) {
             $return_data['bedrooms_to'] = $property->property->bedrooms_to;
         }
-        if(isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
-        {
+        if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0) {
             $return_data['bathrooms_from'] = $property->property->bathrooms_from;
         }
-        if(isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0)
-        {
+        if (isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0) {
             $return_data['bathrooms_to'] = $property->property->bathrooms_to;
         }
-        if(isset($property->property->built_size_from) && $property->property->built_size_from > 0)
-        {
+        if (isset($property->property->built_size_from) && $property->property->built_size_from > 0) {
             $return_data['built_size_from'] = $property->property->built_size_from;
         }
-        if(isset($property->property->built_size_to) && $property->property->built_size_to > 0)
-        {
+        if (isset($property->property->built_size_to) && $property->property->built_size_to > 0) {
             $return_data['built_size_to'] = $property->property->built_size_to;
         }
         if (isset($property->attachments) && count($property->attachments) > 0) {
@@ -150,6 +148,55 @@ class Developments extends Model {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
             }
             $return_data['attachments'] = $attachments;
+        }
+        if (isset($property->documents) && count($property->documents) > 0) {
+            foreach ($property->documents as $pic) {
+                if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
+
+                    if (isset(Yii::$app->params['constructions_doc_url']))
+                        $floor_plans[] = Yii::$app->params['constructions_doc_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                }
+            }
+            $return_data['floor_plans'] = $floor_plans;
+        }
+        if (isset($property->documents) && count($property->documents) > 0) {
+            foreach ($property->documents as $pic) {
+                if (isset($pic->identification_type) && $pic->identification_type == 'QS') {
+                    if (isset(Yii::$app->params['constructions_doc_url']))
+                        $quality_specifications[] = Yii::$app->params['constructions_doc_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                }
+            }
+            $return_data['quality_specifications'] = $quality_specifications;
+        }
+        if (isset($property->property->phase) && count($property->property->phase) > 0) {
+            $phases = [];
+            foreach ($property->property->phase as $phase) {
+                $arr = [];
+                if (isset($phase->phase_name) && $phase->phase_name != '') {
+                    $arr['phase_name'] = $phase->phase_name;
+                }
+                if (isset($phase->price_from) && $phase->price_from != '') {
+                    $arr['price_from'] = $phase->price_from;
+                }
+                if (isset($phase->price_to) && $phase->price_to != '') {
+                    $arr['price_to'] = $phase->price_to;
+                }
+                if (isset($phase->tq) && count($phase->tq) > 0) {
+                    $all_types = Dropdowns::types();
+                    $types = [];
+                    foreach ($phase->tq as $tq) {
+                        if (isset($tq->type) && $tq->type != '') {
+                            foreach ($all_types as $type) {
+                                if ($type['key'] == $tq->type)
+                                    $types[] = isset($type['value'][strtolower($contentLang)]) ? $type['value'][strtolower($contentLang)] : (isset($type['value']['en']) ? $type['value']['en'] : '');
+                            }
+                        }
+                    }
+                    $arr['types'] = $types;
+                }
+                $phases[] = $arr;
+            }
+            $return_data['phases'] = $phases;
         }
         $features = [];
         $setting = [];
@@ -166,32 +213,50 @@ class Developments extends Model {
                     $views[] = ucfirst(str_replace('_', ' ', $key));
             }
         }
-        if (isset($property->property->general_features) && count($property->property->general_features) > 0) {
+        if (isset($property->property->general_features) && count((array)$property->property->general_features) > 0) {
             foreach ($property->property->general_features as $key => $value) {
                 if ($key == 'kitchens' && $value != '') {
-                    $features[] = \Yii::t('app', 'kitchens') . ': '. \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'kitchens') . ': ' . \Yii::t('app', strtolower($value));
                 }
                 if ($key == 'floors' && $value != '') {
-                    $features[] = \Yii::t('app', 'floors') . ': '. \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'floors') . ': ' . \Yii::t('app', strtolower($value));
                 }
                 if ($key == 'furniture' && $value != 'No') {
-                    $features[] = \Yii::t('app', 'furniture') . ': '. \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'furniture') . ': ' . \Yii::t('app', strtolower($value));
                 } else {
-                    if ($key == true && $key != 'furniture' &&  $key != 'kitchens' &&  $key != 'floors' )
+                    if ($key == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
         }
         $properties = [];
         foreach ($property->properties as $key => $value) {
+            $fplans = [];
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
-                $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
+                $data['currentprice'] = str_replace(',', '.', (number_format((int)($value->property->currentprice))));
             if (isset($value->property->type_one))
                 $data['type'] = $value->property->type_one;
+            if (isset($value->property->block))
+                $data['block'] = $value->property->block;
+            if (isset($value->property->portal))
+                $data['portal'] = $value->property->portal;
+            if (isset($value->property->status))
+                $data['status'] = $value->property->status;
+            if (isset($value->property->built))
+                $data['built'] = $value->property->built;
             if (isset($value->property->location))
                 $data['location'] = $value->property->location;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
+                if (isset($value->documents) && count($value->documents) > 0) {
+                    foreach ($value->documents as $pic) {
+                        if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
+                            if (isset(Yii::$app->params['floor_plans_url']))
+                                $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                        }
+                    }
+                    $data['floor_plans'] = $fplans;
+                }
             if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
                 $data['title'] = $value->property->title->$lang;
             else if (isset($value->property->location))
@@ -226,7 +291,8 @@ class Developments extends Model {
         return $return_data;
     }
 
-    public static function setQuery() {
+    public static function setQuery()
+    {
         $get = Yii::$app->request->get();
         $query = '';
 
