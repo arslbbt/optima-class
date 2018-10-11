@@ -17,8 +17,14 @@ class Developments extends Model
 
     public static function findAll($query)
     {
-        $lang = \Yii::$app->language;
         $langugesSystem = Cms::SystemLanguages();
+        $lang = strtoupper(\Yii::$app->language);
+        $contentLang = $lang;
+        foreach ($langugesSystem as $sysLang) {
+            if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
+                $contentLang = $sysLang['key'];
+            }
+        }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
         $JsonData = file_get_contents($url);
@@ -45,6 +51,9 @@ class Developments extends Model
 
             if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
                 $data['price_from'] = number_format((int)$property->property->phase_low_price_from, 0, '', '.');
+
+            if (isset($property->property->phase_heigh_price_from) && $property->property->phase_heigh_price_from != '')
+                $data['price_to'] = number_format((int)$property->property->phase_heigh_price_from, 0, '', '.');
 
             if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
                 $data['bedrooms'] = $property->property->bedrooms_from;
@@ -83,8 +92,14 @@ class Developments extends Model
     public static function findOne($reference)
     {
         $langugesSystem = Cms::SystemLanguages();
-        $ref = $reference;
         $lang = strtoupper(\Yii::$app->language);
+        $contentLang = $lang;
+        foreach ($langugesSystem as $sysLang) {
+            if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
+                $contentLang = $sysLang['key'];
+            }
+        }
+        $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
@@ -248,15 +263,15 @@ class Developments extends Model
                 $data['location'] = $value->property->location;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
-                if (isset($value->documents) && count($value->documents) > 0) {
-                    foreach ($value->documents as $pic) {
-                        if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
-                            if (isset(Yii::$app->params['floor_plans_url']))
-                                $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
-                        }
+            if (isset($value->documents) && count($value->documents) > 0) {
+                foreach ($value->documents as $pic) {
+                    if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
+                        if (isset(Yii::$app->params['floor_plans_url']))
+                            $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
                     }
-                    $data['floor_plans'] = $fplans;
                 }
+                $data['floor_plans'] = $fplans;
+            }
             if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
                 $data['title'] = $value->property->title->$lang;
             else if (isset($value->property->location))
