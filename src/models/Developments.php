@@ -246,7 +246,7 @@ class Developments extends Model
         }
         $properties = [];
         foreach ($property->properties as $key => $value) {
-            $fplans = [];
+            $data = [];
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int)($value->property->currentprice))));
             if (isset($value->property->type_one))
@@ -264,6 +264,7 @@ class Developments extends Model
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
             if (isset($value->documents) && count($value->documents) > 0) {
+                $fplans = [];
                 foreach ($value->documents as $pic) {
                     if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
                         if (isset(Yii::$app->params['floor_plans_url']))
