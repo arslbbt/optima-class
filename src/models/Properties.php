@@ -995,6 +995,81 @@ class Properties extends Model {
                 $query .= '&sale=1&not_new_construction=1';
             }
         }
+
+        if(isset($get['orientations']) && $get['orientations'] != '')
+        {
+            if(is_array($get['orientations']) && count($get['orientations']) > 0)
+            {
+                foreach ($get["orientations"] as $value)
+                {
+                    if($value!= '')
+                    {
+                        $query .= '&orientation[]=' . $value;
+                    }
+                }
+            }
+        }
+
+        if(isset($get['sea_views']) && $get['sea_views'] != '')
+        {
+            if(is_array($get['sea_views']) && count($get['sea_views']) > 0)
+            {
+                foreach ($get["sea_views"] as $value)
+                {
+                    if($value!= '')
+                    {
+                        $query .= '&views[]=' . $value;
+                    }
+                }
+            }
+        }
+
+        if(isset($get['swimming_pools']) && $get['swimming_pools'] != '')
+        {
+            if(is_array($get['swimming_pools']) && count($get['swimming_pools']) > 0)
+            {
+                foreach ($get["swimming_pools"] as $value)
+                {
+                    if($value!= '')
+                    {
+                        $query .= '&pool[]=' . $value;
+                    }
+                }
+            }
+        }
+
+        if(isset($get['furnitures']) && $get['furnitures'] != '')
+        {
+            if(is_array($get['furnitures']) && count($get['furnitures']) > 0)
+            {
+                foreach ($get["furnitures"] as $value)
+                {
+                    if($value!= '')
+                    {
+                        $query .= '&furniture[]=' . $value;
+                    }
+                }
+            }
+        }
+        if(isset($get['pets']) && $get['pets'] =='true')
+        {
+            $query.= '&categories[]=pets_allowed';
+        }
+
+        if(isset($get['parkings']) && $get['parkings'] != '')
+        {
+            if(is_array($get['parkings']) && count($get['parkings']) > 0)
+            {
+                foreach ($get["parkings"] as $value)
+                {
+                    if($value!= '')
+                    {
+                        $query .= '&parking[]=' . $value;
+                    }
+                }
+            }
+        }
+        
         if (isset($get['province']) && $get['province'] != '') {
             if (is_array($get["province"]) && count($get["province"])) {
                 foreach ($get["province"] as $value) {
