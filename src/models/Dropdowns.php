@@ -50,11 +50,14 @@ class Dropdowns extends Model {
                         'Content-Type' => 'application/json',
                         'Content-Length' => strlen(json_encode($post_data))
                     ])
-                    ->post(Yii::$app->params['node_url'] . 'urbanisations?user=' . Yii::$app->params['user']);
+                    ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
             $data = json_decode($response, TRUE);
-            foreach ($data['docs'] as $doc) {
-                if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
+            if(isset($data['docs']) && count($data['docs']) > 0)
+            {
+                foreach ($data['docs'] as $doc) {
+                    if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
                     $return_data[$doc['key']] = isset($doc['value']) ? $doc['value'] : '';
+                }
             }
             file_put_contents($file, json_encode($return_data));
         } else {

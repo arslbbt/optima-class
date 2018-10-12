@@ -888,7 +888,7 @@ class Properties extends Model {
         if (isset($property->property->distance_next_town) && count((array) $property->property->distance_next_town) > 0 && isset($property->property->distance_next_town->value) && $property->property->distance_next_town->value > 0) {
             $distances['distance_next_town'] = $property->property->distance_next_town->value . ' ' . (isset($property->property->distance_next_town->unit) ? $property->property->distance_next_town->unit : 'km');
         }
-        if (isset($property->construction) && count($property->construction) > 0) {
+        if (isset($property->construction) && count((array)$property->construction) > 0) {
             $obj = $property->construction;
             if (isset($obj->bedrooms_from) && $obj->bedrooms_from != '') {
                 $construction['bedrooms_from'] = $obj->bedrooms_from;
