@@ -59,15 +59,15 @@ class ContactUs extends Model
     public $contact_check_3;
     public $gdpr_status;
     public $cv_file;
+
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3','cv_file', 'gdpr_status'], 'safe'],
+            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['email', 'email'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
-            [['verifyCode'], 'captcha', 'when' => function($model)
-                {
+            [['verifyCode'], 'captcha', 'when' => function($model) {
                     if ($model->verifyCode == 'null')
                     {
                         $return = false;
@@ -94,9 +94,11 @@ class ContactUs extends Model
             'message' => Yii::t('app', strtolower('Message')),
         ];
     }
+
     public function uploadvalidate()
     {
-        if($this->cv_file != ''){
+        if ($this->cv_file != '')
+        {
             $this->cv_file->saveAs('uploads/' . $this->cv_file->baseName . '.' . $this->cv_file->extension);
         }
         // if ($this->validate()) {
@@ -106,6 +108,7 @@ class ContactUs extends Model
         //     return false;
         // }
     }
+
     public function sendMail()
     {
         $settings = Cms::settings();
@@ -113,10 +116,10 @@ class ContactUs extends Model
         {
             if (isset($this->attach) && $this->attach == 1)
             {
-               
+
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf'))
-                {   
+                {
 
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
@@ -145,21 +148,24 @@ class ContactUs extends Model
             }
             else if (isset($this->subscribe) && $this->subscribe == 1)
             {
-                
-                
-                $subscribe_msg ='';
-                $subscribe_subject ='';
-                $logo = 'https://my.optima-crm.com/uploads/cms_settings/'.$settings['_id'].'/' . $settings['header']['logo']['name'];
-                foreach($settings['custom_settings'] as $setting){
-                    if($setting['key'] == 'subscribe'){
+
+
+                $subscribe_msg = '';
+                $subscribe_subject = '';
+                $logo = 'https://my.optima-crm.com/uploads/cms_settings/' . $settings['_id'] . '/' . $settings['header']['logo']['name'];
+                foreach ($settings['custom_settings'] as $setting)
+                {
+                    if ($setting['key'] == 'subscribe')
+                    {
                         $subscribe_msg = \Yii::t('app', $setting['value']);
                     }
-                    if($setting['key'] == 'newsletter_subject'){
+                    if ($setting['key'] == 'newsletter_subject')
+                    {
                         $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
                 }
-                $htmlBody = $subscribe_msg.'<br><br><br><br> <img style="width:40%" src='.$logo.'> ';
-                $email_response =  isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing';
+                $htmlBody = $subscribe_msg . '<br><br><br><br> <img style="width:40%" src=' . $logo . '> ';
+                $email_response = isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing';
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
@@ -169,15 +175,15 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
-                        ->setSubject( $subscribe_subject !=''? $subscribe_subject:'Thank you for contacting us')
+                        ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
                         ->setHtmlBody($subscribe_msg != '' ? $htmlBody : $email_response)
                         ->send();
                 $this->saveAccount();
             }
             else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1)
             {
-                
-                
+
+
                 $html = '';
                 if (isset($this->first_name) && $this->first_name != '')
                 {
@@ -244,13 +250,15 @@ class ContactUs extends Model
             }
             else
             {
-                $subscribe_subject ='';
-                    foreach($settings['custom_settings'] as $setting){
-                        if($setting['key'] == 'enquiry_subject'){
-                            $subscribe_subject = \Yii::t('app', $setting['value']);
-                        }
+                $subscribe_subject = '';
+                foreach ($settings['custom_settings'] as $setting)
+                {
+                    if ($setting['key'] == 'enquiry_subject')
+                    {
+                        $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
-               
+                }
+
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)]))
                 {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
@@ -267,7 +275,7 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose()
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($this->email)
-                        ->setSubject($subscribe_subject !=''? $subscribe_subject:'Thank you for contacting us')
+                        ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
                         ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
@@ -313,6 +321,7 @@ class ContactUs extends Model
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
+            'language' => strtoupper(\Yii::$app->language)
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
