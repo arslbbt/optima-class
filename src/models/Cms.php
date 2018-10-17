@@ -350,6 +350,7 @@ class Cms extends Model
                 $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
             }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
+            $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
             $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
