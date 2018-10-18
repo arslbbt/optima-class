@@ -726,6 +726,31 @@ class Properties extends Model
         {
             $return_data['currentprice'] = $property->property->currentprice;
         }
+        if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons))
+        {
+            $todaydate = strtotime(date("Y/m/d"));
+            $gdprice = [];
+            $zstprice = 0;
+            
+            foreach ($property->property->rental_seasons as $seasons)
+            {
+                if(($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
+                {
+                    $gdprice[] = $seasons->gross_day_price;
+                }
+            }
+            if(count($gdprice) > 0)
+            $zstprice = min($gdprice);
+            $atprice = 0;
+            if (isset($property->bookings_extras) && count((array)$property->bookings_extras) > 0) {
+                foreach ($property->bookings_extras as $booking_extra) {
+                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                        $atprice = $atprice + (isset($booking_extra->price) ? $booking_extra->price : 0);
+                    }
+                }
+            }
+            $return_data['zariko_st_price'] = $zstprice + $atprice;
+        }
 
         if ($price == 'rent')
         {
