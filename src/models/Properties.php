@@ -585,6 +585,7 @@ class Properties extends Model
         $attachment_descriptions = [];
         $attachment_alt_descriptions = [];
         $floor_plans = [];
+        $floor_plans_with_description = [];
         $booked_dates = [];
         $distances = [];
         if (!isset($property->property))
@@ -644,7 +645,7 @@ class Properties extends Model
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
-            $lang_sys_internal_key = $lang_sys['internal_key'];
+            $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
             if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
             {
                 $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
@@ -947,6 +948,25 @@ class Properties extends Model
             }
             $return_data['floor_plans'] = $floor_plans;
         }
+        if (isset($property->documents) && count($property->documents) > 0)
+        {
+            foreach ($property->documents as $pic)
+            {
+                if (isset($pic->identification_type) && $pic->identification_type == 'FP')
+                {
+                    if (isset(Yii::$app->params['floor_plans_url']))
+                    {
+                        $url_fp = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                    }
+                    if(isset($pic->description->$lang))
+                    {
+                        $desc_fp = $pic->description->$lang;
+                    }
+                    $floor_plans_with_description[] = ['url'=> isset($url_fp) ? $url_fp : '', 'description'=> isset($desc_fp) ? $desc_fp : ''];
+                }
+            }
+            $return_data['floor_plans_with_description'] = $floor_plans_with_description;
+        }
         if (isset($property->bookings_extras) && count($property->bookings_extras) > 0)
         {
             $return_data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
@@ -1015,6 +1035,27 @@ class Properties extends Model
                 }
             }
             $return_data['videos'] = $videosArr;
+        }
+
+        if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos)))
+        {
+            $videosArrDesc = [];
+            $videosArr_gogo = [];
+            foreach ($property->property->videos as $video)
+            {
+                $url_vid = '';
+                $desc_vid = '';
+                if (isset($video->status) && $video->status == 1 && isset($video->url->$contentLang) && $video->url->$contentLang != '')
+                {
+                    $url_vid = $video->url->$contentLang;
+                }
+                if (isset($video->status) && $video->status == 1 && isset($video->description->$contentLang) && $video->description->$contentLang != '')
+                {
+                    $desc_vid = $video->description->$contentLang;
+                }
+                $videosArrDesc[] = ['url'=>$url_vid, 'description'=>$desc_vid];
+            }
+            $return_data['videos_with_description'] = $videosArrDesc;
         }
         $categories = [];
         $features = [];
