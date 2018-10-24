@@ -740,8 +740,9 @@ class Properties extends Model
             
             foreach ($property->property->rental_seasons as $seasons)
             {
-                if(($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
+                if(isset($seasons->period_from) && ($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
                 {
+                    if(isset($seasons->gross_day_price))
                     $gdprice[] = $seasons->gross_day_price;
                 }
             }
