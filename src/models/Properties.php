@@ -857,7 +857,7 @@ class Properties extends Model
         {
             $return_data['location_group'] = $property->property->location_group;
         }
-        if (isset($property->property->location))
+        if (isset($property->property->location) && isset($property->property->location_key))
         {
             $return_data['location'] = $property->property->location;
             $return_data['location_key'] = $property->property->location_key;
