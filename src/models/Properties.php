@@ -659,7 +659,7 @@ class Properties extends Model
             {
                 $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
             }
-            else if(isset($slugs[$lang_sys_internal_key])) {
+            elseif(isset($slugs[$lang_sys_internal_key]))
             {
                 if (isset($property->property->type_one) && $property->property->type_one != '')
                     $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
