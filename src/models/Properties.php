@@ -202,6 +202,32 @@ class Properties extends Model
             {
                 $data['sleeps'] = $property->property->sleeps;
             }
+            if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons))
+            {
+            $todaydate = strtotime(date("Y/m/d"));
+            $gdprice = [];
+            $zstprice = 0;
+            
+            foreach ($property->property->rental_seasons as $seasons)
+            {
+                if(isset($seasons->period_from) && ($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
+                {
+                    if(isset($seasons->gross_day_price))
+                    $gdprice[] = $seasons->gross_day_price;
+                }
+            }
+            if(count($gdprice) > 0)
+            $zstprice = min($gdprice);
+            $atprice = 0;
+            if (isset($property->bookings_extras) && count((array)$property->bookings_extras) > 0) {
+                foreach ($property->bookings_extras as $booking_extra) {
+                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                        $atprice = $atprice + (isset($booking_extra->price) ? $booking_extra->price : 0);
+                    }
+                }
+            }
+            $data['zariko_st_price'] = $zstprice + $atprice;
+            }
             if ($rent)
             {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price))
@@ -1082,6 +1108,153 @@ class Properties extends Model
         $garden = [];
         $pool = [];
         $condition = [];
+        $rooms = [];
+        $living_rooms = [];
+        $beds = [];
+        $baths = [];
+        if(isset($property->property->rent) && $property->property->rent == true)
+        {
+            $rental_features = [];
+            $rental_features['beds'] = [];
+            $rental_features['baths'] = [];
+            $rental_features['rooms'] = [];
+            $rental_features['living_rooms'] = [];
+            if(isset($property->property->feet_living_room) && count((array)$property->property->feet_living_room) > 0)
+            {
+                foreach($property->property->feet_living_room as $key=>$value)
+                {
+                    if(isset($value) && $value == true)
+                    {
+                        $living_rooms[] = Yii::t('app', $key);
+                    }
+                }
+                $rental_features['living_rooms'] = $living_rooms;
+            }
+            if(isset($property->property->rooms) && count($property->property->rooms) > 0)
+            {
+                foreach($property->property->rooms as $value)
+                {
+                    $type = isset($value) && isset($value->type) && isset($value->type->$contentLang) ? $value->type->$contentLang : (isset($value) && isset($value->type) && isset($value->type->EN) ? $value->type->EN : '');
+                    $name = isset($value) && isset($value->name) && isset($value->name->$contentLang) ? $value->name->$contentLang : (isset($value) && isset($value->name) && isset($value->name->EN) ? $value->name->EN : '');
+                    $description = isset($value) && isset($value->description) && isset($value->description->$contentLang) ? $value->description->$contentLang : (isset($value) && isset($value->description) && isset($value->description->EN) ? $value->description->EN : '');
+                    $rooms[] = ['type'=>$type, 'name'=>$name, 'description'=>$description];
+                }
+                $rental_features['rooms'] = $rooms;
+            }
+            if(isset($property->property->double_bed) && count($property->property->double_bed) > 0)
+            {
+                $double_bed = [];
+                foreach($property->property->double_bed as $value)
+                {
+                    if(isset($value->x) && $value->x > 0 && isset($value->y) && $value->y > 0)
+                    {
+                        $double_bed[] = ['x'=>$value->x, 'y'=>$value->y];
+                    }
+                }
+                if(count($double_bed) > 0)
+                {
+                    $beds['double_bed'] = $double_bed;
+                }
+            }
+            if(isset($property->property->single_bed) && count($property->property->single_bed) > 0)
+            {
+                $single_bed = [];
+                foreach($property->property->single_bed as $value)
+                {
+                    if(isset($value->x) && $value->x > 0 && (isset($value->y) && $value->y > 0))
+                    {
+                        $single_bed[] = ['x'=>$value->x, 'y'=>$value->y];
+                    }
+                }
+                if(count($single_bed) > 0)
+                {
+                    $beds['single_bed'] = $single_bed;
+                }
+            }
+            if(isset($property->property->sofa_bed) && count($property->property->sofa_bed) > 0)
+            {
+                $sofa_bed = [];
+                foreach($property->property->sofa_bed as $value)
+                {
+                    if(isset($value->x) && $value->x > 0 && isset($value->y) && $value->y > 0)
+                    {
+                        $sofa_bed[] = ['x'=>$value->x, 'y'=>$value->y];
+                    }
+                }
+                if(count($sofa_bed) > 0)
+                {
+                    $beds['sofa_bed'] = $sofa_bed;
+                }
+            }
+            if(isset($property->property->bunk_beds) && count($property->property->bunk_beds) > 0)
+            {
+                $bunk_beds = [];
+                foreach($property->property->bunk_beds as $value)
+                {
+                    if(isset($value->x) && $value->x > 0 && isset($value->y) && $value->y > 0)
+                    {
+                        $bunk_beds[] = ['x'=>$value->x, 'y'=>$value->y];
+                    }
+                }
+                if(count($bunk_beds) > 0)
+                {
+                    $beds['bunk_beds'] = $bunk_beds;
+                }
+            }
+            if(count($beds) > 0)
+            {
+                $rental_features['beds'] = $beds;
+            }
+            if(isset($property->property->bath_tubs) && $property->property->bath_tubs > 0)
+            {
+                $baths['bath_tubs'] = $property->property->bath_tubs;
+            }
+            if(isset($property->property->jaccuzi_bath) && $property->property->jaccuzi_bath > 0)
+            {
+                $baths['jaccuzi_bath'] = $property->property->jaccuzi_bath;
+            }
+            if(isset($property->property->bidet) && $property->property->bidet > 0)
+            {
+                $baths['bidet'] = $property->property->bidet;
+            }
+            if(isset($property->property->toilets) && $property->property->toilets > 0)
+            {
+                $baths['toilets'] = $property->property->toilets;
+            }
+            if(isset($property->property->corner_shower) && $property->property->corner_shower > 0)
+            {
+                $baths['corner_shower'] = $property->property->corner_shower;
+            }
+            if(isset($property->property->sink) && $property->property->sink > 0)
+            {
+                $baths['sink'] = $property->property->sink;
+            }
+            if(isset($property->property->double_sink) && $property->property->double_sink > 0)
+            {
+                $baths['double_sink'] = $property->property->double_sink;
+            }
+            if(isset($property->property->walk_in_shower) && $property->property->walk_in_shower > 0)
+            {
+                $baths['walk_in_shower'] = $property->property->walk_in_shower;
+            }
+            if(isset($property->property->en_suite) && $property->property->en_suite > 0)
+            {
+                $baths['en_suite'] = $property->property->en_suite;
+            }
+            if(isset($property->property->wheelchair_accesible_shower) && $property->property->wheelchair_accesible_shower > 0)
+            {
+                $baths['wheelchair_accesible_shower'] = $property->property->wheelchair_accesible_shower;
+            }
+            if(isset($property->property->hairdryer) && $property->property->hairdryer > 0)
+            {
+                $baths['hairdryer'] = $property->property->hairdryer;
+            }
+            if(count($baths) > 0)
+            {
+                $rental_features['baths'] = $baths;
+            }
+            $return_data['rental_features'] = $rental_features;
+        }
         if (isset($property->property->feet_categories))
         {
             foreach ($property->property->feet_categories as $key => $value)
