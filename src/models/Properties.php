@@ -673,6 +673,7 @@ class Properties extends Model
             $keywords = 'rental_keywords';
         }
         //    start slug_all
+        $slugs = [];
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
