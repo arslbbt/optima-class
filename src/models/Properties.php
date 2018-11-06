@@ -793,6 +793,7 @@ class Properties extends Model
                 $st_price = [];
                 foreach ($property->property->rental_seasons as $seasons)
                 {
+                    if(isset($seasons->new_price) && $seasons->new_price > 0)
                     $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                 }
                 $return_data['price'] = ($st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
