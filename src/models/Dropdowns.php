@@ -114,9 +114,19 @@ class Dropdowns extends Model {
                 $p_q .= '&province[]=' . $province;
             }
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities&user=' . Yii::$app->params['user'] . $p_q);
+            $file_data = json_decode($file_data);
+            usort($file_data, function ($item1, $item2) {
+            return $item1->value <=> $item2->value;
+        });
+        $file_data = json_encode($file_data);
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities&user=' . Yii::$app->params['user']);
+            $file_data = json_decode($file_data);
+            usort($file_data, function ($item1, $item2) {
+            return $item1->value <=> $item2->value;
+        });
+        $file_data = json_encode($file_data);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
