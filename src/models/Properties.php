@@ -122,6 +122,17 @@ class Properties extends Model
             {
                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
+            if(isset($property->property->sale) && $property->property->sale == true && isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '')
+            {
+                $data['sale_rent_title'] = $property->property->title->$contentLang;
+            }
+            elseif(isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_title->$contentLang) && $property->property->rental_title->$contentLang != '')
+            {
+                $data['sale_rent_title'] = $property->property->rental_title->$contentLang;
+            }
+            elseif(isset($property->property->location) && isset($property->property->type_one)){
+                $data['sale_rent_title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+            }
 
             if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '')
             {
@@ -157,6 +168,14 @@ class Properties extends Model
             elseif (isset($property->property->private_info_object->$agency->longitude))
             {
                 $data['lng'] = $property->property->private_info_object->$agency->longitude;
+            }
+            if(isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$lang) && $property->property->description->$lang != '')
+            {
+                $data['sale_rent_description'] = $property->property->description->$lang;
+            }
+            elseif(isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '')
+            {
+                $data['sale_rent_description'] = $property->property->rental_description->$lang;
             }
             if (isset($property->property->$description->$lang))
             {
