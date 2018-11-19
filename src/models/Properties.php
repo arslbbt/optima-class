@@ -870,6 +870,7 @@ class Properties extends Model
             }
             $return_data['videos_with_description'] = $videosArrDesc;
         }
+        $custom_categories = [];
         $categories = [];
         $features = [];
         $climate_control = [];
@@ -1000,6 +1001,22 @@ class Properties extends Model
             foreach ($property->property->feet_categories as $key => $value) {
                 if ($value == true) {
                     $categories[] = $key;
+                }
+            }
+        }
+        if(isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories) > 0)
+        {
+            foreach ($property->property->value_of_custom->feet_custom_categories as $value) {
+                if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                    $custom_categories[] = $value->key;
+                }
+            }
+        }
+        if(isset($property->property->value_of_custom) && isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features) > 0)
+        {
+            foreach ($property->property->value_of_custom->features as $value) {
+                if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                    $custom_categories[] = $value->key;
                 }
             }
         }
@@ -1169,6 +1186,7 @@ class Properties extends Model
         $return_data['property_features'] = [];
         $return_data['property_features']['features'] = $features;
         $return_data['property_features']['categories'] = $categories;
+        $return_data['property_features']['custom_categories'] = $custom_categories;
         $return_data['property_features']['climate_control'] = $climate_control;
         $return_data['property_features']['kitchen'] = $kitchen;
         $return_data['property_features']['setting'] = $setting;
