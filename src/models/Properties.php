@@ -1315,6 +1315,12 @@ class Properties extends Model
                 }
             }
         }
+        if(isset($_GET['bedrooms_in']) && is_array($_GET['bedrooms_in'])) {
+            foreach($_GET['bedrooms_in'] as $bed)
+            {
+                $query .= '&bedrooms_in[]=' . $bed;
+            }
+        }
         if (isset($get["city"]) && $get["city"] != "") {
             if (is_array($get["city"]) && count($get["city"])) {
                 foreach ($get["city"] as $value) {
