@@ -1326,6 +1326,7 @@ class Properties extends Model
                 }
             }
         }
+        // for testing multiple bedrooms
         if(isset($_GET['bedrooms_in']) && is_array($_GET['bedrooms_in'])) {
             foreach($_GET['bedrooms_in'] as $bed)
             {
