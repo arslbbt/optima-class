@@ -34,6 +34,7 @@ class Developments extends Model
         foreach ($apiData as $property) {
             $data = [];
             $features = [];
+            $slugs=[];
             if (isset($property->total_properties)) {
                 $data['total_properties'] = $property->total_properties;
             }
