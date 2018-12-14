@@ -1324,6 +1324,8 @@ class Properties extends Model
                         $query .= '&location[]=' . $value;
                     }
                 }
+            }else{
+                $query .= '&location[]=' . $get["location"];
             }
         }
         // for testing multiple bedrooms
@@ -1340,6 +1342,8 @@ class Properties extends Model
                         $query .= '&address_city[]=' . $value;
                     }
                 }
+            }else{
+                 $query .= '&address_city[]=' . $get["city"];
             }
         }
         if (isset($get["type"]) && is_array($get["type"]) && $get["type"] != "") {
