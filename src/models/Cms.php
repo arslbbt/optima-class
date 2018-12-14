@@ -447,12 +447,19 @@ class Cms extends Model
 //            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
 //        ];
         $data = json_decode($file_data, true);
+        // echo '<pre>';
+        // print_r($data);
+        // die;
+        
         $users = [];
         foreach ($data['users'] as $user)
         {
             $users[] = [
                 'name' => (isset($user['firstname']) ? $user['firstname'] : '') . ' ' . (isset($user['lastname']) ? $user['lastname'] : ''),
                 'dp' => (isset($user['dp']) && $user['dp']) ? Cms::CacheImage(Yii::$app->params['cms_img'] . '/' . $user['_id'] . '/' . $user['dp'], $user['dp']) : '',
+                'number_of_listing'=>(isset($user['number_of_listing']) ? $user['number_of_listing'] : '') ,
+                'number_of_rent'=>(isset($user['number_of_rent']) ? $user['number_of_rent'] : '') ,
+                'number_of_sales'=>(isset($user['number_of_sales']) ? $user['number_of_sales'] : '') ,
             ];
         }
         return $users;
