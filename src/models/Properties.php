@@ -16,7 +16,8 @@ use yii\helpers\ArrayHelper;
 class Properties extends Model
 {
 
-    public static function findAll($query,$cache=false) {
+    public static function findAll($query, $wm = false,$cache=false)
+    {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
