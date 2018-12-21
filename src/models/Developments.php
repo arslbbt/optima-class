@@ -14,12 +14,16 @@ use optima\models\Cms;
  */
 class Developments extends Model {
 
-    public static function findAll($query) {
+    public static function findAll($query,$cache=false) {
         $lang = \Yii::$app->language;
         $langugesSystem = Cms::SystemLanguages();
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
-        $JsonData = file_get_contents($url);
+        if($cache==true){
+            $JsonData = self::DoCache($query,$url);
+        }else{
+            $JsonData = file_get_contents($url);
+        }
         $apiData = json_decode($JsonData);
         $return_data = [];
 
@@ -292,5 +296,22 @@ class Developments extends Model {
         }
         return $query;
     }
-
+    public static function DoCache($query,$url) {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/develop_'.json_encode($query).'.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents($url);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+        return $file_data;
+    }
 }
