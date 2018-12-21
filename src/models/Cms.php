@@ -147,20 +147,20 @@ class Cms extends Model
                         $childArrNested = [];
                         foreach ($child['children'] as $childkeyNested => $childNested)
                         {
-                            $childArrNested[] = ['label' => (isset($childNested['item']['title'][$lang]) && $childNested['item']['title'][$lang] != '') ? $childNested['item']['title'][$lang] : 'please set menu label', 'url' => (isset($childNested['item']['slug'][$lang]) && $childNested['item']['slug'][$lang] != '') ? $childNested['item']['slug'][$lang] : 'slug-not-set'];
+                            $childArrNested[] = ['label' => (isset($childNested['item']['title'][$lang]) && $childNested['item']['title'][$lang] != '') ? $childNested['item']['title'][$lang] : 'please set menu label', 'url' => (isset($childNested['item']['slug'][$lang]) && $childNested['item']['slug'][$lang] != '') ? '/' . $childNested['item']['slug'][$lang] : 'slug-not-set'];
                         }
                         $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'items' => $childArrNested];
                     }
                     else
                     {
-                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? $child['item']['slug'][$lang] : 'slug-not-set'];
+                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? '/' . $child['item']['slug'][$lang] : 'slug-not-set'];
                     }
                 }
                 $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'items' => $childArr];
             }
             else
             {
-                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? $value['item']['slug'][$lang] : 'slug-not-set'];
+                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? '/' . $value['item']['slug'][$lang] : 'slug-not-set'];
             }
         }
         return $itemsArr;
@@ -235,7 +235,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         if ($id == null)
         {
-            $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) .'-'.$type. '.json';
+            $file = $webroot . '/uploads/temp/' . str_replace('/', '_', $slug) . '-' . $type . '.json';
         }
         else
         {
@@ -350,6 +350,7 @@ class Cms extends Model
                 $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
             }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
+            $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
             $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
@@ -375,8 +376,9 @@ class Cms extends Model
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $handle = @fopen($url, 'r');
-            if (!$handle) {
-                $url='https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/1200/' . $name;
+            if (!$handle)
+            {
+                $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/1200/' . $name;
             }
             $file_data = @file_get_contents($url);
             file_put_contents($filesaved, $file_data);
@@ -410,4 +412,57 @@ class Cms extends Model
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
+
+    public static function getUsers()
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . 'Uploads/'))
+            mkdir($webroot . 'Uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/users_data.json';
+        $url = Yii::$app->params['apiUrl'] . 'cms/users&user=' . Yii::$app->params['user'];
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $file_data = file_get_contents($url);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = file_get_contents($file);
+        }
+
+//        $url = Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
+//        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+//        return [
+//            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
+//            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
+//            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+//            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
+//            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
+//            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+//            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+//            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+//            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
+//            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
+//        ];
+        $data = json_decode($file_data, true);
+        // echo '<pre>';
+        // print_r($data);
+        // die;
+        
+        $users = [];
+        foreach ($data['users'] as $user)
+        {
+            $users[] = [
+                'name' => (isset($user['firstname']) ? $user['firstname'] : '') . ' ' . (isset($user['lastname']) ? $user['lastname'] : ''),
+                'dp' => (isset($user['dp']) && $user['dp']) ? Cms::CacheImage(Yii::$app->params['cms_img'] . '/' . $user['_id'] . '/' . $user['dp'], $user['dp']) : '',
+                'number_of_listing'=>(isset($user['number_of_listing']) ? $user['number_of_listing'] : '') ,
+                'number_of_rent'=>(isset($user['number_of_rent']) ? $user['number_of_rent'] : '') ,
+                'number_of_sales'=>(isset($user['number_of_sales']) ? $user['number_of_sales'] : '') ,
+            ];
+        }
+        return $users;
+    }
+
 }
