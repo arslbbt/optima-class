@@ -2092,6 +2092,22 @@ class Properties extends Model
             {
                 $query .= '&orderby[]=status&orderby[]=ASC';
             }
+            elseif ($get['orderby'] == 'priceDESC_st_rental')
+            {
+                $query .= '&orderby[]=st_new_price&orderby[]=DESC';
+            }
+            elseif ($get['orderby'] == 'priceASC_st_rental')
+            {
+                $query .= '&orderby[]=st_new_price&orderby[]=ASC';
+            }
+            elseif ($get['orderby'] == 'priceDESC_lt_rental')
+            {
+                $query .= '&orderby[]=lt_new_price&orderby[]=DESC';
+            }
+            elseif ($get['orderby'] == 'priceASC_lt_rental')
+            {
+                $query .= '&orderby[]=lt_new_price&orderby[]=ASC';
+            }
         }
         return $query;
     }
