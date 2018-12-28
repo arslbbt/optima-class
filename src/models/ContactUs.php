@@ -116,11 +116,9 @@ class ContactUs extends Model
         {
             if (isset($this->attach) && $this->attach == 1)
             {
-
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf'))
                 {
-
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(Yii::$app->params['from_email'])
                             ->setTo($settings['general_settings']['admin_email'])
@@ -148,8 +146,6 @@ class ContactUs extends Model
             }
             else if (isset($this->subscribe) && $this->subscribe == 1)
             {
-
-
                 $subscribe_msg = '';
                 $subscribe_subject = '';
                 $logo = 'https://my.optima-crm.com/uploads/cms_settings/' . $settings['_id'] . '/' . $settings['header']['logo']['name'];
@@ -182,8 +178,6 @@ class ContactUs extends Model
             }
             else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1)
             {
-
-
                 $html = '';
                 if (isset($this->first_name) && $this->first_name != '')
                 {
@@ -264,7 +258,7 @@ class ContactUs extends Model
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
                     if ($this->reference != '')
                     {
-                        $htmlBody = '<br>Enquiry about property (Ref : ' . $this->reference . ')<br><br>' . $htmlBody;
+                        $htmlBody = '<br>'. \Yii::t('app', strtolower('Enquiry about property')).' ('. \Yii::t('app', strtolower('Ref')) .' : ' . $this->reference . ')<br><br>' . $htmlBody;
                     }
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
