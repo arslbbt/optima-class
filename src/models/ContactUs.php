@@ -59,6 +59,7 @@ class ContactUs extends Model
     public $contact_check_3;
     public $gdpr_status;
     public $cv_file;
+    public $language;
 
     public function rules()
     {
