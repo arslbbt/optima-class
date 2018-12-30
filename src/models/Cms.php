@@ -57,7 +57,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function menu($name, $getUrlsFromPage = true, $getOtherSettings = false)
+    public static function menu($name, $getUrlsFromPage = true, $getOtherSettings = true)
     {
         $lang = strtoupper(\Yii::$app->language);
         $webroot = Yii::getAlias('@webroot');
@@ -263,6 +263,7 @@ class Cms extends Model
         $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
             'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
+            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name, 200) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -364,7 +365,7 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function CacheImage($url, $name)
+    public static function CacheImage($url, $name, $size=1200)
     {
         $settings = self::settings();
         $webroot = Yii::getAlias('@webroot');
@@ -372,18 +373,17 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $filesaved = $webroot . '/uploads/temp/' . $name;
+        $filesaved = $webroot . '/uploads/temp/'.$size .'_'.$name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $handle = @fopen($url, 'r');
-            if (!$handle)
-            {
-                $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/1200/' . $name;
+            if (!$handle) {
+                $url='https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/'.$size.'/' . $name;
             }
             $file_data = @file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
-        return '/uploads/temp/' . $name;
+        return '/uploads/temp/' .$size .'_'. $name;
     }
 
     public static function iconLogo($name)
