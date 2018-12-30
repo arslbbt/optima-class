@@ -61,6 +61,8 @@ class ContactUs extends Model
     public $cv_file;
     public $language;
 
+
+    
     public function rules()
     {
         return [
