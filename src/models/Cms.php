@@ -18,6 +18,7 @@ class Cms extends Model
     public static function settings()
     {
         $webroot = Yii::getAlias('@webroot');
+        
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
