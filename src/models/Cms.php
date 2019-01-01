@@ -18,6 +18,7 @@ class Cms extends Model
     public static function settings()
     {
         $webroot = Yii::getAlias('@webroot');
+        
         if (!is_dir($webroot . '/uploads/'))
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
@@ -44,7 +45,8 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/translations_' . $lang . '.json';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang;
+        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents($url);
@@ -68,7 +70,8 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/menu_' . str_replace(' ', '_', strtolower($name)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name);
+            $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -153,14 +156,14 @@ class Cms extends Model
                     }
                     else
                     {
-                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? str_replace('//','/',('/' . $child['item']['slug'][$lang])) : 'slug-not-set'];
+                        $childArr[] = ['label' => (isset($child['item']['title'][$lang]) && $child['item']['title'][$lang] != '') ? $child['item']['title'][$lang] : 'please set menu label', 'url' => (isset($child['item']['slug'][$lang]) && $child['item']['slug'][$lang] != '') ? str_replace('//', '/', ('/' . $child['item']['slug'][$lang])) : 'slug-not-set'];
                     }
                 }
                 $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'items' => $childArr];
             }
             else
             {
-                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? str_replace('//','/',('/' . $value['item']['slug'][$lang])) : 'slug-not-set'];
+                $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? str_replace('//', '/', ('/' . $value['item']['slug'][$lang])) : 'slug-not-set'];
             }
         }
         return $itemsArr;
@@ -176,7 +179,8 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/languages.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user']);
+            $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user'] . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -216,7 +220,8 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/categories&user=' . Yii::$app->params['user'] . '&name=gogo');
+            $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/categories&user=' . Yii::$app->params['user'] . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -245,7 +250,8 @@ class Cms extends Model
         {
             if ($id == null)
             {
-                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type);
+                $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id);
             }
             else
             {
@@ -284,7 +290,8 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'];
+        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'] . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents($url);
@@ -323,7 +330,8 @@ class Cms extends Model
         {
             $query .= '&category=' . $category;
         }
-        $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query;
+        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = file_get_contents($url);
@@ -365,7 +373,7 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function CacheImage($url, $name, $size=1200)
+    public static function CacheImage($url, $name, $size = 1200)
     {
         $settings = self::settings();
         $webroot = Yii::getAlias('@webroot');
@@ -373,17 +381,18 @@ class Cms extends Model
             mkdir($webroot . '/uploads/');
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
-        $filesaved = $webroot . '/uploads/temp/'.$size .'_'.$name;
+        $filesaved = $webroot . '/uploads/temp/' . $size . '_' . $name;
         if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
         {
             $handle = @fopen($url, 'r');
-            if (!$handle) {
-                $url='https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/'.$size.'/' . $name;
+            if (!$handle)
+            {
+                $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
             }
             $file_data = @file_get_contents($url);
             file_put_contents($filesaved, $file_data);
         }
-        return '/uploads/temp/' .$size .'_'. $name;
+        return '/uploads/temp/' . $size . '_' . $name;
     }
 
     public static function iconLogo($name)
@@ -450,16 +459,16 @@ class Cms extends Model
         // echo '<pre>';
         // print_r($data);
         // die;
-        
+
         $users = [];
         foreach ($data['users'] as $user)
         {
             $users[] = [
                 'name' => (isset($user['firstname']) ? $user['firstname'] : '') . ' ' . (isset($user['lastname']) ? $user['lastname'] : ''),
                 'dp' => (isset($user['dp']) && $user['dp']) ? Cms::CacheImage(Yii::$app->params['cms_img'] . '/' . $user['_id'] . '/' . $user['dp'], $user['dp']) : '',
-                'number_of_listing'=>(isset($user['number_of_listing']) ? $user['number_of_listing'] : '') ,
-                'number_of_rent'=>(isset($user['number_of_rent']) ? $user['number_of_rent'] : '') ,
-                'number_of_sales'=>(isset($user['number_of_sales']) ? $user['number_of_sales'] : '') ,
+                'number_of_listing' => (isset($user['number_of_listing']) ? $user['number_of_listing'] : ''),
+                'number_of_rent' => (isset($user['number_of_rent']) ? $user['number_of_rent'] : ''),
+                'number_of_sales' => (isset($user['number_of_sales']) ? $user['number_of_sales'] : ''),
             ];
         }
         return $users;
