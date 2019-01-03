@@ -1131,12 +1131,24 @@ class Properties extends Model
                         /*
                          * grouping logic dates
                          */
+                        // $booking_status[] = $booking->status;
+                        // $group_booked[$key] = [];
+                        // for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
+                        // {
+                        //     $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                        //     $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                        // }
+                        $dates=[];
+                        $period = new \DatePeriod(new \DateTime(date('Y-m-d',$booking->date_from)), new \DateInterval('P1D'), new \DateTime(date('Y-m-d',$booking->date_until).' +1 day'));
+                        foreach ($period as $date) {
+                            $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
+                        }
                         $booking_status[] = $booking->status;
                         $group_booked[$key] = [];
-                        for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400)
+                        foreach ($dates as $date)
                         {
-                            $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
-                            $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
+                            $booked_dates_costa[] = $date;
+                            $group_booked[$key][] = $date;
                         }
                     }
                 }
