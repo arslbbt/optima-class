@@ -18,6 +18,7 @@ class ContactUs extends Model
     public $call_remember;
     public $message;
     public $redirect_url;
+    public $url;
     public $attach;
     public $reference;
     public $verifyCode;
@@ -193,6 +194,16 @@ class ContactUs extends Model
                 {
                     $html .= '<br>';
                     $html .= 'Email: ' . $this->email;
+                }
+                if (isset($this->phone) && $this->phone != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Phone: ' . $this->phone;
+                }
+                if (isset($this->language) && $this->language != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Language: ' . $this->language;
                 }
                 if (isset($this->reference) && $this->reference != '')
                 {
