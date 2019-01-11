@@ -688,6 +688,10 @@ class Properties extends Model
             {
                 $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
+            if(isset($property->property->urbanisation) && $property->property->urbanisation != '')
+            {
+                $data['urbanisation'] = $property->property->urbanisation;
+            }
             $sale_rent = "sale";
             if (isset($property->property->rent) && $property->property->rent == true)
             {
