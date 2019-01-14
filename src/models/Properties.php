@@ -129,7 +129,7 @@ class Properties extends Model
             }
             if (isset($property->property->new_construction) && $property->property->new_construction == 1)
             {
-               $data['new_construction'] = $property->property->new_construction;
+                $data['new_construction'] = $property->property->new_construction;
             }
             if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '')
             {
@@ -231,35 +231,6 @@ class Properties extends Model
             {
                 $data['sleeps'] = $property->property->sleeps;
             }
-            if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons))
-            {
-                $todaydate = strtotime(date("Y/m/d"));
-                $gdprice = [];
-                $zstprice = 0;
-
-                foreach ($property->property->rental_seasons as $seasons)
-                {
-                    if (isset($seasons->period_from) && ($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
-                    {
-                        if (isset($seasons->gross_day_price))
-                            $gdprice[] = $seasons->gross_day_price;
-                    }
-                }
-                if (count($gdprice) > 0)
-                    $zstprice = min($gdprice);
-                $atprice = 0;
-                if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0)
-                {
-                    foreach ($property->bookings_extras as $booking_extra)
-                    {
-                        if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true)
-                        {
-                            $atprice = $atprice + (isset($booking_extra->price) ? $booking_extra->price : 0);
-                        }
-                    }
-                }
-                $data['zariko_st_price'] = $zstprice + $atprice;
-            }
             if ($rent)
             {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price))
@@ -273,7 +244,37 @@ class Properties extends Model
                     {
                         $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                     }
-                    $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    if (isset(Yii::$app->params['rental_logic']) && Yii::$app->params['rental_logic'])
+                    {
+                        $gdprice = [];
+                        $st_price = 0;
+                        foreach ($property->property->rental_seasons as $seasons)
+                        {
+                            if (isset($seasons->gross_day_price))
+                                $gdprice[] = $seasons->gross_day_price;
+                        }
+                        if (count($gdprice) > 0)
+                            $st_price = min($gdprice);
+                        $b_price = 0;
+                        if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0)
+                        {
+                            foreach ($property->bookings_extras as $booking_extra)
+                            {
+                                $divider = 1;
+                                if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
+                                    $divider = 7;
+                                if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true)
+                                {
+                                    $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                }
+                            }
+                        }
+                        $data['price'] = number_format($st_price + $b_price, 2);
+                    }
+                    else
+                    {
+                        $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    }
                     $data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
                     $data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
                 }
@@ -692,7 +693,7 @@ class Properties extends Model
             {
                 $return_data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
-            if(isset($property->property->urbanisation) && $property->property->urbanisation != '')
+            if (isset($property->property->urbanisation) && $property->property->urbanisation != '')
             {
                 $data['urbanisation'] = $property->property->urbanisation;
             }
@@ -827,39 +828,6 @@ class Properties extends Model
             {
                 $return_data['currentprice'] = $property->property->currentprice;
             }
-            if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons))
-            {
-                $todaydate = strtotime(date("Y/m/d"));
-                $gdprice = [];
-                $zstprice = 0;
-
-                foreach ($property->property->rental_seasons as $seasons)
-                {
-                    if (isset($seasons->period_from) && ($todaydate >= $seasons->period_from) && ($todaydate <= $seasons->period_to))
-                    {
-                        if (isset($seasons->gross_day_price))
-                        {
-                            $gdprice[] = $seasons->gross_day_price;
-                        }
-                    }
-                }
-                if (count($gdprice) > 0)
-                {
-                    $zstprice = min($gdprice);
-                }
-                $atprice = 0;
-                if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0)
-                {
-                    foreach ($property->bookings_extras as $booking_extra)
-                    {
-                        if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true)
-                        {
-                            $atprice = $atprice + (isset($booking_extra->price) ? $booking_extra->price : 0);
-                        }
-                    }
-                }
-                $return_data['zariko_st_price'] = $zstprice + $atprice;
-            }
 
             if ($price == 'rent')
             {
@@ -873,7 +841,37 @@ class Properties extends Model
                             $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                         }
                     }
-                    $return_data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    if (isset(Yii::$app->params['rental_logic']) && Yii::$app->params['rental_logic'])
+                    {
+                        $gdprice = [];
+                        $st_price = 0;
+                        foreach ($property->property->rental_seasons as $seasons)
+                        {
+                            if (isset($seasons->gross_day_price))
+                                $gdprice[] = $seasons->gross_day_price;
+                        }
+                        if (count($gdprice) > 0)
+                            $st_price = min($gdprice);
+                        $b_price = 0;
+                        if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0)
+                        {
+                            foreach ($property->bookings_extras as $booking_extra)
+                            {
+                                $divider = 1;
+                                if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
+                                    $divider = 7;
+                                if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true)
+                                {
+                                    $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                }
+                            }
+                        }
+                        $return_data['price'] = number_format($st_price + $b_price, 2);
+                    }
+                    else
+                    {
+                        $return_data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    }
                     $return_data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
                     $return_data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
                 }
@@ -1146,9 +1144,10 @@ class Properties extends Model
                         //     $booked_dates_costa[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                         //     $group_booked[$key][] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                         // }
-                        $dates=[];
-                        $period = new \DatePeriod(new \DateTime(date('Y-m-d',$booking->date_from)), new \DateInterval('P1D'), new \DateTime(date('Y-m-d',$booking->date_until).' +1 day'));
-                        foreach ($period as $date) {
+                        $dates = [];
+                        $period = new \DatePeriod(new \DateTime(date('Y-m-d', $booking->date_from)), new \DateInterval('P1D'), new \DateTime(date('Y-m-d', $booking->date_until) . ' +1 day'));
+                        foreach ($period as $date)
+                        {
                             $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                         }
                         $booking_status[] = $booking->status;
@@ -1363,6 +1362,10 @@ class Properties extends Model
                     $rental_features['baths'] = $baths;
                 }
                 $return_data['rental_features'] = $rental_features;
+            }
+            if (isset($property->property->variant) && $property->property->variant && isset($property->property->variants))
+            {
+                $return_data['variants'] = $property->property->variants;
             }
             if (isset($property->property->feet_categories))
             {
