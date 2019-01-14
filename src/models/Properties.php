@@ -269,6 +269,20 @@ class Properties extends Model
                                 }
                             }
                         }
+                        if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0)
+                        {
+                            foreach ($property->bookings_cleaning as $bookings_cleaning)
+                            {
+                                $divider = 1;
+                                $multiplyer = 1;
+                                if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
+                                    $divider = 7;
+                                if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                    $multiplyer = 24;
+                                if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 18 * $multiplyer / $divider) : 0);
+                            }
+                        }
                         $data['price'] = number_format($st_price + $b_price, 2);
                     }
                     else
@@ -864,6 +878,20 @@ class Properties extends Model
                                 {
                                     $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
                                 }
+                            }
+                        }
+                        if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0)
+                        {
+                            foreach ($property->bookings_cleaning as $bookings_cleaning)
+                            {
+                                $divider = 1;
+                                $multiplyer = 1;
+                                if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
+                                    $divider = 7;
+                                if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                    $multiplyer = 24;
+                                if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 18 * $multiplyer / $divider) : 0);
                             }
                         }
                         $return_data['price'] = number_format($st_price + $b_price, 2);
