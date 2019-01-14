@@ -127,6 +127,10 @@ class Properties extends Model
             {
                 $data['reference'] = $property->agency_code . '-' . $property->property->reference;
             }
+            if (isset($property->property->new_construction) && $property->property->new_construction == 1)
+            {
+               $data['new_construction'] = $property->property->new_construction;
+            }
             if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '')
             {
                 $data['sale_rent_title'] = $property->property->title->$contentLang;
