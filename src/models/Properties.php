@@ -216,7 +216,7 @@ class Properties extends Model
                                 if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
                                     $multiplyer = 24;
                                 if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
-                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 18 * $multiplyer / $divider) : 0);
+                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                             }
                         }
                         $data['price'] = number_format($st_price + $b_price, 2);
@@ -674,7 +674,7 @@ class Properties extends Model
                                 if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
                                     $multiplyer = 24;
                                 if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
-                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 18 * $multiplyer / $divider) : 0);
+                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                             }
                         }
                         $return_data['price'] = number_format($st_price + $b_price, 2);
