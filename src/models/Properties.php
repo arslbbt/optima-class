@@ -367,6 +367,16 @@ class Properties extends Model
             $garden = [];
             $pool = [];
             $condition = [];
+            $rental_investment_info = [];
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
+                foreach ($property->property->value_of_custom->basic_info as $value) {
+                    if(isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '')
+                    {
+                        $rental_investment_info[$value->field] = $value->value;
+                    }
+                }
+            }
+            $data['rental_investment_info'] = $rental_investment_info;
             if (isset($property->property->feet_categories)) {
                 foreach ($property->property->feet_categories as $key => $value) {
                     if ($value == true) {
@@ -950,6 +960,16 @@ class Properties extends Model
             $living_rooms = [];
             $beds = [];
             $baths = [];
+            $rental_investment_info = [];
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
+                foreach ($property->property->value_of_custom->basic_info as $value) {
+                    if(isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '')
+                    {
+                        $rental_investment_info[$value->field] = $value->value;
+                    }
+                }
+            }
+            $return_data['rental_investment_info'] = $rental_investment_info;
             if (isset($property->property->rent) && $property->property->rent == true) {
                 $rental_features = [];
                 $rental_features['beds'] = [];
