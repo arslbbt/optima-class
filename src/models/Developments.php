@@ -265,7 +265,7 @@ class Developments extends Model
         $features = [];
         $setting = [];
         $views = [];
-        if (isset($property->property->setting) && count($property->property->setting) > 0)
+        if (isset($property->property->setting))
         {
             foreach ($property->property->setting as $key => $value)
             {
@@ -273,7 +273,7 @@ class Developments extends Model
                     $setting[] = ucfirst(str_replace('_', ' ', $key));
             }
         }
-        if (isset($property->property->views) && count($property->property->views) > 0)
+        if (isset($property->property->views))
         {
             foreach ($property->property->views as $key => $value)
             {
@@ -281,7 +281,7 @@ class Developments extends Model
                     $views[] = ucfirst(str_replace('_', ' ', $key));
             }
         }
-        if (isset($property->property->general_features) && count((array) $property->property->general_features) > 0)
+        if (isset($property->property->general_features))
         {
             foreach ($property->property->general_features as $key => $value)
             {
@@ -324,7 +324,7 @@ class Developments extends Model
                 $data['location'] = $value->property->location;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
-            if (isset($value->documents) && count($value->documents) > 0)
+            if (isset($value->documents))
             {
                 $fplans = [];
                 foreach ($value->documents as $pic)
@@ -341,7 +341,7 @@ class Developments extends Model
                 $data['title'] = $value->property->title->$lang;
             else if (isset($value->property->location))
                 $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
-            if (isset($value->attachments) && count($value->attachments) > 0)
+            if (isset($value->attachments))
             {
                 $attachments = [];
                 foreach ($value->attachments as $pic)
