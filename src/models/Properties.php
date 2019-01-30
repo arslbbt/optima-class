@@ -128,6 +128,9 @@ class Properties extends Model
             if (isset($property->property->type_one)) {
                 $data['type'] = $property->property->type_one;
             }
+            if (isset($property->property->type_two)) {
+                $data['type_two'] = $property->property->type_two;
+            }
             $agency = Yii::$app->params['agency'];
             if (isset($property->property->latitude) && $property->property->latitude != '') {
                 $data['lat'] = $property->property->latitude;
