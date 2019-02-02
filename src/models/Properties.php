@@ -1767,7 +1767,6 @@ class Properties extends Model
         $rental_prices = [];
         $total_price = 0;
         $rental_bill = 0;
-        $gross_price = 0;
         $deposit = isset($agency['payment_options']) && count($agency['payment_options']) > 0 && isset($agency['payment_options']['deposit']) && $agency['payment_options']['deposit'] > 0 ? $agency['payment_options']['deposit'] : 0;
         $table = '';
         $return_data = [];
@@ -1799,8 +1798,11 @@ class Properties extends Model
                 foreach ($period as $dt) {
                     $tdt = $dt->getTimestamp();
                     if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
-                        $gross_price = isset($season['gross_price']) ? $season['gross_price'] : '';
-                        $rental_bill = $rental_bill + $season['price_per_day'];
+                        if(isset($season['gross_day_price']) && $season['gross_day_price']!==''){
+                            $rental_bill = $rental_bill + $season['gross_day_price'];
+                        }else{
+                            $rental_bill = $rental_bill + $season['price_per_day'];
+                        }
                         $rental_prices['rental_bill'] = $rental_bill;
                         $total_price = $rental_bill;
                     }
