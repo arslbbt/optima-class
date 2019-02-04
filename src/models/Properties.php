@@ -294,7 +294,9 @@ class Properties extends Model
                     $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                 }
             }
-
+            if (isset($property->property->dimensions) && $property->property->dimensions != '') {
+                $data['dimensions'] = $property->property->dimensions;
+            }
             if (isset($property->property->built) && $property->property->built > 0) {
                 $data['built'] = $property->property->built;
             }
@@ -727,11 +729,17 @@ class Properties extends Model
             if (isset($property->property->security_deposit)) {
                 $return_data['security_deposit'] = $property->property->security_deposit;
             }
+            if (isset($property->property->currency) && $property->property->currency != '') {
+                $return_data['currency'] = $property->property->currency;
+            }
             if (isset($property->property->type_one)) {
                 $return_data['type'] = $property->property->type_one;
             }
             if (isset($property->property->type_one_key)) {
                 $return_data['type_key'] = $property->property->type_one_key;
+            }
+            if (isset($property->property->dimensions) && $property->property->dimensions != '') {
+                $return_data['dimensions'] = $property->property->dimensions;
             }
             if (isset($property->property->built)) {
                 $return_data['built'] = $property->property->built;
