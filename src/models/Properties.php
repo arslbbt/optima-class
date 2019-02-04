@@ -173,6 +173,9 @@ class Properties extends Model
                 if (isset($property->property->lt_rental) && $property->property->lt_rental == 1)
                     $data['lt_rental'] = $property->property->lt_rental;
             }
+            if (isset($property->property->currency) && $property->property->currency != '') {
+                $data['currency'] = $property->property->currency;
+            }
             if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                 $data['bedrooms'] = $property->property->bedrooms;
             }
