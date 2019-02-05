@@ -61,11 +61,12 @@ class ContactUs extends Model
     public $gdpr_status;
     public $cv_file;
     public $language;
+    public $listing_agency_email;
 
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status'], 'safe'],
+            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status', 'listing_agency_email'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
@@ -277,6 +278,7 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
+                        ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : '')
                         ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
                         ->send();
                 Yii::$app->mailer->compose()

@@ -502,7 +502,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -520,6 +520,8 @@ class Properties extends Model
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         } elseif ($with_construction == true) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_construction=true&ip=' . \Yii::$app->getRequest()->getUserIP();
+        } elseif ($with_listing_agency == true) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_listing_agency=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         } else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
         $JsonData = file_get_contents($url);
@@ -653,6 +655,22 @@ class Properties extends Model
             }
             if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale == true) {
                 $return_data['currentprice'] = $property->property->currentprice;
+            }
+            if(isset($property->property->own) && $property->property->own == true)
+            {
+                $return_data['own'] = true;
+            }
+            if(isset($property->listing_agency_data) && count((array)$property->listing_agency_data) > 0)
+            {
+                $listing_agency_data = [];
+                foreach($property->listing_agency_data as $key => $value)
+                {
+                    if($key == 'email' && $value != '')
+                    {
+                        $listing_agency_data[$key] = $value;
+                    }
+                }
+                $return_data['listing_agency_data'] = $listing_agency_data;
             }
 
             if ($price == 'rent') {
