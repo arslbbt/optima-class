@@ -278,7 +278,7 @@ class ContactUs extends Model
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
                         ->setTo($settings['general_settings']['admin_email'])
-                        ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : '')
+                        ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
                         ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
                         ->send();
                 Yii::$app->mailer->compose()
