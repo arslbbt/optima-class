@@ -1815,6 +1815,9 @@ class Properties extends Model
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
+            $season_data_from = $property['season_data'][0]['period_to'];
+            $season_data_to = $property['season_data'][count($property['season_data'])-1]['period_to'];
+
             foreach ($property['season_data'] as $season) {
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
@@ -1823,18 +1826,26 @@ class Properties extends Model
 
                 $interval = \DateInterval::createFromDateString('1 day');
                 $period = new \DatePeriod($begin, $interval, $end);
-
+                $undefined_days = 1;
                 foreach ($period as $dt) {
                     $tdt = $dt->getTimestamp();
-                    if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
-                        if(isset($season['gross_day_price']) && $season['gross_day_price']!==''){
-                            $rental_bill = $rental_bill + $season['gross_day_price'];
-                        }else{
-                            $rental_bill = $rental_bill + $season['price_per_day'];
+                
+                    if($tdt > $season_data_to){
+                        $return_data['undefined_period'] = 1;
+                        $return_data['undefined_days'] = $undefined_days++;
+                        $return_data['number_of_days'] = $number_of_days;
+                    }else{
+                        if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
+                            if(isset($season['gross_day_price']) && $season['gross_day_price']!==''){
+                                $rental_bill = $rental_bill + $season['gross_day_price'];
+                            }else{
+                                $rental_bill = $rental_bill + $season['price_per_day'];
+                            }
+                            $rental_prices['rental_bill'] = $rental_bill;
+                            $total_price = $rental_bill;
                         }
-                        $rental_prices['rental_bill'] = $rental_bill;
-                        $total_price = $rental_bill;
                     }
+                    
                 }
             }
         }
