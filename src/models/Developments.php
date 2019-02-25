@@ -299,7 +299,7 @@ class Developments extends Model
                 }
                 else
                 {
-                    if ($key == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
+                    if ($value == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
