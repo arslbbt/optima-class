@@ -259,7 +259,7 @@ class ContactUs extends Model
             else
             {
                 $subscribe_subject = '';
-               $lngn= isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
+               $lngn= 0;//isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
             
                 foreach ($settings['custom_settings'] as $setting)
                 {
