@@ -62,11 +62,11 @@ class ContactUs extends Model
     public $cv_file;
     public $language;
     public $listing_agency_email;
-
+    public $buyer;
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status', 'listing_agency_email'], 'safe'],
+            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
@@ -259,6 +259,8 @@ class ContactUs extends Model
             else
             {
                 $subscribe_subject = '';
+               $lngn= 0;//isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
+            
                 foreach ($settings['custom_settings'] as $setting)
                 {
                     if ($setting['key'] == 'enquiry_subject')
@@ -279,12 +281,12 @@ class ContactUs extends Model
                         ->setFrom($this->email)
                         ->setTo($settings['general_settings']['admin_email'])
                         ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
-                        ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
+                        ->setSubject(isset($settings['email_response_subject'][$lngn]) ? $settings['email_response_subject'][$lngn]['key'] : 'Web enquiry')
                         ->send();
                 Yii::$app->mailer->compose()
                         ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
                         ->setTo($this->email)
-                        ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
+                        ->setSubject(isset($settings['email_response_subject'][$lngn]) && $settings['email_response_subject'][$lngn]['key']!='' ? $settings['email_response_subject'][$lngn]['key'] :( $subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us') )
                         ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                         ->send();
                 $this->saveAccount();
