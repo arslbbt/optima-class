@@ -776,9 +776,9 @@ class Properties extends Model
             } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
                 $return_data['sale_rent_description'] = $property->property->rental_description->$lang;
             }
-            if (isset($property->property->$description->$contentLang)) {
+            if (isset($property->property->$description->$contentLang) && !empty($property->property->$description->$contentLang)) {
                 $return_data['description'] = $property->property->$description->$contentLang;
-            } elseif (isset($property->property->$description->EN)) {
+            } elseif (isset($property->property->$description->EN) && !empty($property->property->$description->EN)) {
                 $return_data['description'] = $property->property->$description->EN;
             }
             if (isset($property->property->address_province)) {
