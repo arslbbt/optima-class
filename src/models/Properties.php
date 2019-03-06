@@ -276,7 +276,7 @@ class Properties extends Model
                 }
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && $property->property->period_seasons[0]->new_price) {
+                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
                     $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
                     $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
                 }
