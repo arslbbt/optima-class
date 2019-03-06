@@ -930,7 +930,7 @@ class Properties extends Model
                         foreach ($period as $date) {
                             $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                         }
-                        $booking_status[] = $booking->status;
+                        $booking_status[] = isset($booking->status) && !empty($booking->status)?$booking->status:'';
                         $group_booked[$key] = [];
                         foreach ($dates as $date) {
                             $booked_dates_costa[] = $date;
