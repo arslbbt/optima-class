@@ -17,7 +17,7 @@ class Properties extends Model
 {
 
     public static function findAll($query, $wm = false, $cache = false)
-    {
+    { 
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
@@ -614,7 +614,14 @@ class Properties extends Model
             if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
                 $return_data['title'] = $property->property->$title->$contentLang;
             } else {
-                if (isset($property->property->location) && $property->property->location != '') {
+                //if 'default_title' in params.php is set to 'EN'. in case current language dont have title it will show title in 'EN' 
+                if(isset(Yii::$app->params['default_title']) && Yii::$app->params['default_title'] == 'EN' && isset($property->property->$title)){
+                    $lang='EN';
+                    $return_data['title'] = isset($property->property->$title->$lang)?$property->property->$title->$lang:'';
+                    
+                }
+                
+                elseif (isset($property->property->locations) && $property->property->location != '') {
                     $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
                 } else {
                     $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one));
@@ -945,7 +952,9 @@ class Properties extends Model
             }
 
 
-
+// echo '<pre>';
+// print_r($property->property->videos);
+// die;
             if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos))) {
                 $videosArr = [];
                 $videosArr_gogo = [];
@@ -954,6 +963,9 @@ class Properties extends Model
                         $videosArr[] = $video->url->$contentLang;
                     }
                 }
+                // echo '<pre>';
+                // print_r($videosArr);
+                // die;
                 $return_data['videos'] = $videosArr;
             }
 
