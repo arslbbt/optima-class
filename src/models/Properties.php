@@ -185,6 +185,9 @@ class Properties extends Model
             if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                 $data['sleeps'] = $property->property->sleeps;
             }
+            if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
+                $data['living_rooms'] = $property->property->living_rooms;
+            }
             if ($rent) {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int)$property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
@@ -653,6 +656,9 @@ class Properties extends Model
             }
             if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                 $return_data['sleeps'] = $property->property->sleeps;
+            }
+            if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
+                $return_data['living_rooms'] = $property->property->living_rooms;
             }
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $return_data['oldprice'] = str_replace(',', '.', (number_format((int)($property->property->oldprice->price))));
