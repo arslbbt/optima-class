@@ -31,7 +31,7 @@ class Properties extends Model
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
-            $JsonData = file_get_contents($url);
+            $JsonData = self::file_get_contents_curl($url);
         }
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -527,7 +527,7 @@ class Properties extends Model
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_listing_agency=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         } else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
-        $JsonData = file_get_contents($url);
+        $JsonData = self::file_get_contents_curl($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
             $settings = Cms::settings();
@@ -1724,10 +1724,10 @@ class Properties extends Model
         }
         $file = $webroot . '/uploads/temp/properties-latlong.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = self::file_get_contents_curl($url);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = file_get_contents($file);
+            $file_data = self::file_get_contents_curl($file);
         }
         return json_decode($file_data, true);
     }
@@ -1743,10 +1743,10 @@ class Properties extends Model
         $file = $webroot . '/uploads/temp/agency.json';
         $url = Yii::$app->params['apiUrl'] . 'properties/agency&user=' . Yii::$app->params['user'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = self::file_get_contents_curl($url);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = file_get_contents($file);
+            $file_data = self::file_get_contents_curl($file);
         }
         return json_decode($file_data, true);
     }
@@ -1760,10 +1760,10 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
+            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = file_get_contents($file);
+            $file_data = self::file_get_contents_curl($file);
         }
         return json_decode($file_data, true);
     }
@@ -1777,7 +1777,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
+            $file_data =self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1800,7 +1800,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . $query . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = self::file_get_contents_curl($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1898,6 +1898,20 @@ class Properties extends Model
         $return_data['rental_prices'] = $rental_prices;
         $return_data['total_price'] = $total_price;
         return $return_data;
+    }
+    public static function file_get_contents_curl($url) {
+        $ch = curl_init();
+    
+        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
+    
+        $data = curl_exec($ch);
+        curl_close($ch);
+    
+        return $data;
     }
 
 }
