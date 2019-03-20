@@ -330,6 +330,8 @@ class ContactUs extends Model
             'property' => isset($this->reference) ? $this->reference : null,
             'newsletter' => isset($this->news_letter) && $this->news_letter == true ? $this->news_letter : false,
             'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
+            'rent_from_date' => isset($this->arrival_date) ? $this->arrival_date : '',
+            'rent_to_date' => isset($this->departure_date) ? $this->departure_date : '',
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
