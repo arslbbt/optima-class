@@ -111,7 +111,7 @@ class Dropdowns extends Model {
             $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] . '&count=true' . $p_q . $c_q);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
         return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
@@ -185,7 +185,7 @@ class Dropdowns extends Model {
             $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/types&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
        $fdata=json_decode($file_data);
     //    echo"<pre>";
