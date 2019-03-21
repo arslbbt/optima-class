@@ -385,17 +385,21 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $filesaved = $webroot . '/uploads/temp/' . $size . '_' . $name;
-        if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
-        {
-            $handle = @fopen($url, 'r');
-            if (!$handle)
+        if(isset(Yii::$app->params['ImageFrom']) && Yii::$app->params['ImageFrom']=='remote'){
+            return 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+        }else{
+            if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
             {
-                $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+                $handle = @fopen($url, 'r');
+                if (!$handle)
+                {
+                    $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+                }
+                $file_data = @self::file_get_contents_curl($url);
+                file_put_contents($filesaved, $file_data);
             }
-            $file_data = @self::file_get_contents_curl($url);
-            file_put_contents($filesaved, $file_data);
+            return '/uploads/temp/' . $size . '_' . $name;
         }
-        return '/uploads/temp/' . $size . '_' . $name;
     }
 
     public static function iconLogo($name)
