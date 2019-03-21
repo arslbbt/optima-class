@@ -26,7 +26,7 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/settings.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data =self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template']);
+            $file_data =file_get_contents(Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template']);
             file_put_contents($file, $file_data);
         }
         else
@@ -49,7 +49,7 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
@@ -71,7 +71,7 @@ class Cms extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name . $site_id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -129,7 +129,7 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/menu.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/menu&user=' . Yii::$app->params['user'] . '&id=' . $id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/menu&user=' . Yii::$app->params['user'] . '&id=' . $id);
             file_put_contents($file, $file_data);
         }
         else
@@ -180,7 +180,7 @@ class Cms extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user'] . $site_id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user'] . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -200,7 +200,7 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/SystemLanguages.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/system-languages&user=' . Yii::$app->params['user'] . '&name=gogo');
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/system-languages&user=' . Yii::$app->params['user'] . '&name=gogo');
             file_put_contents($file, $file_data);
         }
         else
@@ -221,7 +221,7 @@ class Cms extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/categories&user=' . Yii::$app->params['user'] . $site_id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/categories&user=' . Yii::$app->params['user'] . $site_id);
             file_put_contents($file, $file_data);
         }
         else
@@ -251,11 +251,11 @@ class Cms extends Model
             if ($id == null)
             {
                 $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id);
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id);
             }
             else
             {
-                $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
+                $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
             }
             file_put_contents($file, $file_data);
         }
@@ -294,7 +294,7 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'] . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
@@ -337,7 +337,7 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data =self::file_get_contents_curl($url);
+            $file_data =file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
@@ -395,7 +395,7 @@ class Cms extends Model
                 {
                     $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
                 }
-                $file_data = @self::file_get_contents_curl($url);
+                $file_data = @file_get_contents($url);
                 file_put_contents($filesaved, $file_data);
             }
             return '/uploads/temp/' . $size . '_' . $name;
@@ -440,7 +440,7 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/users&user=' . Yii::$app->params['user'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
