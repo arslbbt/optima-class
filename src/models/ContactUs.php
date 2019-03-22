@@ -314,6 +314,10 @@ class ContactUs extends Model
         {
             $call_rememeber = 'call me back: After 18:00';
         }
+        else if(isset($this->call_remember) && $this->call_remember != '')
+        {
+            $call_rememeber = $this->call_remember;
+        }
         if ($this->owner)
             $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
         else
