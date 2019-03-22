@@ -17,7 +17,7 @@ class Properties extends Model
 {
 
     public static function findAll($query, $wm = false, $cache = false)
-    {
+    { 
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
@@ -185,6 +185,9 @@ class Properties extends Model
             if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                 $data['sleeps'] = $property->property->sleeps;
             }
+            if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
+                $data['living_rooms'] = $property->property->living_rooms;
+            }
             if ($rent) {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int)$property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
@@ -276,7 +279,7 @@ class Properties extends Model
                 }
             }
             if (isset($property->property->rent) && $property->property->rent == 1) {
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && $property->property->period_seasons[0]->new_price) {
+                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
                     $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
                     $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
                 }
@@ -614,7 +617,14 @@ class Properties extends Model
             if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
                 $return_data['title'] = $property->property->$title->$contentLang;
             } else {
-                if (isset($property->property->location) && $property->property->location != '') {
+                //if 'default_title' in params.php is set to 'EN'. in case current language dont have title it will show title in 'EN' 
+                if(isset(Yii::$app->params['default_title']) && Yii::$app->params['default_title'] == 'EN' && isset($property->property->$title)){
+                    $lang='EN';
+                    $return_data['title'] = isset($property->property->$title->$lang)?$property->property->$title->$lang:'';
+                    
+                }
+                
+                elseif (isset($property->property->locations) && $property->property->location != '') {
                     $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one)) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
                 } else {
                     $return_data['title'] = \Yii::t('app', strtolower($property->property->type_one));
@@ -646,6 +656,9 @@ class Properties extends Model
             }
             if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                 $return_data['sleeps'] = $property->property->sleeps;
+            }
+            if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
+                $return_data['living_rooms'] = $property->property->living_rooms;
             }
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $return_data['oldprice'] = str_replace(',', '.', (number_format((int)($property->property->oldprice->price))));
@@ -733,7 +746,7 @@ class Properties extends Model
                     $return_data['price'] = ($property->property->currentprice != 0) ? number_format((int)$property->property->currentprice, 0, '', '.') : '';
                 }
             }
-            if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && $property->property->period_seasons[0]->new_price) {
+            if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
                 $return_data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
                 $return_data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
             }
@@ -776,9 +789,9 @@ class Properties extends Model
             } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
                 $return_data['sale_rent_description'] = $property->property->rental_description->$lang;
             }
-            if (isset($property->property->$description->$contentLang)) {
+            if (isset($property->property->$description->$contentLang) && !empty($property->property->$description->$contentLang)) {
                 $return_data['description'] = $property->property->$description->$contentLang;
-            } elseif (isset($property->property->$description->EN)) {
+            } elseif (isset($property->property->$description->EN) && !empty($property->property->$description->EN)) {
                 $return_data['description'] = $property->property->$description->EN;
             }
             if (isset($property->property->address_province)) {
@@ -930,7 +943,7 @@ class Properties extends Model
                         foreach ($period as $date) {
                             $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                         }
-                        $booking_status[] = $booking->status;
+                        $booking_status[] = isset($booking->status) && !empty($booking->status)?$booking->status:'';
                         $group_booked[$key] = [];
                         foreach ($dates as $date) {
                             $booked_dates_costa[] = $date;
@@ -945,7 +958,9 @@ class Properties extends Model
             }
 
 
-
+// echo '<pre>';
+// print_r($property->property->videos);
+// die;
             if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos))) {
                 $videosArr = [];
                 $videosArr_gogo = [];
@@ -954,6 +969,9 @@ class Properties extends Model
                         $videosArr[] = $video->url->$contentLang;
                     }
                 }
+                // echo '<pre>';
+                // print_r($videosArr);
+                // die;
                 $return_data['videos'] = $videosArr;
             }
 
@@ -1759,7 +1777,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
+            $file_data =file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1869,6 +1887,20 @@ class Properties extends Model
         $return_data['rental_prices'] = $rental_prices;
         $return_data['total_price'] = $total_price;
         return $return_data;
+    }
+    public static function file_get_contents_curl($url) {
+        $ch = curl_init();
+    
+        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
+    
+        $data = curl_exec($ch);
+        curl_close($ch);
+    
+        return $data;
     }
 
 }
