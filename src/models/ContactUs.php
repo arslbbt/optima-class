@@ -54,6 +54,10 @@ class ContactUs extends Model
     public $assigned_to;
     public $news_letter;
     public $arrival_date;
+    public $buy_price_from;
+    public $buy_price_to;
+    public $strent_price_from;
+    public $strent_price_to;
     public $departure_date;
     public $contact_check_1;
     public $contact_check_2;
@@ -67,7 +71,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email'], 'safe'],
+            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
@@ -340,6 +344,12 @@ class ContactUs extends Model
             'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
             'rent_from_date' => isset($this->arrival_date) ? $this->arrival_date : '',
             'rent_to_date' => isset($this->departure_date) ? $this->departure_date : '',
+            'types' => isset($this->property_type) ? $this->property_type : '',
+            'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : '',
+            'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : '',
+            'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : '',
+            'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : '',
+            'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : '',
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
