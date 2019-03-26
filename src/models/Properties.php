@@ -31,7 +31,7 @@ class Properties extends Model
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
-            $JsonData = self::file_get_contents_curl($url);
+            $JsonData = file_get_contents($url);
         }
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -527,7 +527,7 @@ class Properties extends Model
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_listing_agency=true&ip=' . \Yii::$app->getRequest()->getUserIP();
         } else
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
-        $JsonData = self::file_get_contents_curl($url);
+        $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
             $settings = Cms::settings();
@@ -1724,10 +1724,10 @@ class Properties extends Model
         }
         $file = $webroot . '/uploads/temp/properties-latlong.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
         return json_decode($file_data, true);
     }
@@ -1743,10 +1743,10 @@ class Properties extends Model
         $file = $webroot . '/uploads/temp/agency.json';
         $url = Yii::$app->params['apiUrl'] . 'properties/agency&user=' . Yii::$app->params['user'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
         return json_decode($file_data, true);
     }
@@ -1760,10 +1760,10 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
             file_put_contents($file, $file_data);
         } else {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
         return json_decode($file_data, true);
     }
@@ -1777,7 +1777,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data =self::file_get_contents_curl(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
+            $file_data =file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1800,7 +1800,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . $query . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1833,9 +1833,6 @@ class Properties extends Model
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
-            $season_data_from = $property['season_data'][0]['period_to'];
-            $season_data_to = $property['season_data'][count($property['season_data'])-1]['period_to'];
-
             foreach ($property['season_data'] as $season) {
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
@@ -1844,26 +1841,18 @@ class Properties extends Model
 
                 $interval = \DateInterval::createFromDateString('1 day');
                 $period = new \DatePeriod($begin, $interval, $end);
-                $undefined_days = 1;
+
                 foreach ($period as $dt) {
                     $tdt = $dt->getTimestamp();
-                
-                    if($tdt > $season_data_to){
-                        $return_data['undefined_period'] = 1;
-                        $return_data['undefined_days'] = $undefined_days++;
-                        $return_data['number_of_days'] = $number_of_days;
-                    }else{
-                        if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
-                            if(isset($season['gross_day_price']) && $season['gross_day_price']!==''){
-                                $rental_bill = $rental_bill + $season['gross_day_price'];
-                            }else{
-                                $rental_bill = $rental_bill + $season['price_per_day'];
-                            }
-                            $rental_prices['rental_bill'] = $rental_bill;
-                            $total_price = $rental_bill;
+                    if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
+                        if(isset($season['gross_day_price']) && $season['gross_day_price']!==''){
+                            $rental_bill = $rental_bill + $season['gross_day_price'];
+                        }else{
+                            $rental_bill = $rental_bill + $season['price_per_day'];
                         }
+                        $rental_prices['rental_bill'] = $rental_bill;
+                        $total_price = $rental_bill;
                     }
-                    
                 }
             }
         }

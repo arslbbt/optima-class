@@ -481,7 +481,7 @@ class Developments extends Model
         }
         else
         {
-            $file_data = self::file_get_contents_curl($file);
+            $file_data = file_get_contents($file);
         }
         return $file_data;
     }
