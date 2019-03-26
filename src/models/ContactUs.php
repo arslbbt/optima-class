@@ -142,7 +142,7 @@ class ContactUs extends Model
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                         ->setFrom(isset($this->email)? $this->email : '')
                         ->setTo(isset($ae_array) ? $ae_array : '')
-                        ->setSubject(isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry')
+                        ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
                         ->send();
                     $this->saveAccount();
                     if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
@@ -290,12 +290,12 @@ class ContactUs extends Model
                     ->setFrom(isset($this->email)? $this->email : '')
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
-                    ->setSubject(isset($settings['email_response_subject'][$lngn]) ? $settings['email_response_subject'][$lngn]['key'] : 'Web enquiry')
+                    ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
                     ->send();
                 Yii::$app->mailer->compose()
                 ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
                 ->setTo($this->email)
-                ->setSubject(isset($settings['email_response_subject'][$lngn]) && $settings['email_response_subject'][$lngn]['key']!='' ? $settings['email_response_subject'][$lngn]['key'] :( $subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us') )
+                ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
                 ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                 ->send();
                 $this->saveAccount();
