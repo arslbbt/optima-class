@@ -965,10 +965,48 @@ class Properties extends Model
                 $return_data['booked_dates_costa'] = $booked_dates_costa;
             }
 
-
-            // echo '<pre>';
-            // print_r($property->property->videos);
-            // die;
+            if(isset($property->testimonials))
+            {
+                $testimonials = [];
+                foreach($property->testimonials as $test)
+                {
+                    if(isset($test->status) && $test->status == 'approved')
+                    {
+                        $test_array = [];
+                        if(isset($test->date) && $test->date != '')
+                        {
+                            $test_array['date'] = $test->date;
+                        }
+                        if(isset($test->name) && $test->name != '')
+                        {
+                            $test_array['name'] = $test->name;
+                        }
+                        if(isset($test->testimonial) && $test->testimonial != '')
+                        {
+                            $test_array['testimonial'] = $test->testimonial;
+                        }
+                        if(isset($test->rating))
+                        {
+                            $value_avg = 0;
+                            foreach($test->rating as $rating)
+                            {
+                                if($rating != '')
+                                $value_avg = $value_avg + $rating;
+                            }
+                            $value_avg = ceil($value_avg / 10);
+                        }
+                        if(isset($value_avg) && $value_avg > 0)
+                        {
+                            $test_array['rating'] = $value_avg;
+                        }
+                    }
+                    $testimonials[] = $test_array;
+                }
+                if(count($testimonials) > 0)
+                {
+                    $return_data['testimonials'] = $testimonials;
+                }
+            }
             if (isset($property->property->videos) && (is_array($property->property->videos) || is_object($property->property->videos))) {
                 $videosArr = [];
                 $videosArr_gogo = [];
