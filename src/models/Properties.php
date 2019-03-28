@@ -289,8 +289,18 @@ class Properties extends Model
                 }
                 if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
                     $st_price = [];
+                    $discount = false;
+                    $data['discount'] = [];
                     foreach ($property->property->rental_seasons as $seasons) {
                         $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                        if (!$discount && isset($seasons->old_price) && $seasons->old_price && isset($seasons->new_price) && $seasons->new_price) {
+                            $discount = true;
+                            $data['discount'] = [
+                                'value' => (($seasons->old_price * 1 - $seasons->new_price * 1) * 100) / ($seasons->new_price * 1),
+                                'from' => $seasons->period_from,
+                                'to' => $seasons->period_to
+                            ];
+                        }
                     }
                     $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') : '';
                     $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
@@ -582,6 +592,7 @@ class Properties extends Model
             $seo_title = 'seo_title';
             $seo_description = 'seo_description';
             $keywords = 'keywords';
+            $perma_link = 'perma_link';
             if ($sale_rent == 'rent') {
                 $title = 'rental_title';
                 $description = 'rental_description';
@@ -589,14 +600,15 @@ class Properties extends Model
                 $seo_title = 'rental_seo_title';
                 $seo_description = 'rental_seo_description';
                 $keywords = 'rental_keywords';
+                $perma_link = 'rental_perma_link';
             }
             //    start slug_all
             $slugs = [];
             foreach ($langugesSystem as $lang_sys) {
                 $lang_sys_key = $lang_sys['key'];
                 $lang_sys_internal_key = isset($lang_sys['internal_key']) ? $lang_sys['internal_key'] : '';
-                if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '') {
-                    $slugs[$lang_sys_internal_key] = $property->property->perma_link->$lang_sys_key;
+                if (isset($property->property->$perma_link->$lang_sys_key) && $property->property->$perma_link->$lang_sys_key != '') {
+                    $slugs[$lang_sys_internal_key] = $property->property->$perma_link->$lang_sys_key;
                 } elseif (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
                     $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
                 } elseif (isset($slugs[$lang_sys_internal_key])) {
