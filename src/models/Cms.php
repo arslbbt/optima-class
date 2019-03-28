@@ -26,7 +26,7 @@ class Cms extends Model
         $file = $webroot . '/uploads/temp/settings.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template']);
+            $file_data =file_get_contents(Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template']);
             file_put_contents($file, $file_data);
         }
         else
@@ -306,6 +306,9 @@ class Cms extends Model
 
         $retdata = [];
         $array = [];
+        // echo"<pre>";
+        // print_r($dataEach);
+        // die;
         foreach ($dataEach as $key => $data)
         {
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
@@ -334,7 +337,7 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = file_get_contents($url);
+            $file_data =file_get_contents($url);
             file_put_contents($file, $file_data);
         }
         else
@@ -382,17 +385,21 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $filesaved = $webroot . '/uploads/temp/' . $size . '_' . $name;
-        if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
-        {
-            $handle = @fopen($url, 'r');
-            if (!$handle)
+        if(isset(Yii::$app->params['ImageFrom']) && Yii::$app->params['ImageFrom']=='remote'){
+            return 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+        }else{
+            if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
             {
-                $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+                $handle = @fopen($url, 'r');
+                if (!$handle)
+                {
+                    $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+                }
+                $file_data = @file_get_contents($url);
+                file_put_contents($filesaved, $file_data);
             }
-            $file_data = @file_get_contents($url);
-            file_put_contents($filesaved, $file_data);
+            return '/uploads/temp/' . $size . '_' . $name;
         }
-        return '/uploads/temp/' . $size . '_' . $name;
     }
 
     public static function iconLogo($name)
@@ -473,5 +480,18 @@ class Cms extends Model
         }
         return $users;
     }
-
+    public static function file_get_contents_curl($url) {
+        $ch = curl_init();
+    
+        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
+    
+        $data = curl_exec($ch);
+        curl_close($ch);
+    
+        return $data;
+    }
 }

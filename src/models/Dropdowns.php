@@ -163,6 +163,8 @@ class Dropdowns extends Model {
         $file = $webroot . '/uploads/temp/types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/types&user=' . Yii::$app->params['user']);
+            // echo $file_data;
+            // die;
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -187,8 +189,12 @@ class Dropdowns extends Model {
         } else {
             $file_data = file_get_contents($file);
         }
-
-        foreach (json_decode($file_data) as $file) {
+       $fdata=json_decode($file_data);
+    //    echo"<pre>";
+    //    print_r($fdata);
+    //    die;
+        
+        foreach ($fdata as $file) {
             $sub_types = [];
             if (isset($file->sub_type) && count($file->sub_type) > 0) {
                 foreach ($file->sub_type as $subtype) {
@@ -239,12 +245,14 @@ class Dropdowns extends Model {
             mkdir($webroot . '/uploads/temp/');
         }
         $file = $webroot . '/uploads/temp/locationGroups_' . implode(',', $provinces) . '.json';
+      
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user=' . Yii::$app->params['user'] . $p_q);
+           
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user=' . Yii::$app->params['user']);
@@ -252,11 +260,27 @@ class Dropdowns extends Model {
         } else {
             $file_data = file_get_contents($file);
         }
-        return json_decode($file_data, TRUE);
+        // echo $file_data;
+        //    die;
+        return json_decode($file_data, true);
     }
 
     public static function orientations() {
         return [['key' => "north", 'value' => \Yii::t('app', 'north')], ['key' => "north_east", 'value' => \Yii::t('app', 'north_east')], ['key' => "east", 'value' => \Yii::t('app', 'east')], ['key' => "south_east", 'value' => \Yii::t('app', 'south_east')], ['key' => "south", 'value' => \Yii::t('app', 'south')], ['key' => "south_west", 'value' => \Yii::t('app', 'south_west')], ['key' => "west", 'value' => \Yii::t('app', 'west')], ['key' => "north_west", 'value' => \Yii::t('app', 'north_west')],];
+    }
+    public static function file_get_contents_curl($url) {
+        $ch = curl_init();
+    
+        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
+    
+        $data = curl_exec($ch);
+        curl_close($ch);
+    
+        return $data;
     }
 
 }

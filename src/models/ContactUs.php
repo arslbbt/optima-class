@@ -54,6 +54,10 @@ class ContactUs extends Model
     public $assigned_to;
     public $news_letter;
     public $arrival_date;
+    public $buy_price_from;
+    public $buy_price_to;
+    public $strent_price_from;
+    public $strent_price_to;
     public $departure_date;
     public $contact_check_1;
     public $contact_check_2;
@@ -62,11 +66,12 @@ class ContactUs extends Model
     public $cv_file;
     public $language;
     public $listing_agency_email;
-
+    public $buyer;
+    public $mobile_phone;
     public function rules()
     {
         return [
-            [['name', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status', 'listing_agency_email'], 'safe'],
+            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
@@ -116,34 +121,38 @@ class ContactUs extends Model
     public function sendMail()
     {
         $settings = Cms::settings();
-        if ($this->validate() && isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
+        if(isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
+        {
+            $ae_array = explode(',', $settings['general_settings']['admin_email']);
+        }
+        if ($this->validate() && isset($ae_array))
         {
             if (isset($this->attach) && $this->attach == 1)
             {
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf'))
                 {
-                    Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                            ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                            ->setTo($settings['general_settings']['admin_email'])
-                            ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
-                            ->send();
                     Yii::$app->mailer->compose()
-                            ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                            ->setTo($this->email)
-                            ->setSubject('Thank you for contacting us')
-                            ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
-                            ->attach($webroot . '/uploads/pdf/property.pdf')
-                            ->send();
+                    ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                    ->setTo($this->email)
+                    ->setSubject('Thank you for contacting us')
+                    ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
+                    ->attach($webroot . '/uploads/pdf/property.pdf')
+                    ->send();
+                    Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                        ->setFrom(isset($this->email)? $this->email : '')
+                        ->setTo(isset($ae_array) ? $ae_array : '')
+                        ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
+                        ->send();
                     $this->saveAccount();
                     if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     {
                         Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                                ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                                ->setTo($this->sender_email)
-                                ->setSubject('Suggested property')
-                                ->attach($webroot . '/uploads/pdf/property.pdf')
-                                ->send();
+                        ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                        ->setTo($this->sender_email)
+                        ->setSubject('Suggested property')
+                        ->attach($webroot . '/uploads/pdf/property.pdf')
+                        ->send();
                         $this->saveSenderAccount();
                     }
                 }
@@ -166,14 +175,15 @@ class ContactUs extends Model
                 }
                 $htmlBody = $subscribe_msg . '<br><br><br><br> <img style="width:40%" src=' . $logo . '> ';
                 $email_response = isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing';
+                    
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                        ->setTo($settings['general_settings']['admin_email'])
-                        ->setSubject('Subscribing newsletter Email')
-                        ->setHtmlBody($this->email . ' would like to be added to your newsletters')
-                        ->send();
+                    ->setFrom(isset($this->email)? $this->email : '')
+                    ->setTo(isset($ae_array) ? $ae_array : '')
+                    ->setSubject('Subscribing newsletter Email')
+                    ->setHtmlBody($this->email . ' would like to be added to your newsletters')
+                    ->send();                
                 Yii::$app->mailer->compose()
-                        ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
+                        ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
                         ->setTo($this->email)
                         ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
                         ->setHtmlBody($subscribe_msg != '' ? $htmlBody : $email_response)
@@ -241,24 +251,25 @@ class ContactUs extends Model
                 {
                     $call_rememeber = 'After 18:00';
                 }
-
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                        ->setTo($settings['general_settings']['admin_email'])
-                        ->setSubject('Booking Enquiry')
-                        ->setHtmlBody($html)
-                        ->send();
+                    ->setFrom(isset($this->email)? $this->email : '')
+                    ->setTo(isset($ae_array) ? $ae_array : '')
+                    ->setSubject('Booking Enquiry')
+                    ->setHtmlBody($html)
+                    ->send();
                 Yii::$app->mailer->compose()
-                        ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                        ->setTo($this->email)
-                        ->setSubject('Thank you for contacting us')
-                        ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
-                        ->send();
+                ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                ->setTo($this->email)
+                ->setSubject('Thank you for contacting us')
+                ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
+                ->send();
                 $this->saveAccount();
             }
             else
             {
                 $subscribe_subject = '';
+               $lngn= 0;//isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
+            
                 foreach ($settings['custom_settings'] as $setting)
                 {
                     if ($setting['key'] == 'enquiry_subject')
@@ -276,17 +287,17 @@ class ContactUs extends Model
                     }
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom($this->email)
-                        ->setTo($settings['general_settings']['admin_email'])
-                        ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
-                        ->setSubject(isset($setting['email_response_subject'][0]) ? $setting['email_response_subject'][0]['key'] : 'Web enquiry')
-                        ->send();
+                    ->setFrom(isset($this->email)? $this->email : '')
+                    ->setTo(isset($ae_array) ? $ae_array : '')
+                    ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
+                    ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
+                    ->send();
                 Yii::$app->mailer->compose()
-                        ->setFrom(isset($settings['general_settings']['admin_email'])?$settings['general_settings']['admin_email']:Yii::$app->params['from_email'])
-                        ->setTo($this->email)
-                        ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
-                        ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
-                        ->send();
+                ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                ->setTo($this->email)
+                ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
+                ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
+                ->send();
                 $this->saveAccount();
                 if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
@@ -310,6 +321,10 @@ class ContactUs extends Model
         {
             $call_rememeber = 'call me back: After 18:00';
         }
+        else if(isset($this->call_remember) && $this->call_remember != '')
+        {
+            $call_rememeber = $this->call_remember;
+        }
         if ($this->owner)
             $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
         else
@@ -323,9 +338,18 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
+            'mobile_phone' => isset($this->mobile_phone)?$this->mobile_phone:'',
             'property' => isset($this->reference) ? $this->reference : null,
             'newsletter' => isset($this->news_letter) && $this->news_letter == true ? $this->news_letter : false,
             'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
+            'rent_from_date' => isset($this->arrival_date) ? $this->arrival_date : '',
+            'rent_to_date' => isset($this->departure_date) ? $this->departure_date : '',
+            'types' => isset($this->property_type) ? $this->property_type : '',
+            'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : '',
+            'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : '',
+            'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : '',
+            'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : '',
+            'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : '',
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
