@@ -87,6 +87,10 @@ class Properties extends Model
             }
             $data = [];
             $features = [];
+            if(isset($property->property->created_at) && $property->property->created_at != '')
+            {
+                $data['created_at'] = $property->property->created_at;
+            }
             if (isset($property->total_properties)) {
                 $data['total_properties'] = $property->total_properties;
             }
