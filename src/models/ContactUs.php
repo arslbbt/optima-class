@@ -354,7 +354,7 @@ class ContactUs extends Model
             'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
             'html_content' => isset($this->html_content) ? $this->html_content : '',
-            'lgroups' => isset($this->lgroups) ? $this->lgroups : [],
+            'lgroups' => isset($this->lgroups) ? implode(',',$this->lgroups) : [],
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
             'language' => strtoupper(\Yii::$app->language)
         );
