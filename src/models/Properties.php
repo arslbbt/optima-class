@@ -28,6 +28,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+       
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -343,6 +344,11 @@ class Properties extends Model
             if (isset($property->property->address_province)) {
                 $data['province'] = $property->property->address_province;
             }
+            if (isset($property->property->value_of_custom->feet_custom_categories)) {
+                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+                $data['feet_custom_categories'] = ArrayHelper::toArray($property->property->value_of_custom->feet_custom_categories);
+            }
+           
             $slugs = [];
             foreach ($langugesSystem as $lang_sys) {
 
@@ -514,7 +520,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false,$with_count=false)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -540,6 +546,11 @@ class Properties extends Model
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
         }
+        if (isset($with_count) && $with_count==true) {
+            $url = $url . '&view_count=true';
+        }
+        
+       
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
@@ -683,6 +694,18 @@ class Properties extends Model
             }
             if (isset($property->property->own) && $property->property->own == true) {
                 $return_data['own'] = true;
+            }
+            if (isset($property->property->created_at) && !empty($property->property->created_at)) {
+                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+                $return_data['created_at'] = $property->property->created_at;
+            }
+            if (isset($property->property->floors) && !empty($property->property->floors)) {
+                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+                $return_data['floors'] = ArrayHelper::toArray($property->property->floors);
+            }
+            if (isset($property->view_count) && !empty($property->view_count)) {
+                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+                $return_data['view_count'] = $property->view_count;
             }
             if (isset($property->listing_agency_data) && count((array)$property->listing_agency_data) > 0) {
                 $listing_agency_data = [];
@@ -1015,9 +1038,7 @@ class Properties extends Model
                         $videosArr[] = $video->url->$contentLang;
                     }
                 }
-                // echo '<pre>';
-                // print_r($videosArr);
-                // die;
+                
                 $return_data['videos'] = $videosArr;
             }
 
