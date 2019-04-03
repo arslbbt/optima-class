@@ -189,6 +189,16 @@ class Properties extends Model
             if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
                 $data['living_rooms'] = $property->property->living_rooms;
             }
+            if (isset($property->property->address_street) && $property->property->address_street != '') {
+                $data['address_street'] = $property->property->longitude;
+            } elseif (isset($property->property->private_info_object->$agency->address_street)) {
+                $data['address_street'] = $property->property->private_info_object->$agency->address_street;
+            }
+            if (isset($property->property->address_street_number) && $property->property->address_street_number != '') {
+                $data['address_street_number'] = $property->property->longitude;
+            } elseif (isset($property->property->private_info_object->$agency->address_street_number)) {
+                $data['address_street_number'] = $property->property->private_info_object->$agency->address_street_number;
+            }
             if ($rent) {
                 if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
                     $data['price'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int)$property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
