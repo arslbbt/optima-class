@@ -24,7 +24,7 @@ class Dropdowns extends Model {
         }
         $file = $webroot . '/uploads/temp/provinces.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/provinces&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -42,7 +42,7 @@ class Dropdowns extends Model {
         }
         $file = $webroot . '/uploads/temp/countries.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/countries&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -108,7 +108,7 @@ class Dropdowns extends Model {
                     $c_q .= '&city[]=' . $city;
                 }
             }
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&user=' . Yii::$app->params['user'] . '&count=true' . $p_q . $c_q);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -131,7 +131,7 @@ class Dropdowns extends Model {
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities&user=' . Yii::$app->params['user'] . $p_q);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities'.$p_q.'&user_apikey=' . Yii::$app->params['api_key']);
             $file_data = json_decode($file_data);
             usort($file_data, function ($item1, $item2) {
             return $item1->value <=> $item2->value;
@@ -139,7 +139,7 @@ class Dropdowns extends Model {
         $file_data = json_encode($file_data);
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']);
             $file_data = json_decode($file_data);
             usort($file_data, function ($item1, $item2) {
             return $item1->value <=> $item2->value;
@@ -162,7 +162,7 @@ class Dropdowns extends Model {
         }
         $file = $webroot . '/uploads/temp/types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/types&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key']);
             // echo $file_data;
             // die;
             file_put_contents($file, $file_data);
@@ -184,7 +184,7 @@ class Dropdowns extends Model {
         }
         $file = $webroot . '/uploads/temp/types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/types&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -251,11 +251,11 @@ class Dropdowns extends Model {
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user=' . Yii::$app->params['user'] . $p_q);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value'.$p_q.'&user_apikey=' . Yii::$app->params['api_key']);
            
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
