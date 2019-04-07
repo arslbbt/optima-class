@@ -27,7 +27,7 @@ class Properties extends Model
             }
         }
         $query .= self::setQuery();
-        $url = Yii::$app->params['apiUrl'] . 'properties&user=' . Yii::$app->params['user'] . $query;
+        $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
        
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -543,15 +543,15 @@ class Properties extends Model
         $ref = $reference;
 
         if (isset($with_booking) && $with_booking == true) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&with_booking=true&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP().'&user_apikey=' . Yii::$app->params['api_key'];
         } elseif ($with_locationgroup == true) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_locationgroup=true&ip=' . \Yii::$app->getRequest()->getUserIP();
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&with_locationgroup=true&ip=' . \Yii::$app->getRequest()->getUserIP().'&user_apikey=' . Yii::$app->params['api_key'];
         } elseif ($with_construction == true) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_construction=true&ip=' . \Yii::$app->getRequest()->getUserIP();
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&with_construction=true&ip=' . \Yii::$app->getRequest()->getUserIP().'&user_apikey=' . Yii::$app->params['api_key'];
         } elseif ($with_listing_agency == true) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&with_listing_agency=true&ip=' . \Yii::$app->getRequest()->getUserIP();
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&with_listing_agency=true&ip=' . \Yii::$app->getRequest()->getUserIP().'&user_apikey=' . Yii::$app->params['api_key'];
         } else {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP();
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP().'&user_apikey=' . Yii::$app->params['api_key'];
         }
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
@@ -950,7 +950,7 @@ class Properties extends Model
                 $return_data['security_deposit'] = $property->property->security_deposit;
             }
             if (isset($property->property->vt_ids[0])) {
-                $return_data['vt'] = 'https://my.optima-crm.com/yiiapp/frontend/web/index.php?r=virtualtours&user=' . Yii::$app->params['user'] . '&id=' . $property->property->vt_ids[0];
+                $return_data['vt'] = Yii::$app->params['apiUrl'].'virtualtours&id=' . $property->property->vt_ids[0].'&user_apikey=' . Yii::$app->params['api_key'];
             }
             if (isset($property->property->license_number)) {
                 $return_data['license_number'] = $property->property->license_number;
@@ -1791,7 +1791,7 @@ class Properties extends Model
     public static function findAllWithLatLang()
     {
         $webroot = Yii::getAlias('@webroot');
-        $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user=' . Yii::$app->params['user'];
+        $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user_apikey=' . Yii::$app->params['api_key'];
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
         }
@@ -1817,7 +1817,7 @@ class Properties extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agency.json';
-        $url = Yii::$app->params['apiUrl'] . 'properties/agency&user=' . Yii::$app->params['user'];
+        $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
@@ -1836,7 +1836,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&user=' . Yii::$app->params['user'] . '&listing_agent=' . $id);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&listing_agent=' . $id.'&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1853,7 +1853,7 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user=' . Yii::$app->params['user']);
+            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key']);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
