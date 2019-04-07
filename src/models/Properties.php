@@ -102,9 +102,9 @@ class Properties extends Model
                 if (isset($property->property->$ref))
                     $data['reference'] = $property->property->$ref;
                 else
-                    $data['reference'] = $property->agency_code . '-' . $property->property->reference;
+                    $data['reference'] = isset($property->agency_code)?$property->agency_code. '-':'' . $property->property->reference;
             } else {
-                $data['reference'] = $property->agency_code . '-' . $property->property->reference;
+                $data['reference'] = isset($property->agency_code)?$property->agency_code. '-':'' . $property->property->reference;
             }
             if (isset($property->property->new_construction) && $property->property->new_construction == 1) {
                 $data['new_construction'] = $property->property->new_construction;
