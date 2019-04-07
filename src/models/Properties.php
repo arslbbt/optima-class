@@ -77,455 +77,468 @@ class Properties extends Model
             $seo_description = 'seo_description';
             $keywords = 'keywords';
             $perma_link = 'perma_link';
-            if (isset($property->property->rent) && $property->property->rent == true) {
-                $title = 'rental_title';
-                $description = 'rental_description';
-                $price = 'rent';
-                $seo_title = 'rental_seo_title';
-                $seo_description = 'rental_seo_description';
-                $keywords = 'rental_keywords';
-                $perma_link = 'rental_perma_link';
-            }
-            $data = [];
-            $features = [];
-            if (isset($property->total_properties)) {
-                $data['total_properties'] = $property->total_properties;
-            }
-            if (isset($property->property->_id)) {
-                $data['_id'] = $property->property->_id;
-            }
-            if (isset($property->property->reference)) {
-                $data['id'] = $property->property->reference;
-            }
-            if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference') {
-                $ref = $settings['general_settings']['reference'];
-                if (isset($property->property->$ref))
-                    $data['reference'] = $property->property->$ref;
-                else
-                    $data['reference'] = isset($property->agency_code)?$property->agency_code. '-':'' . $property->property->reference;
-            } else {
-                $data['reference'] = isset($property->agency_code)?$property->agency_code. '-':'' . $property->property->reference;
-            }
-            if (isset($property->property->new_construction) && $property->property->new_construction == 1) {
-                $data['new_construction'] = $property->property->new_construction;
-            }
-            if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '') {
-                $data['sale_rent_title'] = $property->property->title->$contentLang;
-            } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_title->$contentLang) && $property->property->rental_title->$contentLang != '') {
-                $data['sale_rent_title'] = $property->property->rental_title->$contentLang;
-            } elseif (isset($property->property->location) && isset($property->property->type_one)) {
-                $data['sale_rent_title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-            }
-
-            if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
-                $data['title'] = $property->property->$title->$contentLang;
-            } elseif (isset($property->property->location) && isset($property->property->type_one)) {
-                $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-            }
-
-            if (isset($property->property->status)) {
-                $data['status'] = $property->property->status;
-            }
-            if (isset($property->property->type_one)) {
-                $data['type'] = $property->property->type_one;
-            }
-            if (isset($property->property->type_two)) {
-                $data['type_two'] = $property->property->type_two;
-            }
-            $agency = Yii::$app->params['agency'];
-            if (isset($property->property->latitude) && $property->property->latitude != '') {
-                $data['lat'] = $property->property->latitude;
-            } elseif (isset($property->property->private_info_object->$agency->latitude)) {
-                $data['lat'] = $property->property->private_info_object->$agency->latitude;
-            }
-
-            if (isset($property->property->longitude) && $property->property->longitude != '') {
-                $data['lng'] = $property->property->longitude;
-            } elseif (isset($property->property->private_info_object->$agency->longitude)) {
-                $data['lng'] = $property->property->private_info_object->$agency->longitude;
-            }
-            if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$lang) && $property->property->description->$lang != '') {
-                $data['sale_rent_description'] = $property->property->description->$lang;
-            } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
-                $data['sale_rent_description'] = $property->property->rental_description->$lang;
-            }
-            if (isset($property->property->$description->$lang)) {
-                $data['description'] = $property->property->$description->$lang;
-            }
-            if (isset($property->property->location)) {
-                $data['location'] = $property->property->location;
-            }
-            if (isset($property->property->region)) {
-                $data['region'] = $property->property->region;
-            }
-            if (isset($property->property->address_country)) {
-                $data['country'] = $property->property->address_country;
-            }
-            if (isset($property->property->address_city)) {
-                $data['city'] = $property->property->address_city;
-            }
-            if (isset($property->property->sale) && $property->property->sale == 1) {
-                $data['sale'] = $property->property->sale;
-            }
-            if (isset($property->property->rent) && $property->property->rent == 1) {
-                $data['rent'] = $property->property->rent;
-                if (isset($property->property->st_rental) && $property->property->st_rental == 1)
-                    $data['st_rental'] = $property->property->st_rental;
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == 1)
-                    $data['lt_rental'] = $property->property->lt_rental;
-            }
-            if (isset($property->property->currency) && $property->property->currency != '') {
-                $data['currency'] = $property->property->currency;
-            }
-            if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
-                $data['bedrooms'] = $property->property->bedrooms;
-            }
-            if (isset($property->property->bathrooms) && $property->property->bathrooms > 0) {
-                $data['bathrooms'] = $property->property->bathrooms;
-            }
-            if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
-                $data['sleeps'] = $property->property->sleeps;
-            }
-            if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
-                $data['living_rooms'] = $property->property->living_rooms;
-            }
-            if (isset($property->property->address_street) && $property->property->address_street != '') {
-                $data['address_street'] = $property->property->longitude;
-            } elseif (isset($property->property->private_info_object->$agency->address_street)) {
-                $data['address_street'] = $property->property->private_info_object->$agency->address_street;
-            }
-            if (isset($property->property->address_street_number) && $property->property->address_street_number != '') {
-                $data['address_street_number'] = $property->property->longitude;
-            } elseif (isset($property->property->private_info_object->$agency->address_street_number)) {
-                $data['address_street_number'] = $property->property->private_info_object->$agency->address_street_number;
-            }
-            if ($rent) {
-                if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
-                    $data['price'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int)$property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
-                    $st_price = [];
-                    foreach ($property->property->rental_seasons as $seasons) {
-                        $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+            if (isset($property->property)) {
+                if (isset($property->property->rent) && $property->property->rent == true) {
+                    $title = 'rental_title';
+                    $description = 'rental_description';
+                    $price = 'rent';
+                    $seo_title = 'rental_seo_title';
+                    $seo_description = 'rental_seo_description';
+                    $keywords = 'rental_keywords';
+                    $perma_link = 'rental_perma_link';
+                }
+                $data = [];
+                $features = [];
+                if (isset($property->total_properties)) {
+                    $data['total_properties'] = $property->total_properties;
+                }
+                if (isset($property->property->_id)) {
+                    $data['_id'] = $property->property->_id;
+                }
+                if (isset($property->property->reference)) {
+                    $data['id'] = $property->property->reference;
+                }
+                if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference') {
+                    $ref = $settings['general_settings']['reference'];
+                    if (isset($property->property->$ref)) {
+                        $data['reference'] = $property->property->$ref;
+                    } else {
+                        $data['reference'] = $property->agency_code . '-' . $property->property->reference;
                     }
-                    if (isset(Yii::$app->params['rental_logic']) && Yii::$app->params['rental_logic']) {
-                        $gdprice = [];
-                        $st_price = 0;
+                } else {
+                    $data['reference'] = $property->agency_code . '-' . $property->property->reference;
+                }
+                if (isset($property->property->new_construction) && $property->property->new_construction == 1) {
+                    $data['new_construction'] = $property->property->new_construction;
+                }
+                if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->title->$contentLang) && $property->property->title->$contentLang != '') {
+                    $data['sale_rent_title'] = $property->property->title->$contentLang;
+                } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_title->$contentLang) && $property->property->rental_title->$contentLang != '') {
+                    $data['sale_rent_title'] = $property->property->rental_title->$contentLang;
+                } elseif (isset($property->property->location) && isset($property->property->type_one)) {
+                    $data['sale_rent_title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                }
+
+                if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
+                    $data['title'] = $property->property->$title->$contentLang;
+                } elseif (isset($property->property->location) && isset($property->property->type_one)) {
+                    $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                }
+
+                if (isset($property->property->status)) {
+                    $data['status'] = $property->property->status;
+                }
+                if (isset($property->property->type_one)) {
+                    $data['type'] = $property->property->type_one;
+                }
+                if (isset($property->property->type_two)) {
+                    $data['type_two'] = $property->property->type_two;
+                }
+                $agency = Yii::$app->params['agency'];
+                if (isset($property->property->latitude) && $property->property->latitude != '') {
+                    $data['lat'] = $property->property->latitude;
+                } elseif (isset($property->property->private_info_object->$agency->latitude)) {
+                    $data['lat'] = $property->property->private_info_object->$agency->latitude;
+                }
+
+                if (isset($property->property->longitude) && $property->property->longitude != '') {
+                    $data['lng'] = $property->property->longitude;
+                } elseif (isset($property->property->private_info_object->$agency->longitude)) {
+                    $data['lng'] = $property->property->private_info_object->$agency->longitude;
+                }
+                if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$lang) && $property->property->description->$lang != '') {
+                    $data['sale_rent_description'] = $property->property->description->$lang;
+                } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
+                    $data['sale_rent_description'] = $property->property->rental_description->$lang;
+                }
+                if (isset($property->property->$description->$lang)) {
+                    $data['description'] = $property->property->$description->$lang;
+                }
+                if (isset($property->property->location)) {
+                    $data['location'] = $property->property->location;
+                }
+                if (isset($property->property->region)) {
+                    $data['region'] = $property->property->region;
+                }
+                if (isset($property->property->address_country)) {
+                    $data['country'] = $property->property->address_country;
+                }
+                if (isset($property->property->address_city)) {
+                    $data['city'] = $property->property->address_city;
+                }
+                if (isset($property->property->sale) && $property->property->sale == 1) {
+                    $data['sale'] = $property->property->sale;
+                }
+                if (isset($property->property->rent) && $property->property->rent == 1) {
+                    $data['rent'] = $property->property->rent;
+                    if (isset($property->property->st_rental) && $property->property->st_rental == 1) {
+                        $data['st_rental'] = $property->property->st_rental;
+                    }
+                    if (isset($property->property->lt_rental) && $property->property->lt_rental == 1) {
+                        $data['lt_rental'] = $property->property->lt_rental;
+                    }
+                }
+                if (isset($property->property->currency) && $property->property->currency != '') {
+                    $data['currency'] = $property->property->currency;
+                }
+                if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
+                    $data['bedrooms'] = $property->property->bedrooms;
+                }
+                if (isset($property->property->bathrooms) && $property->property->bathrooms > 0) {
+                    $data['bathrooms'] = $property->property->bathrooms;
+                }
+                if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
+                    $data['sleeps'] = $property->property->sleeps;
+                }
+                if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
+                    $data['living_rooms'] = $property->property->living_rooms;
+                }
+                if (isset($property->property->address_street) && $property->property->address_street != '') {
+                    $data['address_street'] = $property->property->longitude;
+                } elseif (isset($property->property->private_info_object->$agency->address_street)) {
+                    $data['address_street'] = $property->property->private_info_object->$agency->address_street;
+                }
+                if (isset($property->property->address_street_number) && $property->property->address_street_number != '') {
+                    $data['address_street_number'] = $property->property->longitude;
+                } elseif (isset($property->property->private_info_object->$agency->address_street_number)) {
+                    $data['address_street_number'] = $property->property->private_info_object->$agency->address_street_number;
+                }
+                if ($rent) {
+                    if ($ltrent && isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons->{'0'}->new_price)) {
+                        $data['price'] = ($property->property->period_seasons->{'0'}->new_price != 0) ? number_format((int)$property->property->period_seasons->{'0'}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
+                    } elseif ($strent && isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
+                        $st_price = [];
                         foreach ($property->property->rental_seasons as $seasons) {
-                            if (isset($seasons->gross_day_price))
-                                $gdprice[] = $seasons->gross_day_price;
+                            $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
                         }
-                        if (count($gdprice) > 0)
-                            $st_price = min($gdprice);
-                        $b_price = 0;
-                        if (isset($property->bookings_extras) && count((array)$property->bookings_extras) > 0) {
-                            foreach ($property->bookings_extras as $booking_extra) {
-                                $divider = 1;
-                                if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
-                                    $divider = 7;
-                                if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
-                                    $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                        if (isset(Yii::$app->params['rental_logic']) && Yii::$app->params['rental_logic']) {
+                            $gdprice = [];
+                            $st_price = 0;
+                            foreach ($property->property->rental_seasons as $seasons) {
+                                if (isset($seasons->gross_day_price)) {
+                                    $gdprice[] = $seasons->gross_day_price;
                                 }
                             }
-                        }
-                        if (isset($property->bookings_cleaning) && count((array)$property->bookings_cleaning) > 0) {
-                            foreach ($property->bookings_cleaning as $bookings_cleaning) {
-                                $divider = 1;
-                                $multiplyer = 1;
-                                if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
-                                    $divider = 7;
-                                if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
-                                    $multiplyer = 24;
-                                if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
-                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                            if (count($gdprice) > 0) {
+                                $st_price = min($gdprice);
                             }
+                            $b_price = 0;
+                            if (isset($property->bookings_extras) && count((array)$property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay')) {
+                                        $divider = 7;
+                                    }
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
+                            }
+                            if (isset($property->bookings_cleaning) && count((array)$property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay')) {
+                                        $divider = 7;
+                                    }
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour') {
+                                        $multiplyer = 24;
+                                    }
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client') {
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                                    }
+                                }
+                            }
+                            $data['price'] = number_format($st_price + $b_price, 2);
+                        } else {
+                            $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                         }
-                        $data['price'] = number_format($st_price + $b_price, 2);
-                    } else {
-                        $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                        $data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
+                        $data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
                     }
-                    $data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
-                    $data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
-                }
-            } else {
-                if (isset($property->property->currentprice)) {
-                    $data['price'] = ($property->property->currentprice != 0) ? number_format((int)$property->property->currentprice, 0, '', '.') : '';
-                }
-            }
-
-
-            if ($rent) {
-                if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
-                    $st_price = [];
-                    foreach ($property->property->rental_seasons as $seasons) {
-                        $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                } else {
+                    if (isset($property->property->currentprice)) {
+                        $data['price'] = ($property->property->currentprice != 0) ? number_format((int)$property->property->currentprice, 0, '', '.') : '';
                     }
-                    $data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
-                } elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons)) {
-                    $st_price = [];
-                    foreach ($property->property->period_seasons as $seasons) {
-                        $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                }
+
+
+                if ($rent) {
+                    if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
+                        $st_price = [];
+                        foreach ($property->property->rental_seasons as $seasons) {
+                            $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                        }
+                        $data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
+                    } elseif (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons)) {
+                        $st_price = [];
+                        foreach ($property->property->period_seasons as $seasons) {
+                            $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                        }
+                        $data['season_data'] = ArrayHelper::toArray($property->property->period_seasons);
                     }
-                    $data['season_data'] = ArrayHelper::toArray($property->property->period_seasons);
+                } else {
+                    if (isset($property->property->currentprice)) {
+                        $data['price'] = ($property->property->currentprice != 0) ? number_format((int)$property->property->currentprice, 0, '', '.') : '';
+                    }
                 }
-            } else {
-                if (isset($property->property->currentprice)) {
-                    $data['price'] = ($property->property->currentprice != 0) ? number_format((int)$property->property->currentprice, 0, '', '.') : '';
-                }
-            }
 
 
 
-            if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
-                $data['currentprice'] = str_replace(',', '.', (number_format((int)($property->property->currentprice))));
-            }
-            if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
-                $data['oldprice'] = str_replace(',', '.', (number_format((int)($property->property->oldprice->price))));
-            }
-            if (isset($property->property->oldprice->price_on_demand) && $property->property->oldprice->price_on_demand == true) {
-                $data['price_on_demand'] = true;
-            }
-            if (isset($property->property->sale) && $property->property->sale == 1 || isset($property->property->transfer) && $property->property->transfer == 1) {
                 if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
-                    $data['saleprice'] = str_replace(',', '.', (number_format((int)($property->property->currentprice))));
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int)($property->property->currentprice))));
                 }
-            }
-            if (isset($property->property->rent) && $property->property->rent == 1) {
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
-                    $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                    $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
+                    $data['oldprice'] = str_replace(',', '.', (number_format((int)($property->property->oldprice->price))));
                 }
-                if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_object($property->property->period_seasons) && $property->property->period_seasons->{0}->new_price) {
-                    $data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int)$property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                    $data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int)$property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                if (isset($property->property->oldprice->price_on_demand) && $property->property->oldprice->price_on_demand == true) {
+                    $data['price_on_demand'] = true;
                 }
-                if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
-                    $st_price = [];
-                    $discount = false;
-                    $data['discount'] = [];
-                    foreach ($property->property->rental_seasons as $seasons) {
-                        $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
-                        if (!$discount && isset($seasons->old_price) && $seasons->old_price && isset($seasons->new_price) && $seasons->new_price) {
-                            $discount = true;
-                            $data['discount'] = [
+                if (isset($property->property->sale) && $property->property->sale == 1 || isset($property->property->transfer) && $property->property->transfer == 1) {
+                    if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
+                        $data['saleprice'] = str_replace(',', '.', (number_format((int)($property->property->currentprice))));
+                    }
+                }
+                if (isset($property->property->rent) && $property->property->rent == 1) {
+                    if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
+                        $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
+                        $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int)$property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                    }
+                    if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_object($property->property->period_seasons) && $property->property->period_seasons->{0}->new_price) {
+                        $data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int)$property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
+                        $data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int)$property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                    }
+                    if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
+                        $st_price = [];
+                        $discount = false;
+                        $data['discount'] = [];
+                        foreach ($property->property->rental_seasons as $seasons) {
+                            $st_price[] = ['price' => isset($seasons->new_price) ? $seasons->new_price : '', 'period' => isset($seasons->period) ? $seasons->period : '', 'seasons' => isset($seasons->seasons) ? $seasons->seasons : ''];
+                            if (!$discount && isset($seasons->old_price) && $seasons->old_price && isset($seasons->new_price) && $seasons->new_price) {
+                                $discount = true;
+                                $data['discount'] = [
                                 'value' => (($seasons->old_price * 1 - $seasons->new_price * 1) * 100) / ($seasons->new_price * 1),
                                 'from' => $seasons->period_from,
                                 'to' => $seasons->period_to
                             ];
+                            }
+                        }
+                        $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') : '';
+                        $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
+                        $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    }
+                }
+                if (isset($property->property->dimensions) && $property->property->dimensions != '') {
+                    $data['dimensions'] = $property->property->dimensions;
+                }
+                if (isset($property->property->built) && $property->property->built > 0) {
+                    $data['built'] = $property->property->built;
+                }
+                if (isset($property->property->plot) && $property->property->plot > 0) {
+                    $data['plot'] = $property->property->plot;
+                }
+                if (isset($property->property->custom_categories) && is_array($property->property->custom_categories)) {
+                    $cats = self::Categories();
+                    $catsArr = [];
+                    foreach ($property->property->custom_categories as $catdata) {
+                        if (isset($cats[$catdata])) {
+                            $catsArr[] = $cats[$catdata];
                         }
                     }
-                    $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') : '';
-                    $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
-                    $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int)$st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                    $data['categories'] = $catsArr;
                 }
-            }
-            if (isset($property->property->dimensions) && $property->property->dimensions != '') {
-                $data['dimensions'] = $property->property->dimensions;
-            }
-            if (isset($property->property->built) && $property->property->built > 0) {
-                $data['built'] = $property->property->built;
-            }
-            if (isset($property->property->plot) && $property->property->plot > 0) {
-                $data['plot'] = $property->property->plot;
-            }
-            if (isset($property->property->custom_categories) && is_array($property->property->custom_categories)) {
-                $cats = self::Categories();
-                $catsArr = [];
-                foreach ($property->property->custom_categories as $catdata) {
-                    if (isset($cats[$catdata]))
-                        $catsArr[] = $cats[$catdata];
+                if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
+                    $data['terrace'] = $property->property->terrace->{0}->terrace;
                 }
-                $data['categories'] = $catsArr;
-            }
-            if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
-                $data['terrace'] = $property->property->terrace->{0}->terrace;
-            }
-            if (isset($property->property->updated_at) && $property->property->updated_at != '') {
-                $data['updated_at'] = $property->property->updated_at;
-            }
-            if (isset($property->bookings_extras) && count($property->bookings_extras) > 0) {
-                $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
-            }
-            if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0) {
-                $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
-            }
-            if (isset($property->property->location_group) && $property->property->location_group != 'N/A') {
-                $data['location_group'] = $property->property->location_group;
-            }
-            if (isset($property->property->address_province)) {
-                $data['province'] = $property->property->address_province;
-            }
-            if (isset($property->property->value_of_custom->feet_custom_categories)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
-                $data['feet_custom_categories'] = ArrayHelper::toArray($property->property->value_of_custom->feet_custom_categories);
-            }
+                if (isset($property->property->updated_at) && $property->property->updated_at != '') {
+                    $data['updated_at'] = $property->property->updated_at;
+                }
+                if (isset($property->bookings_extras) && count($property->bookings_extras) > 0) {
+                    $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
+                }
+                if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0) {
+                    $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
+                }
+                if (isset($property->property->location_group) && $property->property->location_group != 'N/A') {
+                    $data['location_group'] = $property->property->location_group;
+                }
+                if (isset($property->property->address_province)) {
+                    $data['province'] = $property->property->address_province;
+                }
+                if (isset($property->property->value_of_custom->feet_custom_categories)) {
+                    // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+                    $data['feet_custom_categories'] = ArrayHelper::toArray($property->property->value_of_custom->feet_custom_categories);
+                }
            
-            $slugs = [];
-            foreach ($langugesSystem as $lang_sys) {
-
-                $lang_sys_key = $lang_sys['key'];
-                $lang_sys_internal_key = isset($lang_sys['internal_key']) && $lang_sys['internal_key'] != '' ? $lang_sys['internal_key'] : '';
-                if (isset($property->property->$perma_link->$lang_sys_key) && $property->property->$perma_link->$lang_sys_key != '') {
-                    $slugs[$lang_sys_internal_key] = $property->property->$perma_link->$lang_sys_key;
-                } else if (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
-                    $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
-                } else {
-                    if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key]))
-                        $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
-                    if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key]))
-                        $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
-                }
-            }
-            //        end slug_all
-            $data['slug_all'] = $slugs;
-            if (isset($property->attachments) && count($property->attachments) > 0) {
-                $attachments = [];
-                if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
-                    foreach ($property->attachments as $pic) {
-                        $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
-                    }
-                } else {
-                    foreach ($property->attachments as $pic) {
-                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                $slugs = [];
+                foreach ($langugesSystem as $lang_sys) {
+                    $lang_sys_key = $lang_sys['key'];
+                    $lang_sys_internal_key = isset($lang_sys['internal_key']) && $lang_sys['internal_key'] != '' ? $lang_sys['internal_key'] : '';
+                    if (isset($property->property->$perma_link->$lang_sys_key) && $property->property->$perma_link->$lang_sys_key != '') {
+                        $slugs[$lang_sys_internal_key] = $property->property->$perma_link->$lang_sys_key;
+                    } elseif (isset($property->property->$title->$lang_sys_key) && $property->property->$title->$lang_sys_key != '') {
+                        $slugs[$lang_sys_internal_key] = $property->property->$title->$lang_sys_key;
+                    } else {
+                        if (isset($property->property->type_one) && $property->property->type_one != '' && isset($slugs[$lang_sys_internal_key])) {
+                            $slugs[$lang_sys_internal_key] = $property->property->type_one . ' ' . 'in' . ' ';
+                        }
+                        if (isset($property->property->location) && $property->property->location != '' && isset($slugs[$lang_sys_internal_key])) {
+                            $slugs[$lang_sys_internal_key] = $slugs[$lang_sys_internal_key] . $property->property->location;
+                        }
                     }
                 }
-                $data['attachments'] = $attachments;
-            }
-            $categories = [];
-            $features = [];
-            $climate_control = [];
-            $kitchen = [];
-            $setting = [];
-            $orientation = [];
-            $views = [];
-            $utilities = [];
-            $security = [];
-            $furniture = [];
-            $parking = [];
-            $garden = [];
-            $pool = [];
-            $condition = [];
-            $rental_investment_info = [];
-            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
-                foreach ($property->property->value_of_custom->basic_info as $value) {
-                    if (isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '') {
-                        $rental_investment_info[$value->field] = $value->value;
+                //        end slug_all
+                $data['slug_all'] = $slugs;
+                if (isset($property->attachments) && count($property->attachments) > 0) {
+                    $attachments = [];
+                    if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
+                        foreach ($property->attachments as $pic) {
+                            $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                        }
+                    } else {
+                        foreach ($property->attachments as $pic) {
+                            $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                        }
+                    }
+                    $data['attachments'] = $attachments;
+                }
+                $categories = [];
+                $features = [];
+                $climate_control = [];
+                $kitchen = [];
+                $setting = [];
+                $orientation = [];
+                $views = [];
+                $utilities = [];
+                $security = [];
+                $furniture = [];
+                $parking = [];
+                $garden = [];
+                $pool = [];
+                $condition = [];
+                $rental_investment_info = [];
+                if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
+                    foreach ($property->property->value_of_custom->basic_info as $value) {
+                        if (isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '') {
+                            $rental_investment_info[$value->field] = $value->value;
+                        }
                     }
                 }
-            }
-            $data['rental_investment_info'] = $rental_investment_info;
-            if (isset($property->property->feet_categories)) {
-                foreach ($property->property->feet_categories as $key => $value) {
-                    if ($value == true) {
-                        $categories[] = $key;
+                $data['rental_investment_info'] = $rental_investment_info;
+                if (isset($property->property->feet_categories)) {
+                    foreach ($property->property->feet_categories as $key => $value) {
+                        if ($value == true) {
+                            $categories[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_features)) {
-                foreach ($property->property->feet_features as $key => $value) {
-                    if ($value == true) {
-                        $features[] = $key;
+                if (isset($property->property->feet_features)) {
+                    foreach ($property->property->feet_features as $key => $value) {
+                        if ($value == true) {
+                            $features[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_climate_control)) {
-                foreach ($property->property->feet_climate_control as $key => $value) {
-                    if ($value == true) {
-                        $climate_control[] = $key;
+                if (isset($property->property->feet_climate_control)) {
+                    foreach ($property->property->feet_climate_control as $key => $value) {
+                        if ($value == true) {
+                            $climate_control[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_kitchen)) {
-                foreach ($property->property->feet_kitchen as $key => $value) {
-                    if ($value == true) {
-                        $kitchen[] = $key;
+                if (isset($property->property->feet_kitchen)) {
+                    foreach ($property->property->feet_kitchen as $key => $value) {
+                        if ($value == true) {
+                            $kitchen[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_setting)) {
-                foreach ($property->property->feet_setting as $key => $value) {
-                    if ($value == true) {
-                        $setting[] = $key;
+                if (isset($property->property->feet_setting)) {
+                    foreach ($property->property->feet_setting as $key => $value) {
+                        if ($value == true) {
+                            $setting[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_orientation)) {
-                foreach ($property->property->feet_orientation as $key => $value) {
-                    if ($value == true) {
-                        $orientation[] = $key;
+                if (isset($property->property->feet_orientation)) {
+                    foreach ($property->property->feet_orientation as $key => $value) {
+                        if ($value == true) {
+                            $orientation[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_views)) {
-                foreach ($property->property->feet_views as $key => $value) {
-                    if ($value == true) {
-                        $views[] = $key;
+                if (isset($property->property->feet_views)) {
+                    foreach ($property->property->feet_views as $key => $value) {
+                        if ($value == true) {
+                            $views[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_utilities)) {
-                foreach ($property->property->feet_utilities as $key => $value) {
-                    if ($value == true) {
-                        $utilities[] = $key;
+                if (isset($property->property->feet_utilities)) {
+                    foreach ($property->property->feet_utilities as $key => $value) {
+                        if ($value == true) {
+                            $utilities[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_security)) {
-                foreach ($property->property->feet_security as $key => $value) {
-                    if ($value == true) {
-                        $security[] = $key;
+                if (isset($property->property->feet_security)) {
+                    foreach ($property->property->feet_security as $key => $value) {
+                        if ($value == true) {
+                            $security[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_furniture)) {
-                foreach ($property->property->feet_furniture as $key => $value) {
-                    if ($value == true) {
-                        $furniture[] = $key;
+                if (isset($property->property->feet_furniture)) {
+                    foreach ($property->property->feet_furniture as $key => $value) {
+                        if ($value == true) {
+                            $furniture[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_parking)) {
-                foreach ($property->property->feet_parking as $key => $value) {
-                    if ($value == true) {
-                        $parking[] = $key;
+                if (isset($property->property->feet_parking)) {
+                    foreach ($property->property->feet_parking as $key => $value) {
+                        if ($value == true) {
+                            $parking[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_garden)) {
-                foreach ($property->property->feet_garden as $key => $value) {
-                    if ($value == true) {
-                        $garden[] = $key;
+                if (isset($property->property->feet_garden)) {
+                    foreach ($property->property->feet_garden as $key => $value) {
+                        if ($value == true) {
+                            $garden[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_pool)) {
-                foreach ($property->property->feet_pool as $key => $value) {
-                    if ($value == true) {
-                        $pool[] = $key;
+                if (isset($property->property->feet_pool)) {
+                    foreach ($property->property->feet_pool as $key => $value) {
+                        if ($value == true) {
+                            $pool[] = $key;
+                        }
                     }
                 }
-            }
-            if (isset($property->property->feet_condition)) {
-                foreach ($property->property->feet_condition as $key => $value) {
-                    if ($value == true) {
-                        $condition[] = $key;
+                if (isset($property->property->feet_condition)) {
+                    foreach ($property->property->feet_condition as $key => $value) {
+                        if ($value == true) {
+                            $condition[] = $key;
+                        }
                     }
                 }
+                $data['property_features'] = [];
+                $data['property_features']['features'] = $features;
+                $data['property_features']['categories'] = $categories;
+                $data['property_features']['climate_control'] = $climate_control;
+                $data['property_features']['kitchen'] = $kitchen;
+                $data['property_features']['setting'] = $setting;
+                $data['property_features']['orientation'] = $orientation;
+                $data['property_features']['views'] = $views;
+                $data['property_features']['utilities'] = $utilities;
+                $data['property_features']['security'] = $security;
+                $data['property_features']['parking'] = $parking;
+                $data['property_features']['garden'] = $garden;
+                $data['property_features']['pool'] = $pool;
+                $data['property_features']['condition'] = $condition;
+                $return_data[] = $data;
             }
-            $data['property_features'] = [];
-            $data['property_features']['features'] = $features;
-            $data['property_features']['categories'] = $categories;
-            $data['property_features']['climate_control'] = $climate_control;
-            $data['property_features']['kitchen'] = $kitchen;
-            $data['property_features']['setting'] = $setting;
-            $data['property_features']['orientation'] = $orientation;
-            $data['property_features']['views'] = $views;
-            $data['property_features']['utilities'] = $utilities;
-            $data['property_features']['security'] = $security;
-            $data['property_features']['parking'] = $parking;
-            $data['property_features']['garden'] = $garden;
-            $data['property_features']['pool'] = $pool;
-            $data['property_features']['condition'] = $condition;
-            $return_data[] = $data;
         }
         return $return_data;
     }
