@@ -1919,7 +1919,6 @@ class Properties extends Model
         $now = $arrival;
         $your_date = $departure;
         $datediff = $your_date - $now;
-        $undefined_days = 0;
 
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
 
@@ -1931,7 +1930,6 @@ class Properties extends Model
                 // $begin->modify('-1 day');
                 $end = new \DateTime(date('Y-m-d', $departure));
                 $end->modify('+1 day');
-                $season_data_to = $season['period_to'];
 
                 $interval = \DateInterval::createFromDateString('1 day');
                 $period = new \DatePeriod($begin, $interval, $end);
