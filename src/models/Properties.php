@@ -1919,14 +1919,21 @@ class Properties extends Model
         $now = $arrival;
         $your_date = $departure;
         $datediff = $your_date - $now;
-        $undefined_days = 0;
-
+        
+        $end_season_to = [];
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             $season_data_from = $property['season_data'][0]['period_to'];
             $season_data_to = $property['season_data'][count($property['season_data']) - 1]['period_to'];
+
+            foreach($property['season_data'] as $season){
+                if($season['period_to']){
+                    $end_season_to[]=$season['period_to'];
+                }
+            }
             foreach ($property['season_data'] as $season) {
+                $undefined_days = 0;
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
                 $end = new \DateTime(date('Y-m-d', $departure));
@@ -1938,7 +1945,7 @@ class Properties extends Model
 
                 foreach ($period as $dt) {
                     $tdt = $dt->getTimestamp();
-                    if ($tdt > $season_data_to) {
+                    if ($tdt > max($end_season_to)) {
                         $return_data['undefined_period'] = 1;
                         $return_data['undefined_days'] = $undefined_days++;
                         $return_data['number_of_days'] = $number_of_days;
