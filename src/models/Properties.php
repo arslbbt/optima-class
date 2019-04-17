@@ -124,6 +124,9 @@ class Properties extends Model
                     } elseif (isset($property->property->location) && isset($property->property->type_one)) {
                         $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
                     }
+                    if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
+                        $data['meta_title'] = $property->property->$seo_title->$contentLang;
+                    }
 
                     if (isset($property->property->status)) {
                         $data['status'] = $property->property->status;
