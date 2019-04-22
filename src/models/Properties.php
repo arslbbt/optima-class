@@ -1311,6 +1311,10 @@ class Properties extends Model
             if (isset($property->property->feet_parking)) {
                 foreach ($property->property->feet_parking as $key => $value) {
                     if ($value == true) {
+                        if($key == 'parking_quantity')
+                        {
+                            $return_data['parking_quantity'] = $value;
+                        }
                         $parking[] = $key;
                     }
                 }
