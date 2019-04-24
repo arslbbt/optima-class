@@ -836,6 +836,12 @@ class Properties extends Model
             if (isset($property->property->plot)) {
                 $return_data['plot'] = $property->property->plot;
             }
+            if (isset($property->property->community_fees)) {
+                $return_data['community_fees'] = $property->property->community_fees;
+            }
+            if (isset($property->property->ibi)) {
+                $return_data['real_estate_tax'] = $property->property->ibi;
+            }
             if (isset($property->property->year_built)) {
                 $return_data['year_built'] = $property->property->year_built;
             }
