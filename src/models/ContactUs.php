@@ -273,7 +273,7 @@ class ContactUs extends Model
             
                 foreach ($settings['custom_settings'] as $setting)
                 {
-                    if ($setting['key'] == 'enquiry_subject')
+                    if (isset($setting['key']) && $setting['key'] == 'enquiry_subject')
                     {
                         $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
