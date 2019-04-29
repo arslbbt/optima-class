@@ -347,6 +347,7 @@ class ContactUs extends Model
             'rent_to_date' => isset($this->departure_date) ? $this->departure_date : '',
             'types' => isset($this->property_type) ? $this->property_type : '',
             'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : '',
+            'min_bathrooms' => isset($this->bathrooms) ? $this->bathrooms : '',
             'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : '',
             'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : '',
             'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : '',
