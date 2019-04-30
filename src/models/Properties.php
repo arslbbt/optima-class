@@ -1766,6 +1766,13 @@ class Properties extends Model
         if (isset($get["agency_reference"]) && $get["agency_reference"] != "") {
             $query .= '&agency_reference=' . $get['agency_reference'];
         }
+        if (isset($get["building-style"]) && is_array($get["building-style"]) && $get["building-style"] != "") {
+            foreach ($get["building-style"] as $style) {
+                $query .= '&p_style[]=' . $style;
+            }
+        }
+        
+
         if (isset($get["sale"]) && $get["sale"] != "") {
             $query .= '&sale=1';
         }
