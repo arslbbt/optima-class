@@ -576,8 +576,6 @@ class Properties extends Model
         if (isset($with_count) && $with_count==true) {
             $url = $url . '&view_count=true';
         }
-        
-       
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
@@ -723,15 +721,12 @@ class Properties extends Model
                 $return_data['own'] = true;
             }
             if (isset($property->property->created_at) && !empty($property->property->created_at)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
                 $return_data['created_at'] = $property->property->created_at;
             }
-            if (isset($property->property->floors) && !empty($property->property->floors)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+            if (isset($property->property->floors) && !empty($property->property->floors)) {   
                 $return_data['floors'] = ArrayHelper::toArray($property->property->floors);
             }
             if (isset($property->view_count) && !empty($property->view_count)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
                 $return_data['view_count'] = $property->view_count;
             }
             if (isset($property->listing_agency_data) && count((array)$property->listing_agency_data) > 0) {
@@ -978,6 +973,10 @@ class Properties extends Model
             if (isset($property->property->license_number)) {
                 $return_data['license_number'] = $property->property->license_number;
             }
+            if (isset($property->property->minimum_stay)) {
+                $return_data['minimum_stay'] = ArrayHelper::toArray($property->property->minimum_stay);
+            }
+            
             if (isset($property->bookings) && count($property->bookings) > 0) {
                 $group_booked = [];
                 $booking_status = [];
