@@ -1945,6 +1945,7 @@ class Properties extends Model
         $end_season_to = [];
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
 
+
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             $season_data_from = $property['season_data'][0]['period_to'];
             $season_data_to = $property['season_data'][count($property['season_data']) - 1]['period_to'];
@@ -1954,7 +1955,23 @@ class Properties extends Model
                     $end_season_to[]=$season['period_to'];
                 }
             }
+            
             foreach ($property['season_data'] as $season) {
+                // rental discount logic -----STRT-----
+                if(isset($season['discounts'])){
+                    asort($season['discounts']);
+                    $discount = array_filter($season['discounts'], function ($var) use ($number_of_days) {
+                        if(isset($var['number_days'])){
+                            return ($var['number_days'] <= $number_of_days);
+                        }
+                    });
+                    $discount = end($discount);
+                    if(!empty($discount)){
+                        $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] !='') ? $discount['discount_percent'] : 0; 
+                    }
+                }
+                // rental discount logic -----END-----
+
                 $undefined_days = 0;
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
@@ -1982,7 +1999,8 @@ class Properties extends Model
                             $total_price = $rental_bill;
                         }
                         $rental_prices['rental_bill'] = $rental_bill;
-                        $total_price = $rental_bill;
+                        // $total_price = $rental_bill;
+                        $total_price = $rental_bill - ($rental_bill * (isset($discount_percent)?$discount_percent:0) / 100 );
                     }
                 }
             }
