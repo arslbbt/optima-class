@@ -866,6 +866,9 @@ class Properties extends Model
                 $return_data['location_group'] = $property->property->location_group;
             }
             if (isset($property->property->location) && isset($property->property->location_key)) {
+                if (isset($property->property->location_name)) {
+                    $return_data['location_name'] = (isset(\Yii::$app->language) && strtolower(\Yii::$app->language)=='es')?$property->property->location_name->es_AR: $property->property->location_name->en;
+                }
                 $return_data['location'] = $property->property->location;
                 $return_data['location_key'] = $property->property->location_key;
             }
