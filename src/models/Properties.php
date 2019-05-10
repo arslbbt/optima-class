@@ -1949,16 +1949,15 @@ class Properties extends Model
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             $season_data_from = $property['season_data'][0]['period_to'];
             $season_data_to = $property['season_data'][count($property['season_data']) - 1]['period_to'];
-
             foreach($property['season_data'] as $season){
                 if($season['period_to']){
                     $end_season_to[]=$season['period_to'];
                 }
             }
-            
             foreach ($property['season_data'] as $season) {
                 // rental discount logic -----STRT-----
-                if(isset($season['discounts'])){
+                $s_gross_perday_price = isset($season['gross_day_price']) && $season['gross_day_price'] !== '' ? $season['gross_day_price'] : '';
+                if(isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price ){
                     asort($season['discounts']);
                     $discount = array_filter($season['discounts'], function ($var) use ($number_of_days) {
                         if(isset($var['number_days'])){
@@ -1967,7 +1966,8 @@ class Properties extends Model
                     });
                     $discount = end($discount);
                     if(!empty($discount)){
-                        $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] !='') ? $discount['discount_percent'] : 0; 
+                        $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] !='') ? $discount['discount_percent'] : 0;
+                        $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100) );
                     }
                 }
                 // rental discount logic -----END-----
@@ -1990,8 +1990,8 @@ class Properties extends Model
                         $return_data['number_of_days'] = $number_of_days;
                     } else {
                         if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
-                            if (isset($season['gross_day_price']) && $season['gross_day_price'] !== '') {
-                                $rental_bill = $rental_bill + $season['gross_day_price'];
+                            if ($s_gross_perday_price !== '') {
+                                $rental_bill = $rental_bill + $s_gross_perday_price;
                             } else {
                                 $rental_bill = $rental_bill + $season['price_per_day'];
                             }
@@ -1999,8 +1999,7 @@ class Properties extends Model
                             $total_price = $rental_bill;
                         }
                         $rental_prices['rental_bill'] = $rental_bill;
-                        // $total_price = $rental_bill;
-                        $total_price = $rental_bill - ($rental_bill * (isset($discount_percent)?$discount_percent:0) / 100 );
+                        $total_price = $rental_bill;
                     }
                 }
             }
