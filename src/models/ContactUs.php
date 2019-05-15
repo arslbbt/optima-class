@@ -21,6 +21,7 @@ class ContactUs extends Model
     public $url;
     public $attach;
     public $reference;
+    public $agency_set_ref;
     public $verifyCode;
     public $transaction;
     public $property_type;
@@ -72,7 +73,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups'], 'safe'],
+            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'redirect_url', 'attach', 'reference', 'agency_set_ref', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'swimming_pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups'], 'safe'],
             [['first_name', 'last_name', 'email', 'message'], 'required'],
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
@@ -218,10 +219,15 @@ class ContactUs extends Model
                     $html .= '<br>';
                     $html .= 'Language: ' . $this->language;
                 }
-                if (isset($this->reference) && $this->reference != '')
+                if (isset($this->agency_set_ref) && $this->agency_set_ref != '')
                 {
                     $html .= '<br>';
-                    $html .= 'Prop. Ref : ' . $this->reference;
+                    $html .= 'Prop. Ref : ' . $this->agency_set_ref;
+                }
+                if (!(isset($this->agency_set_ref) && $this->agency_set_ref != '') && isset($this->reference) && $this->reference != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Prop.Ref : ' . $this->reference;
                 }
                 if (isset($this->arrival_date) && $this->arrival_date != '')
                 {
