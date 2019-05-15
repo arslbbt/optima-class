@@ -21,6 +21,7 @@ class ContactUs extends Model
     public $url;
     public $attach;
     public $reference;
+    public $agency_set_ref;
     public $verifyCode;
     public $transaction;
     public $property_type;
@@ -222,10 +223,15 @@ class ContactUs extends Model
                     $html .= '<br>';
                     $html .= 'Language: ' . $this->language;
                 }
-                if (isset($this->reference) && $this->reference != '')
+                if (isset($this->agency_set_ref) && $this->agency_set_ref != '')
                 {
                     $html .= '<br>';
-                    $html .= 'Prop. Ref : ' . $this->reference;
+                    $html .= 'Prop. Ref : ' . $this->agency_set_ref;
+                }
+                if (!(isset($this->agency_set_ref) && $this->agency_set_ref != '') && isset($this->reference) && $this->reference != '')
+                {
+                    $html .= '<br>';
+                    $html .= 'Prop.Ref : ' . $this->reference;
                 }
                 if (isset($this->arrival_date) && $this->arrival_date != '')
                 {
@@ -277,7 +283,7 @@ class ContactUs extends Model
             
                 foreach ($settings['custom_settings'] as $setting)
                 {
-                    if ($setting['key'] == 'enquiry_subject')
+                    if (isset($setting['key']) && $setting['key'] == 'enquiry_subject')
                     {
                         $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
@@ -343,23 +349,24 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
-            'mobile_phone' => isset($this->mobile_phone)?$this->mobile_phone:'',
+            'mobile_phone' => isset($this->mobile_phone)?$this->mobile_phone:null,
             'property' => isset($this->reference) ? $this->reference : null,
             'newsletter' => isset($this->news_letter) && $this->news_letter == true ? $this->news_letter : false,
-            'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : '',
-            'rent_from_date' => isset($this->arrival_date) ? $this->arrival_date : '',
-            'rent_to_date' => isset($this->departure_date) ? $this->departure_date : '',
-            'types' => isset($this->property_type) ? $this->property_type : '',
-            'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : '',
-            'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : '',
-            'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : '',
-            'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : '',
-            'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : '',
-            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
-            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
-            'html_content' => isset($this->html_content) ? $this->html_content : '',
+            'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : null,
+            'rent_from_date' => isset($this->arrival_date) ? $this->arrival_date : null,
+            'rent_to_date' => isset($this->departure_date) ? $this->departure_date : null,
+            'types' => isset($this->property_type) ? $this->property_type : null,
+            'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : null,
+            'min_bathrooms' => isset($this->bathrooms) ? $this->bathrooms : null,
+            'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : null,
+            'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : null,
+            'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : null,
+            'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : null,
+            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : null,
+            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
+            'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? implode(',',$this->lgroups) : [],
-            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
             'language' => strtoupper(\Yii::$app->language)
         );
         $curl = new \linslin\yii2\curl\Curl();
@@ -370,19 +377,19 @@ class ContactUs extends Model
     {
         $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
         $fields = array(
-            'forename' => isset($this->sender_first_name) ? $this->sender_first_name : '',
-            'surname' => isset($this->sender_last_name) ? $this->sender_last_name : '',
-            'email' => isset($this->sender_email) ? $this->sender_email : '',
+            'forename' => isset($this->sender_first_name) ? $this->sender_first_name : null,
+            'surname' => isset($this->sender_last_name) ? $this->sender_last_name : null,
+            'email' => isset($this->sender_email) ? $this->sender_email : null,
             'gdpr_status' => $this->gdpr_status,
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
-            'phone' => isset($this->sender_phone) ? $this->sender_phone : '',
+            'phone' => isset($this->sender_phone) ? $this->sender_phone : null,
             'property' => isset($this->reference) ? $this->reference : null,
-            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : '',
-            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : '',
-            'html_content' => isset($this->html_content) ? $this->html_content : '',
-            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : ''),
+            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : null,
+            'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
+            'html_content' => isset($this->html_content) ? $this->html_content : null,
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);

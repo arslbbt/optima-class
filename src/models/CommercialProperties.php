@@ -13,9 +13,11 @@ use linslin\yii2\curl;
  * @property User|null $user This property is read-only.
  *
  */
-class CommercialProperties extends Model {
+class CommercialProperties extends Model
+{
 
-    public static function findAll($page = 1, $page_size = 10) {
+    public static function findAll($page = 1, $page_size = 10)
+    {
         $options = ["page" => $page, "limit" => $page_size];
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2))
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
@@ -29,11 +31,11 @@ class CommercialProperties extends Model {
 
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
-                ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user_apikey=' . Yii::$app->params['api_key']);
         $response = json_decode($response, TRUE);
         $properties = [];
         foreach ($response['docs'] as $property) {
@@ -43,26 +45,29 @@ class CommercialProperties extends Model {
         return $response;
     }
 
-    public static function findOne($id) {
+    public static function findOne($id)
+    {
         $post_data = ['options' => ''];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
-                ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user_apikey=' . Yii::$app->params['api_key']);
         $response = json_decode($response, TRUE);
         $property = self::formateProperty($response);
         return $property;
     }
 
-    public static function setQuery() {
+    public static function setQuery()
+    {
         $query = [];
         return $query;
     }
 
-    public static function formateProperty($property) {
+    public static function formateProperty($property)
+    {
         Yii::$app->language = 'en';
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
@@ -177,5 +182,4 @@ class CommercialProperties extends Model {
 
         return $f_property;
     }
-
 }

@@ -124,6 +124,9 @@ class Properties extends Model
                     } elseif (isset($property->property->location) && isset($property->property->type_one)) {
                         $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
                     }
+                    if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
+                        $data['meta_title'] = $property->property->$seo_title->$contentLang;
+                    }
 
                     if (isset($property->property->status)) {
                         $data['status'] = $property->property->status;
@@ -573,8 +576,6 @@ class Properties extends Model
         if (isset($with_count) && $with_count==true) {
             $url = $url . '&view_count=true';
         }
-        
-       
         $JsonData = file_get_contents($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
@@ -720,15 +721,12 @@ class Properties extends Model
                 $return_data['own'] = true;
             }
             if (isset($property->property->created_at) && !empty($property->property->created_at)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
                 $return_data['created_at'] = $property->property->created_at;
             }
-            if (isset($property->property->floors) && !empty($property->property->floors)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
+            if (isset($property->property->floors) && !empty($property->property->floors)) {   
                 $return_data['floors'] = ArrayHelper::toArray($property->property->floors);
             }
             if (isset($property->view_count) && !empty($property->view_count)) {
-                // $data['feet_custom_categories'] = $property->property->value_of_custom->feet_custom_categories;
                 $return_data['view_count'] = $property->view_count;
             }
             if (isset($property->listing_agency_data) && count((array)$property->listing_agency_data) > 0) {
@@ -833,6 +831,12 @@ class Properties extends Model
             if (isset($property->property->plot)) {
                 $return_data['plot'] = $property->property->plot;
             }
+            if (isset($property->property->community_fees)) {
+                $return_data['community_fees'] = $property->property->community_fees;
+            }
+            if (isset($property->property->ibi)) {
+                $return_data['real_estate_tax'] = $property->property->ibi;
+            }
             if (isset($property->property->year_built)) {
                 $return_data['year_built'] = $property->property->year_built;
             }
@@ -862,6 +866,9 @@ class Properties extends Model
                 $return_data['location_group'] = $property->property->location_group;
             }
             if (isset($property->property->location) && isset($property->property->location_key)) {
+                if (isset($property->property->location_name)) {
+                    $return_data['location_name'] = (isset(\Yii::$app->language) && strtolower(\Yii::$app->language)=='es')?$property->property->location_name->es_AR: $property->property->location_name->en;
+                }
                 $return_data['location'] = $property->property->location;
                 $return_data['location_key'] = $property->property->location_key;
             }
@@ -969,6 +976,10 @@ class Properties extends Model
             if (isset($property->property->license_number)) {
                 $return_data['license_number'] = $property->property->license_number;
             }
+            if (isset($property->property->minimum_stay)) {
+                $return_data['minimum_stay'] = ArrayHelper::toArray($property->property->minimum_stay);
+            }
+            
             if (isset($property->bookings) && count($property->bookings) > 0) {
                 $group_booked = [];
                 $booking_status = [];
@@ -1308,6 +1319,10 @@ class Properties extends Model
             if (isset($property->property->feet_parking)) {
                 foreach ($property->property->feet_parking as $key => $value) {
                     if ($value == true) {
+                        if($key == 'parking_quantity')
+                        {
+                            $return_data['parking_quantity'] = $value;
+                        }
                         $parking[] = $key;
                     }
                 }
@@ -1754,6 +1769,13 @@ class Properties extends Model
         if (isset($get["agency_reference"]) && $get["agency_reference"] != "") {
             $query .= '&agency_reference=' . $get['agency_reference'];
         }
+        if (isset($get["building-style"]) && is_array($get["building-style"]) && $get["building-style"] != "") {
+            foreach ($get["building-style"] as $style) {
+                $query .= '&p_style[]=' . $style;
+            }
+        }
+        
+
         if (isset($get["sale"]) && $get["sale"] != "") {
             $query .= '&sale=1';
         }
@@ -1919,14 +1941,38 @@ class Properties extends Model
         $now = $arrival;
         $your_date = $departure;
         $datediff = $your_date - $now;
-        $undefined_days = 0;
-
+        
+        $end_season_to = [];
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
+
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             $season_data_from = $property['season_data'][0]['period_to'];
             $season_data_to = $property['season_data'][count($property['season_data']) - 1]['period_to'];
+            foreach($property['season_data'] as $season){
+                if($season['period_to']){
+                    $end_season_to[]=$season['period_to'];
+                }
+            }
             foreach ($property['season_data'] as $season) {
+                // rental discount logic -----STRT-----
+                $s_gross_perday_price = isset($season['gross_day_price']) && $season['gross_day_price'] !== '' ? $season['gross_day_price'] : '';
+                if(isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price ){
+                    asort($season['discounts']);
+                    $discount = array_filter($season['discounts'], function ($var) use ($number_of_days) {
+                        if(isset($var['number_days'])){
+                            return ($var['number_days'] <= $number_of_days);
+                        }
+                    });
+                    $discount = end($discount);
+                    if(!empty($discount)){
+                        $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] !='') ? $discount['discount_percent'] : 0;
+                        $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100) );
+                    }
+                }
+                // rental discount logic -----END-----
+
+                $undefined_days = 0;
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
                 $end = new \DateTime(date('Y-m-d', $departure));
@@ -1938,14 +1984,14 @@ class Properties extends Model
 
                 foreach ($period as $dt) {
                     $tdt = $dt->getTimestamp();
-                    if ($tdt > $season_data_to) {
+                    if ($tdt > max($end_season_to)) {
                         $return_data['undefined_period'] = 1;
                         $return_data['undefined_days'] = $undefined_days++;
                         $return_data['number_of_days'] = $number_of_days;
                     } else {
                         if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
-                            if (isset($season['gross_day_price']) && $season['gross_day_price'] !== '') {
-                                $rental_bill = $rental_bill + $season['gross_day_price'];
+                            if ($s_gross_perday_price !== '') {
+                                $rental_bill = $rental_bill + $s_gross_perday_price;
                             } else {
                                 $rental_bill = $rental_bill + $season['price_per_day'];
                             }
