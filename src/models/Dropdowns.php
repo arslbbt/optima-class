@@ -108,7 +108,7 @@ class Dropdowns extends Model {
                     $c_q .= '&city[]=' . $city;
                 }
             }
-            $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.(isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)!='en')?'es_Ar':'en';
+                        $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.((isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)!='en')?'es_Ar':'en');
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         } else {
