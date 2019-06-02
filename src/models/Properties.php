@@ -59,6 +59,12 @@ class Properties extends Model
                 $sale = true;
             }
         }
+        $query_components = explode("&",$query);
+        if(count($query_components)>0){
+            if(in_array('rent=1', $query_components) || in_array('st_rental=1', $query_components)){
+                $rent = true;
+            }
+        }
         if (isset($get["rent"]) && $get['rent'] != "") {
             $rent = true;
         }
