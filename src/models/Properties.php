@@ -921,7 +921,7 @@ class Properties extends Model
             if (isset($property->property->$keywords->$contentLang) && $property->property->$keywords->$contentLang != '') {
                 $return_data['meta_keywords'] = $property->property->$keywords->$contentLang;
             }
-            if (isset($property->property->custom_categories)) {
+            if (isset($property->property->custom_categories) && !empty($property->property->custom_categories)) {
                 $cats = self::Categories();
                 $catsArr = [];
                 foreach ($property->property->custom_categories as $catdata) {
