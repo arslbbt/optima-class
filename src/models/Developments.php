@@ -360,6 +360,9 @@ class Developments extends Model
         foreach ($langugesSystem as $lang_sys)
         {
             $lang_sys_key = $lang_sys['key'];
+             $lang_sys_key = $lang_sys['key'];
+            if(!isset($lang_sys['internal_key']))
+               continue;
             $lang_sys_internal_key = $lang_sys['internal_key'];
             if (isset($property->property->perma_link->$lang_sys_key) && $property->property->perma_link->$lang_sys_key != '')
             {
