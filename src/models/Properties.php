@@ -992,6 +992,7 @@ class Properties extends Model
             if (isset($property->bookings) && count($property->bookings) > 0) {
                 $group_booked = [];
                 $booking_status = [];
+                $booked_dates_costa=[];
                 foreach ($property->bookings as $key => $booking) {
                     if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '') {
                         for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
