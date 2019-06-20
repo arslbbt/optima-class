@@ -306,9 +306,6 @@ class Cms extends Model
 
         $retdata = [];
         $array = [];
-        // echo"<pre>";
-        // print_r($dataEach);
-        // die;
         foreach ($dataEach as $key => $data)
         {
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
@@ -326,7 +323,11 @@ class Cms extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
-        $query = '&post_type=' . $name;
+        if(is_numeric($name)) {
+            $query = '&post_type_id=' . $name;
+        } else {
+            $query = '&post_type=' . $name;
+        }
         if ($name == 'page')
             $query .= '&page-size=false';
         if ($category != null)
@@ -463,10 +464,6 @@ class Cms extends Model
 //            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
 //        ];
         $data = json_decode($file_data, true);
-        // echo '<pre>';
-        // print_r($data);
-        // die;
-
         $users = [];
         foreach ($data['users'] as $user)
         {
