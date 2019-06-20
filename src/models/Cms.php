@@ -326,7 +326,7 @@ class Cms extends Model
         if(is_numeric($name)) {
             $query = '&post_type_id=' . $name;
         } else {
-            $query = '&post_type_id=' . $name;
+            $query = '&post_type=' . $name;
         }
         if ($name == 'page')
             $query .= '&page-size=false';
