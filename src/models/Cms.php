@@ -315,67 +315,57 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function postTypes($name, $category = null, $forRoutes = null)
-    {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/'))
-            mkdir($webroot . '/uploads/');
-        if (!is_dir($webroot . '/uploads/temp/'))
-            mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
-        if(is_numeric($name)) {
-            $query = '&post_type_id=' . $name;
-        } else {
-            $query = '&post_type=' . $name;
-        }
-        if ($name == 'page')
-            $query .= '&page-size=false';
-        if ($category != null)
-        {
-            $query .= '&category=' . $category;
-        }
-        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
-        {
-            $file_data =file_get_contents($url);
-            file_put_contents($file, $file_data);
-        }
-        else
-        {
-            $file_data = file_get_contents($file);
-        }
-        $dataEach = json_decode($file_data, TRUE);
-        $lang = strtoupper(\Yii::$app->language);
+public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10)
+   {
+       $webroot = Yii::getAlias('@webroot');
+       if (!is_dir($webroot . '/uploads/'))
+           mkdir($webroot . '/uploads/');
+       if (!is_dir($webroot . '/uploads/temp/'))
+           mkdir($webroot . '/uploads/temp/');
+       $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
+       $query = '&post_type=' . $name;
+       if ($name == 'page' || $pageSize == false)
+           $query .= '&page-size=false';
+       if ($pageSize != false)
+           $query .= '&page-size=' . $pageSize;
+       if ($category != null) {
+           $query .= '&category=' . $category;
+       }
+       $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+       $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
+       if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+           $file_data = file_get_contents($url);
+           file_put_contents($file, $file_data);
+       } else {
+           $file_data = file_get_contents($file);
+       }
+       $dataEach = json_decode($file_data, TRUE);
+       $lang = strtoupper(\Yii::$app->language);
 
-        $retdata = [];
-        $array = [];
-        foreach ($dataEach as $key => $data)
-        {
-            $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-            $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-            if ($forRoutes == true)
-            {
-                $array['featured_image'] = $url;
-            }
-            else
-            {
-                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
-            }
-            $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
-            $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
-            $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
-            $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
-            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
-            $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
-            $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
-            $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
-            $array['custom_settings'] = isset($data['custom_settings']) ? $data['custom_settings'] : '';
-            $array['categories'] = isset($data['categories']) ? $data['categories'] : [];
-            $retdata[] = $array;
-        }
-        return $retdata;
-    }
+       $retdata = [];
+       $array = [];
+       foreach ($dataEach as $key => $data) {
+           $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+           $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+           if ($forRoutes == true) {
+               $array['featured_image'] = $url;
+           } else {
+               $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
+           }
+           $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
+           $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
+           $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
+           $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
+           $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
+           $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
+           $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
+           $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
+           $array['custom_settings'] = isset($data['custom_settings']) ? $data['custom_settings'] : '';
+           $array['categories'] = isset($data['categories']) ? $data['categories'] : [];
+           $retdata[] = $array;
+       }
+       return $retdata;
+   }
 
     public static function CacheImage($url, $name, $size = 1200)
     {
