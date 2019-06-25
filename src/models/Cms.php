@@ -323,7 +323,11 @@ public static function postTypes($name, $category = null, $forRoutes = null, $pa
        if (!is_dir($webroot . '/uploads/temp/'))
            mkdir($webroot . '/uploads/temp/');
        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
-       $query = '&post_type=' . $name;
+       if(is_numeric($name)) {
+           $query = '&post_type_id=' . $name;
+       } else {
+           $query = '&post_type=' . $name;
+       }
        if ($name == 'page' || $pageSize == false)
            $query .= '&page-size=false';
        if ($pageSize != false)
