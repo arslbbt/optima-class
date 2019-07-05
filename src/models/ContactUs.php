@@ -70,6 +70,7 @@ class ContactUs extends Model
     public $buyer;
     public $mobile_phone;
     public $lgroups;
+    public $reCaptcha;
     public function rules()
     {
         return [
@@ -82,6 +83,7 @@ class ContactUs extends Model
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
+            [['reCaptcha'], \himiklab\yii2\recaptcha\ReCaptchaValidator2::className(), 'uncheckedMessage' => 'Please confirm that you are not a bot.'],
             [['verifyCode'], 'captcha', 'when' => function($model) {
                     if ($model->verifyCode == 'null')
                     {
