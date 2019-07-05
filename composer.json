@@ -3,7 +3,8 @@
     "description": "class for optima crm",
     "require-dev": {
         "yiisoft/yii2":  ">=2.0.13.1",
-        "linslin/yii2-curl": "*"
+        "linslin/yii2-curl": "*",
+        "himiklab/yii2-recaptcha-widget": "*"
     },
     "version": "3.0.1",
     "minimum-stability": "dev",
