@@ -83,7 +83,19 @@ class ContactUs extends Model
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
-            [['reCaptcha'], \himiklab\yii2\recaptcha\ReCaptchaValidator2::className(), 'uncheckedMessage' => 'Please confirm that you are not a bot.'],
+            [['reCaptcha'], \himiklab\yii2\recaptcha\ReCaptchaValidator2::className(), 
+            'when' => function($model) {
+                if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll')
+                {
+                    $return = false;
+                }
+                else
+                {
+                    $return = true;
+                }
+                return $return;
+            }],
+
             [['verifyCode'], 'captcha', 'when' => function($model) {
                     if ($model->verifyCode == 'null')
                     {
