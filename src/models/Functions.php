@@ -42,6 +42,7 @@ class Functions extends Model
 
         return $it->redirect(Yii::$app->request->referrer);
     }
+    
     public static function dynamicPage($it){
         $params = Yii::$app->params;
         $cmsModel = Slugs('page', $params);
