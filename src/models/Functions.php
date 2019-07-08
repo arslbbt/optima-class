@@ -23,8 +23,6 @@ class Functions extends Model
         $model->load(Yii::$app->request->get());
         $model->verifyCode=true;
         $model->reCaptcha=Yii::$app->request->get('reCaptcha'); 
-
-        //$model->sendMail();
         
         if (!$model->sendMail()) {
             $errors = 'Message not sent!';
