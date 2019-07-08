@@ -62,13 +62,25 @@ class Functions extends Model
                 }
             }
         }
-        if(isset($page_template)){
+        /*if(isset($page_template)){
             $ret = $it->render($page_template, [
                 'page_data' => $page_data
             ]);
             return $ret;
+        }*/
+        if(isset($page_template)){   
+            try
+            {
+                $ret = $it->render($page_template, [
+                    'page_data' => $page_data
+                ]);
+                return $ret;
+            }
+            catch (ViewNotFoundException $e)
+            {
+                die;
+            }
         }
-
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
