@@ -42,7 +42,7 @@ class Functions extends Model
 
         return $it->redirect(Yii::$app->request->referrer);
     }
-    
+
     public static function dynamicPage($it){
         $params = Yii::$app->params;
         $cmsModel = Slugs('page', $params);
@@ -51,6 +51,7 @@ class Functions extends Model
 
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
+            $row['slug_all'][strtoupper(Yii::$app->language)];
             if($row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
                 $page_data = Cms::pageBySlug($this_page);
                 if(isset($page_data) and isset($page_data['custom_settings']) and isset($page_data['custom_settings'][strtoupper(Yii::$app->language)]) and count($page_data['custom_settings'][strtoupper(Yii::$app->language)]) > 0)
