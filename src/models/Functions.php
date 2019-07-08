@@ -51,8 +51,8 @@ class Functions extends Model
 
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
-            $row['slug_all'][strtoupper(Yii::$app->language)];
-            if($row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
+            //$row['slug_all'][strtoupper(Yii::$app->language)];
+            if(isset($row['slug_all']) and isset($row['slug_all'][strtoupper(Yii::$app->language)]) and $row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
                 $page_data = Cms::pageBySlug($this_page);
                 if(isset($page_data) and isset($page_data['custom_settings']) and isset($page_data['custom_settings'][strtoupper(Yii::$app->language)]) and count($page_data['custom_settings'][strtoupper(Yii::$app->language)]) > 0)
                 foreach($page_data['custom_settings'][strtoupper(Yii::$app->language)] as $custom_keys){
