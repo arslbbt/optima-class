@@ -24,7 +24,7 @@ class Functions extends Model
         $model->verifyCode=true;
         $model->reCaptcha=Yii::$app->request->get('reCaptcha'); 
 
-        $model->sendMail();
+        //$model->sendMail();
         
         if (!$model->sendMail()) {
             $errors = 'Message not sent!';
