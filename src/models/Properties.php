@@ -32,7 +32,9 @@ class Properties extends Model
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
-            $JsonData = file_get_contents($url);
+            $JsonData = 
+            //file_get_contents($url);
+            Functions::getCRMData($url);
         }
         $apiData = json_decode($JsonData);
         $settings = Cms::settings();
@@ -582,7 +584,9 @@ class Properties extends Model
         if (isset($with_count) && $with_count==true) {
             $url = $url . '&view_count=true';
         }
-        $JsonData = file_get_contents($url);
+        $JsonData = 
+        //file_get_contents($url);
+        Functions::getCRMData($url);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
             $settings = Cms::settings();
@@ -1846,7 +1850,9 @@ class Properties extends Model
         }
         $file = $webroot . '/uploads/temp/properties-latlong.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = 
+            //file_get_contents($url);
+            Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1865,7 +1871,9 @@ class Properties extends Model
         $file = $webroot . '/uploads/temp/agency.json';
         $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = 
+            //file_get_contents($url);
+            Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1882,7 +1890,11 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&listing_agent=' . $id.'&user_apikey=' . Yii::$app->params['api_key']);
+            $url = Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&listing_agent=' . $id.'&user_apikey=' . Yii::$app->params['api_key'];
+            $file_data = 
+            //file_get_contents($url);
+            Functions::getCRMData($url);
+
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1899,7 +1911,10 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents(Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key']);
+            $url = Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key'];
+            $file_data = 
+            //file_get_contents();
+            Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1922,7 +1937,9 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . sha1($query) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_get_contents($url);
+            $file_data = 
+            //file_get_contents($url);
+            Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
