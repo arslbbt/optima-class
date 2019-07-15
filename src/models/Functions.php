@@ -96,7 +96,7 @@ class Functions extends Model
             ],
         ];
     }
-    public function getCRMData($url, $cache = true, $fields = array(), $auth = false){
+    public static function getCRMData($url, $cache = true, $fields = array(), $auth = false){
         return Functions::getCurlData($url, $cache);
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
@@ -116,7 +116,7 @@ class Functions extends Model
         }
         return Functions::getCurlData($url, $cache);
     }
-    public function getCurlData($url, $cache = true, $fields = array(), $auth = false){
+    public static function getCurlData($url, $cache = true, $fields = array(), $auth = false){
     
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
