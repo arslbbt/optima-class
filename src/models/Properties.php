@@ -203,12 +203,12 @@ class Properties extends Model
                         $data['living_rooms'] = $property->property->living_rooms;
                     }
                     if (isset($property->property->address_street) && $property->property->address_street != '') {
-                        $data['address_street'] = $property->property->longitude;
+                        $data['address_street'] = $property->property->address_street;
                     } elseif (isset($property->property->private_info_object->$agency->address_street)) {
                         $data['address_street'] = $property->property->private_info_object->$agency->address_street;
                     }
                     if (isset($property->property->address_street_number) && $property->property->address_street_number != '') {
-                        $data['address_street_number'] = $property->property->longitude;
+                        $data['address_street_number'] = $property->property->address_street_number;
                     } elseif (isset($property->property->private_info_object->$agency->address_street_number)) {
                         $data['address_street_number'] = $property->property->private_info_object->$agency->address_street_number;
                     }

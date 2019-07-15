@@ -23,8 +23,6 @@ class Functions extends Model
         $model->load(Yii::$app->request->get());
         $model->verifyCode=true;
         $model->reCaptcha=Yii::$app->request->get('reCaptcha'); 
-
-        //$model->sendMail();
         
         if (!$model->sendMail()) {
             $errors = 'Message not sent!';
@@ -58,6 +56,10 @@ class Functions extends Model
                 foreach($page_data['custom_settings'][strtoupper(Yii::$app->language)] as $custom_keys){
                     if($custom_keys['key'] == 'page_template'){
                         $page_template = $custom_keys['value'];
+                        
+                    }
+                    if($custom_keys['key'] == 'custom_post_id'){
+                        $custom_post_id = $custom_keys['value'];   
                     }
                 }
             }
@@ -71,8 +73,10 @@ class Functions extends Model
         if(isset($page_template)){   
             try
             {
+                $custom_post_id = Cms::postTypes($custom_post_id);
                 $ret = $it->render($page_template, [
-                    'page_data' => $page_data
+                    'page_data' => $page_data,
+                    'custom_post_id' => $custom_post_id
                 ]);
                 return $ret;
             }
@@ -81,6 +85,7 @@ class Functions extends Model
                 //die;
             }
         }
+        return $it->render('404', []);
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
