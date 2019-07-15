@@ -492,6 +492,7 @@ class Developments extends Model
         return $file_data;
     }
     public static function file_get_contents_curl($url) {
+        return Functions::getCRMData($url);
         $ch = curl_init();
     
         curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
