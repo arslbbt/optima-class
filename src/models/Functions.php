@@ -49,7 +49,7 @@ class Functions extends Model
 
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
-            //$row['slug_all'][strtoupper(Yii::$app->language)];
+            $cms_page_exists = true;
             if(isset($row['slug_all']) and isset($row['slug_all'][strtoupper(Yii::$app->language)]) and $row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
                 $page_data = Cms::pageBySlug($this_page);
                 if(isset($page_data) and isset($page_data['custom_settings']) and isset($page_data['custom_settings'][strtoupper(Yii::$app->language)]) and count($page_data['custom_settings'][strtoupper(Yii::$app->language)]) > 0)
@@ -73,7 +73,11 @@ class Functions extends Model
         if(isset($page_template)){   
             try
             {
-                $custom_post_id = Cms::postTypes($custom_post_id);
+                if(isset($custom_post_id))
+                    $custom_post_id = Cms::postTypes($custom_post_id);
+                else
+                    $custom_post_id = '';
+                
                 $ret = $it->render($page_template, [
                     'page_data' => $page_data,
                     'custom_post_id' => $custom_post_id
@@ -84,6 +88,23 @@ class Functions extends Model
             {
                 //die;
             }
+        }elseif(isset($this_page)){
+            try{
+                $ret = $it->render($this_page, [
+                    'page_data' => $page_data
+                ]);
+                return $ret;
+            }catch(ViewNotFoundException $e){
+                $ret = $it->render('page', [
+                    'page_data' => $page_data
+                ]);
+                return $ret;
+            }
+        }elseif(isset($cms_page_exists)){
+            $ret = $it->render('page', [
+                'page_data' => $page_data
+            ]);
+            return $ret;
         }
         return $it->render('404', []);
         return [
