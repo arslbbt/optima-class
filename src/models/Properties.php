@@ -1790,11 +1790,14 @@ class Properties extends Model
         }
         
 
-        if (isset($get["sale"]) && $get["sale"] != "") {
+        if (isset($get["sale"]) && !isset($get["rent"]) && $get["sale"] != "") {
             $query .= '&sale=1';
         }
-        if (isset($get["rent"]) && $get["rent"] != "") {
+        if (!isset($get["sale"]) && isset($get["rent"]) && $get["rent"] != "") {
             $query .= '&rent=1';
+        }
+        if (isset($get["sale"]) && $get["sale"] && isset($get["rent"]) && $get["rent"]) {
+            $query .= '&sale_rent=1';
         }
         if (isset($get["st_rental"]) && $get["st_rental"] != "") {
             $query .= '&st_rental=1';
@@ -1807,6 +1810,16 @@ class Properties extends Model
         }
         if (isset($get["keywords"]) && $get["keywords"] != "") {
             $query .= '&keywords=' . $get["keywords"];
+        }
+        if (isset($get["listing_agent"]) && $get["listing_agent"]) {
+            if(is_array($get["listing_agent"])){
+                foreach ($get['listing_agent'] as $agent)
+                {
+                    $query .= '&listing_agent[]=' . $agent;
+                }
+            }else{
+                $query .= '&listing_agent=' . $get["listing_agent"];
+            }
         }
         if (isset($get['orderby']) && !empty($get['orderby'])) {
             if ($get['orderby'] == 'dateASC') {
