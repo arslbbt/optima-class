@@ -90,7 +90,7 @@ class Dropdowns extends Model {
         return $return_data;
     }
 
-    public static function locations($provinces = [], $to_json = false, $cities = []) {
+    public static function locations($provinces = [], $to_json = false, $cities = [], $country = '') {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
@@ -114,7 +114,11 @@ class Dropdowns extends Model {
                     $c_q .= '&city[]=' . $city;
                 }
             }
-            $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.((isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)=='es')?'es_AR':'en');
+            $country_check = '';
+            if(isset($country)){
+                $country_check = '&country='.$country;
+            }
+            $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.((isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)=='es')?'es_AR':'en').$country_check;
             $file_data = 
             //file_get_contents($url);
             Functions::getCRMData($url);
