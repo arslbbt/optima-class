@@ -998,7 +998,7 @@ class Properties extends Model
                 $booking_status = [];
                 $booked_dates_costa=[];
                 foreach ($property->bookings as $key => $booking) {
-                   if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '' && is_numeric($booking->date_from) && is_numaric($booking->date_until)) {
+                   if (isset($booking->date_from) && $booking->date_from != '' && isset($booking->date_until) && $booking->date_until != '' && is_numeric($booking->date_from) && is_numeric($booking->date_until)) {
                             for ($i = $booking->date_from; $i <= $booking->date_until; $i += 86400) {
                                 $booked_dates[] = date(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y", $i);
                             }
