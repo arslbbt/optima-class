@@ -144,7 +144,31 @@ class ContactUs extends Model
         if(isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
         {
             $ae_array = explode(',', $settings['general_settings']['admin_email']);
+
+            foreach($ae_array as $k){
+                $arr = explode('[', $k);
+
+                if(count($arr) > 0){
+                    if(isset($arr[1])){
+                        $formatted_email = true;
+                        $ae_arr = [str_replace(']', '', $arr[1]) => $arr[0]];
+                        break;
+                    }
+                }
+            }
+            if(isset($formatted_email)){
+                $ae_array = $ae_arr;
+            }
         }
+        if(isset($ae_array) && is_array($ae_array)){
+            $from_email = $ae_array;
+            
+        }elseif(isset($ae_array[0])){
+            $from_email = trim($ae_array[0]);
+        }else{
+            $from_email = Yii::$app->params['from_email'];
+        }
+
         if ($this->validate() && isset($ae_array))
         {
             if (isset($this->attach) && $this->attach == 1)
@@ -153,7 +177,7 @@ class ContactUs extends Model
                 if (is_dir($webroot . '/uploads/pdf'))
                 {
                     Yii::$app->mailer->compose()
-                    ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                    ->setFrom($from_email)
                     ->setTo($this->email)
                     ->setSubject('Thank you for contacting us')
                     ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for contacting us')
@@ -312,18 +336,19 @@ class ContactUs extends Model
                     }
                 }
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(isset($this->email)? $this->email : '')
+                    ->setFrom($from_email)
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
                     ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
                     ->send();
                 Yii::$app->mailer->compose()
-                ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]):Yii::$app->params['from_email'])
+                ->setFrom($from_email)
                 ->setTo($this->email)
                 ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
                 ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                 ->send();
                 $this->saveAccount();
+                
                 if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
             }
