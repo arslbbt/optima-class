@@ -140,6 +140,7 @@ class ContactUs extends Model
 
     public function sendMail()
     {
+        //if you wanna pass email with name format will me:  Your Name[Your@email.address]
         $settings = Cms::settings();
         if(isset($settings['general_settings']['admin_email']) && $settings['general_settings']['admin_email'] != '')
         {
