@@ -35,7 +35,7 @@ class CommercialProperties extends Model
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
             ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user_apikey=' . Yii::$app->params['api_key']);
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
         $response = json_decode($response, TRUE);
         $properties = [];
         foreach ($response['docs'] as $property) {
@@ -54,7 +54,7 @@ class CommercialProperties extends Model
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
             ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user_apikey=' . Yii::$app->params['api_key']);
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
         $response = json_decode($response, TRUE);
         $property = self::formateProperty($response);
         return $property;
