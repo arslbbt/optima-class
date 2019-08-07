@@ -115,7 +115,7 @@ class Dropdowns extends Model {
                 }
             }
             $country_check = '';
-            if(isset($country)){
+            if($country){
                 $country_check = '&country='.$country;
             }
             $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.((isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)=='es')?'es_AR':'en').$country_check;
