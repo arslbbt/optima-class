@@ -115,7 +115,7 @@ class Dropdowns extends Model {
                 }
             }
             $country_check = '';
-            if($country){
+            if(isset($country)){
                 $country_check = '&country='.$country;
             }
             $url=Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q.'&user_apikey=' . Yii::$app->params['api_key'].'&lang='.((isset(\Yii::$app->language)&& strtolower(\Yii::$app->language)=='es')?'es_AR':'en').$country_check;
@@ -128,6 +128,18 @@ class Dropdowns extends Model {
         }
         return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
+
+    public static function CommercialType()
+   {
+       $curl = new curl\Curl();
+       $response = $curl->setRequestBody(json_encode([]))
+           ->setHeaders([
+               'Content-Type' => 'application/json',
+               'Content-Length' => strlen(json_encode([]))
+           ])
+            ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
+        return json_decode($response, TRUE);    
+   }
 
     public static function cities($provinces = [], $to_json = false) {
         $webroot = Yii::getAlias('@webroot');
