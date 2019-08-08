@@ -55,7 +55,9 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
-
+        // echo "<pre>";
+        // print_r(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
+        // die();
         $response = json_decode($response, TRUE);
         $properties = [];
         foreach ($response['docs'] as $property) {
@@ -67,7 +69,14 @@ class CommercialProperties extends Model
 
     public static function findOne($id)
     {
-        $post_data = ['options' => ''];
+        $options = [];
+        $options['populate'] = [
+            [
+                'path' => 'property_attachments',
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]]
+            ]
+        ];
+        $post_data = ['options' => $options];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
@@ -75,11 +84,16 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+        // echo "<pre>";
+        // print_r(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+        // die();
+
         $response = json_decode($response, TRUE);
+
         $property = self::formateProperty($response);
         // echo "<pre>";
         // print_r($property);
-        // die;
+        // die();
         return $property;
     }
 
@@ -105,6 +119,21 @@ class CommercialProperties extends Model
         if (isset($get['country']) && $get['country']) {
             $query['country'] = (int) $get['country'];
         }
+        if (isset($get['city']) && $get['city']) {
+            $query['city'] = (int) $get['city'];
+        }
+        if (isset($get['location']) && $get['location']) {
+            $query['location'] = (int) $get['location'];
+        }
+        if (isset($get['province']) && $get['province']) {
+            $query['province'] = (int) $get['province'];
+        }
+        if (isset($get['region']) && $get['region']) {
+            $query['region'] = (int) $get['region'];
+        }
+
+
+
 
 
         // if(isset($get['bedrooms']) && $get['bedrooms'] )
@@ -181,6 +210,9 @@ class CommercialProperties extends Model
         }
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
+        }
+        if (isset($property['location'])) {
+            $f_property['location_key'] = $property['location'];
         }
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
