@@ -18,7 +18,7 @@ use function PHPSTORM_META\type;
 class CommercialProperties extends Model
 {
 
-    public static function findAll($page = 1, $page_size = 10, $query = [])
+    public static function findAll($page = 1, $page_size = 10, $query = [], $sort = ['current_price' => '-1'])
     {
         $options = ["page" => $page, "limit" => $page_size];
 
@@ -29,10 +29,9 @@ class CommercialProperties extends Model
             ]
         ];
 
-        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2))
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
-        else
-            $sort = ['current_price' => '-1'];
+        }
         $options['sort'] = $sort;
 
         $post_data = ["options" => $options];
@@ -56,9 +55,7 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
-        // echo "<pre>";
-        // print_r(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
-        // die;
+
         $response = json_decode($response, TRUE);
         $properties = [];
         foreach ($response['docs'] as $property) {
@@ -191,10 +188,10 @@ class CommercialProperties extends Model
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
         }
-        if (isset($property['attachments']) && count($property['attachments']) > 0) {
+        if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
-            foreach ($property['attachments'] as $pic) {
-                $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+            foreach ($property['property_attachments'] as $pic) {
+                $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
             }
             $f_property['attachments'] = $attachments;
         }
