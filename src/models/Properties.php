@@ -426,6 +426,7 @@ class Properties extends Model
                     $parking = [];
                     $garden = [];
                     $pool = [];
+                    $pool_size = "";
                     $condition = [];
                     $rental_investment_info = [];
                     if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
@@ -520,10 +521,15 @@ class Properties extends Model
                             }
                         }
                     }
+                    
                     if (isset($property->property->feet_pool)) {
                         foreach ($property->property->feet_pool as $key => $value) {
                             if ($value == true) {
                                 $pool[] = $key;
+                            }
+                            if($key == 'pool_private_size')
+                            {
+                              $pool_size = (array)$value;
                             }
                         }
                     }
@@ -547,6 +553,7 @@ class Properties extends Model
                     $data['property_features']['parking'] = $parking;
                     $data['property_features']['garden'] = $garden;
                     $data['property_features']['pool'] = $pool;
+                    $data['property_features']['pool_size'] = $pool_size;
                     $data['property_features']['condition'] = $condition;
                     $return_data[] = $data;
                 }
