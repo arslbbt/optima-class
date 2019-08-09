@@ -226,9 +226,17 @@ class Properties extends Model
                                 $gdprice = [];
                                 $st_price = 0;
                                 foreach ($property->property->rental_seasons as $seasons) {
-                                    if (isset($seasons->gross_day_price)) {
-                                        $gdprice[] = $seasons->gross_day_price;
-                                    }
+                                    /* For price per week */
+                                    if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                                       if (isset($seasons->new_price)) {
+                                           $gdprice[] = $seasons->new_price;
+                                       }
+                                   }
+                                   else{
+                                       if (isset($seasons->price_per_day)) {
+                                           $gdprice[] = $seasons->price_per_day;
+                                       }
+                                   }
                                 }
                                 if (count($gdprice) > 0) {
                                     $st_price = min($gdprice);
