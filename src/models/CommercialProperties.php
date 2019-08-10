@@ -211,11 +211,30 @@ class CommercialProperties extends Model
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
         }
+        if (isset($property['city'])) {
+            $f_property['city_value'] = $property['city_value'];
+        }
+        if (isset($property['country'])) {
+            $f_property['country_value'] = $property['country'];
+        }
+        if (isset($property['province'])) {
+            $f_property['province_value'] = $property['province_value'];
+        }
         if (isset($property['location'])) {
             $f_property['location_key'] = $property['location'];
         }
+        if (isset($property['location_value'])) {
+            $f_property['location_value'] = $property['location_value'];
+        }
+
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
+        }
+        if (isset($property['sale'])) {
+            $f_property['sale'] = true;
+        }
+        if (isset($property['type_one_value'])) {
+            $f_property['type_one_value'] = $property['type_one_value'];
         }
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
