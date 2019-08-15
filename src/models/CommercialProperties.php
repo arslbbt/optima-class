@@ -6,6 +6,8 @@ use Yii;
 use yii\base\Model;
 use optima\models\Cms;
 use linslin\yii2\curl;
+use phpDocumentor\Reflection\Location;
+use function PHPSTORM_META\type;
 
 /**
  * LoginForm is the model behind the login form.
@@ -16,26 +18,46 @@ use linslin\yii2\curl;
 class CommercialProperties extends Model
 {
 
-    public static function findAll($page = 1, $page_size = 10)
+    public static function findAll($page = 1, $page_size = 10, $query = [], $sort = ['current_price' => '-1'])
     {
         $options = ["page" => $page, "limit" => $page_size];
-        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2))
+
+        $options['populate'] = [
+            [
+                'path' => 'property_attachments',
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]]
+            ]
+        ];
+
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
-        else
-            $sort = ['current_price' => '-1'];
+        }
         $options['sort'] = $sort;
+
         $post_data = ["options" => $options];
-        $query = self::setQuery();
+        // echo "<pre>";
+        // print_r($options['populate']);
+        // die;
+        if (!count($query)) {
+            $query = self::setQuery();
+        }
+
+
         if (count($query))
             $post_data['query'] = $query;
-
+        // echo "<pre>";
+        // print_r($post_data);
+        // die;
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
             ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user_apikey=' . Yii::$app->params['api_key']);
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
+        // echo "<pre>";
+        // print_r(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
+        // die();
         $response = json_decode($response, TRUE);
         $properties = [];
         foreach ($response['docs'] as $property) {
@@ -47,22 +69,87 @@ class CommercialProperties extends Model
 
     public static function findOne($id)
     {
-        $post_data = ['options' => ''];
+        $options = [];
+        $options['populate'] = [
+            [
+                'path' => 'property_attachments',
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]]
+            ]
+        ];
+        $post_data = ['options' => $options];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
             ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user_apikey=' . Yii::$app->params['api_key']);
+            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+        // echo "<pre>";
+        // print_r(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+        // die();
+
         $response = json_decode($response, TRUE);
+
         $property = self::formateProperty($response);
+        // echo "<pre>";
+        // print_r($property);
+        // die();
         return $property;
     }
 
     public static function setQuery()
     {
+        $get = Yii::$app->request->get();
         $query = [];
+        if (isset($get['price_from']) && $get['price_from']) {
+            $query['current_price'] = ['$gte' => (int) $get['price_from']];
+        }
+        if (isset($get['reference']) && $get['reference']) {
+            $query['$or'] = [
+                ["reference" => (int) $get['reference']],
+                ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
+                ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
+            ];
+        }
+
+        if (isset($get['type']) && $get['type']) {
+            $query['type_one'] = ['$in' => $get['type']];
+        }
+
+        if (isset($get['country']) && $get['country']) {
+            $query['country'] = (int) $get['country'];
+        }
+        if (isset($get['city']) && $get['city']) {
+            $query['city'] = (int) $get['city'];
+        }
+        if (isset($get['location']) && $get['location']) {
+            $query['location'] = (int) $get['location'];
+        }
+        if (isset($get['province']) && $get['province']) {
+            $query['province'] = (int) $get['province'];
+        }
+        if (isset($get['region']) && $get['region']) {
+            $query['region'] = (int) $get['region'];
+        }
+
+
+
+
+
+        // if(isset($get['bedrooms']) && $get['bedrooms'] )
+        // {
+        //     $query['bedrooms']= ['$gte'=> 2, $lte: 3}
+        // }
+        if (isset($get['location']) && $get['location']) {
+
+            $query['location'] = (int) $get['location'];
+        }
+        if (isset($get['featured']) && $get['featured']) {
+            $query['featured'] = true;
+        }
+
+
+
         return $query;
     }
 
@@ -76,6 +163,7 @@ class CommercialProperties extends Model
             $ref = $settings['general_settings']['reference'];
             $f_property['reference'] = $property[$ref];
         } else {
+
             $f_property['reference'] = $property['reference'];
         }
         if (isset($property['_id'])) {
@@ -121,15 +209,40 @@ class CommercialProperties extends Model
             $f_property['bathrooms'] = $property['bathrooms'];
         }
         if (isset($property['city'])) {
-            $return_data['city_key'] = $property['city'];
+            $f_property['city_key'] = $property['city'];
         }
+        if (isset($property['city'])) {
+            $f_property['city_value'] = $property['city_value'];
+        }
+        if (isset($property['country'])) {
+            $f_property['country_value'] = $property['country'];
+        }
+        if (isset($property['province'])) {
+            $f_property['province_value'] = $property['province_value'];
+        }
+        if (isset($property['location'])) {
+            $f_property['location_key'] = $property['location'];
+        }
+        if (isset($property['location_value'])) {
+            $f_property['location_value'] = $property['location_value'];
+        }
+
         if (isset($property['type_one_key'])) {
-            $return_data['type_key'] = $property['type_one_key'];
+            $f_property['type_key'] = $property['type_one_key'];
         }
-        if (isset($property['attachments']) && count($property['attachments']) > 0) {
+        if (isset($property['sale'])) {
+            $f_property['sale'] = true;
+        }
+        if (isset($property['type_one_value'])) {
+            $f_property['type_one_value'] = $property['type_one_value'];
+        }
+        if (isset($property['current_price'])) {
+            $f_property['price'] = $property['current_price'];
+        }
+        if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
-            foreach ($property['attachments'] as $pic) {
-                $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+            foreach ($property['property_attachments'] as $pic) {
+                $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
             }
             $f_property['attachments'] = $attachments;
         }

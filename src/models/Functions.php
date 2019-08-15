@@ -102,14 +102,14 @@ class Functions extends Model
                 //die;
             }
         }elseif(isset($this_page)){
-            try{
+            if (is_file($this_page)){
                 $ret = $it->render($this_page, [
-                    'page_data' => $page_data
+                    'page_data' => isset($page_data)?$page_data:''
                 ]);
                 return $ret;
-            }catch(ViewNotFoundException $e){
+            }else{
                 $ret = $it->render('page', [
-                    'page_data' => $page_data
+                    'page_data' => isset($page_data)?$page_data:''
                 ]);
                 return $ret;
             }

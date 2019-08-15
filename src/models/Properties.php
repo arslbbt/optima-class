@@ -226,8 +226,15 @@ class Properties extends Model
                                 $gdprice = [];
                                 $st_price = 0;
                                 foreach ($property->property->rental_seasons as $seasons) {
-                                    if (isset($seasons->gross_day_price)) {
-                                        $gdprice[] = $seasons->gross_day_price;
+                                    /* For price per week */
+                                    if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                                        if (isset($seasons->new_price)) {
+                                            $gdprice[] = $seasons->new_price;
+                                        }
+                                    } else {
+                                        if (isset($seasons->price_per_day)) {
+                                            $gdprice[] = $seasons->price_per_day;
+                                        }
                                     }
                                 }
                                 if (count($gdprice) > 0) {
@@ -426,6 +433,7 @@ class Properties extends Model
                     $parking = [];
                     $garden = [];
                     $pool = [];
+                    $pool_size = "";
                     $condition = [];
                     $rental_investment_info = [];
                     if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
@@ -520,10 +528,14 @@ class Properties extends Model
                             }
                         }
                     }
+
                     if (isset($property->property->feet_pool)) {
                         foreach ($property->property->feet_pool as $key => $value) {
                             if ($value == true) {
                                 $pool[] = $key;
+                            }
+                            if ($key == 'pool_private_size') {
+                                $pool_size = (array) $value;
                             }
                         }
                     }
@@ -547,6 +559,7 @@ class Properties extends Model
                     $data['property_features']['parking'] = $parking;
                     $data['property_features']['garden'] = $garden;
                     $data['property_features']['pool'] = $pool;
+                    $data['property_features']['pool_size'] = $pool_size;
                     $data['property_features']['condition'] = $condition;
                     $return_data[] = $data;
                 }
@@ -1973,6 +1986,7 @@ class Properties extends Model
 
         $end_season_to = [];
         $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
+        $number_of_days = $number_of_days - 1;
 
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
