@@ -28,9 +28,6 @@ class CommercialProperties extends Model
                 'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]],
             ]
         ];
-        //$query_array['favourite_ids'] = [0=>'5cd560fed314c86ba2258d85',1=>'5d4c321bc0fb225c974c89f2',2=>'5c5597bbd9973d0526203e0f'];
-        //$query_array['favourite_ids'] = explode(',', "5cd560fed314c86ba2258d85,5d4c321bc0fb225c974c89f2,5c5597bbd9973d0526203e0f,5d4be8cb0de7717a1beb5ec5");
-        // $query_array['price'] = '1221';
 
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
@@ -52,17 +49,13 @@ class CommercialProperties extends Model
             }
         }
         if(isset($query) && $query != '' && is_array($query)){
-            //$post_data = ["options" => $options];	        
-            // echo "<pre>";	        if(isset($query) && $query != ''){
-            // print_r($options['populate']);	            $vars = explode('&', $query);
-            // die;	            
-            //foreach($vars as $var){
-            if (!count($query)) {	                
-                // $k = explode('=', $var);
+            if (!count($query)) {
                 $query = self::setQuery();
             }
             if (count($query)){
                 $query_array = $query;
+                // echo '<pre>--------';
+                // print_r($query);
             }
         }
 
@@ -71,6 +64,7 @@ class CommercialProperties extends Model
 
         
         $post_data = ["options" => $options];
+        //[ '$gt' =>  100000, '$lt' => 6]
         if(!empty($query_array))
             $post_data["query"] =  $query_array;
 
@@ -120,7 +114,11 @@ class CommercialProperties extends Model
         // print_r(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
         // die();
 
+        
         $response = json_decode($response, TRUE);
+        // echo '<pre>---';
+        // print_r($response['kitchen']);
+        // die;
 
         $property = self::formateProperty($response);
         // echo "<pre>";
@@ -162,6 +160,10 @@ class CommercialProperties extends Model
         }
         if (isset($get['region']) && $get['region']) {
             $query['region'] = (int) $get['region'];
+        }
+        if (isset($get['price_from'])) {
+            $query['$gt'] = (int) $get['price_from'];
+            $query['$lt'] = (int) 100000000000000000;
         }
 
 
@@ -305,6 +307,18 @@ class CommercialProperties extends Model
         $f_property['property_features']['orientation'] = $orientation;
         $f_property['property_features']['views'] = $views;
         $f_property['property_features']['condition'] = $condition;
+        $f_property['property_features']['kitchen'] = (isset($property['kitchen']))?$property['kitchen']:'';
+        $f_property['property_features']['security'] = (isset($property['security']))?$property['security']:'';
+        $f_property['property_features']['utility'] = (isset($property['utility']))?$property['utility']:'';
+        $f_property['property_features']['furniture'] = (isset($property['furniture']))?$property['furniture']:'';
+        $f_property['property_features']['climate_control'] = (isset($property['climate_control']))?$property['climate_control']:'';
+        $f_property['property_features']['parking'] = (isset($property['parking']))?$property['parking']:'';
+        $f_property['property_features']['garden'] = (isset($property['garden']))?$property['garden']:'';
+        $f_property['property_features']['pool'] = (isset($property['pool']))?$property['pool']:'';
+        $f_property['property_features']['leisure'] = (isset($property['leisure']))?$property['leisure']:'';
+        $f_property['property_features']['features'] = (isset($property['features']))?$property['features']:'';
+        $f_property['property_features']['rooms'] = (isset($property['rooms']))?$property['rooms']:'';
+
 
         return $f_property;
     }
