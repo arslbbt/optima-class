@@ -38,7 +38,7 @@ class CommercialProperties extends Model
         $options['sort'] = $sort;
 
         
-        if(isset($query) && $query != ''){
+        if(isset($query) && $query != '' && !is_array($query)){
             $vars = explode('&', $query);
             foreach($vars as $var){
                 $k = explode('=', $var);
