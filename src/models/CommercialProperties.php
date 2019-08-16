@@ -144,7 +144,7 @@ class CommercialProperties extends Model
             ];
         }
 
-        if (isset($get['type']) && $get['type']) {
+        if (isset($get['type']) && $get['type'] && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
             $query['type_one'] = ['$in' => $get['type']];
         }
 
