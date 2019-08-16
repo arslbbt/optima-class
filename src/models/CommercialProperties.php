@@ -51,11 +51,16 @@ class CommercialProperties extends Model
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
+                // echo '*******';
             }
             if (count($query)){
+                // echo '8888888';
+                // if (isset($query['price_from'])) {
+                //     $query['current_price']['$gt'] = (int) $get['price_from'];
+                //     $query['current_price']['$lt'] = (int) 100000000000000000;
+                // }
+        
                 $query_array = $query;
-                // echo '<pre>--------';
-                // print_r($query);
             }
         }
 
@@ -67,6 +72,9 @@ class CommercialProperties extends Model
         //[ '$gt' =>  100000, '$lt' => 6]
         if(!empty($query_array))
             $post_data["query"] =  $query_array;
+        
+        // echo '<pre>--------';
+        // print_r($post_data);
 
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         
@@ -162,8 +170,8 @@ class CommercialProperties extends Model
             $query['region'] = (int) $get['region'];
         }
         if (isset($get['price_from'])) {
-            $query['$gt'] = (int) $get['price_from'];
-            $query['$lt'] = (int) 100000000000000000;
+            $query['current_price']['$gt'] = (int) $get['price_from'];
+            $query['current_price']['$lt'] = (int) 100000000000000000;
         }
 
 
