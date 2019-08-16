@@ -51,8 +51,28 @@ class CommercialProperties extends Model
                 }
             }
         }
+        if(isset($query) && $query != '' && is_array($query)){
+            //$post_data = ["options" => $options];	        
+            // echo "<pre>";	        if(isset($query) && $query != ''){
+            // print_r($options['populate']);	            $vars = explode('&', $query);
+            // die;	            
+            //foreach($vars as $var){
+            if (!count($query)) {	                
+                // $k = explode('=', $var);
+                $query = self::setQuery();
+            }
+            if (count($query)){
+                $query_array = $query;
+            }
+        }
+
+
+
+
         
-        $post_data = ["options" => $options,"query" => $query_array];
+        $post_data = ["options" => $options];
+        if(!empty($query_array))
+            $post_data["query"] =  $query_array;
 
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         
@@ -63,7 +83,8 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post($node_url);
-        $response = json_decode($response, TRUE);        
+        $response = json_decode($response, TRUE);
+
 
         $properties = [];
 
@@ -72,6 +93,9 @@ class CommercialProperties extends Model
             $properties[] = self::formateProperty($property);
         }
         $response['docs'] = $properties;
+        // echo '<pre>';
+        // print_r($response);
+        // print_r($post_data);
         return $response;
     }
 
