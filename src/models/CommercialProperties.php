@@ -18,48 +18,56 @@ use function PHPSTORM_META\type;
 class CommercialProperties extends Model
 {
 
-    public static function findAll($page = 1, $page_size = 10, $query = [], $sort = ['current_price' => '-1'])
+    public static function findAll($page = 1, $page_size = 10, $query = '', $sort = ['current_price' => '-1'])
     {
+        $query_array=[];
         $options = ["page" => $page, "limit" => $page_size];
-
         $options['populate'] = [
             [
                 'path' => 'property_attachments',
-                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]]
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]],
             ]
         ];
+        //$query_array['favourite_ids'] = [0=>'5cd560fed314c86ba2258d85',1=>'5d4c321bc0fb225c974c89f2',2=>'5c5597bbd9973d0526203e0f'];
+        //$query_array['favourite_ids'] = explode(',', "5cd560fed314c86ba2258d85,5d4c321bc0fb225c974c89f2,5c5597bbd9973d0526203e0f,5d4be8cb0de7717a1beb5ec5");
+        // $query_array['price'] = '1221';
 
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
         }
         $options['sort'] = $sort;
 
-        $post_data = ["options" => $options];
-        // echo "<pre>";
-        // print_r($options['populate']);
-        // die;
-        if (!count($query)) {
-            $query = self::setQuery();
+        
+        if(isset($query) && $query != ''){
+            $vars = explode('&', $query);
+            foreach($vars as $var){
+                $k = explode('=', $var);
+                if(isset($k[0]) && isset($k[1])){
+                    if($k[0] == 'favourite_ids'){
+                        $query_array['favourite_ids'] = explode(',', $k[1]);
+                    }else{
+                        $post_data[$k[0]] = $k[1];
+                    }
+                }
+            }
         }
+        
+        $post_data = ["options" => $options,"query" => $query_array];
 
-
-        if (count($query))
-            $post_data['query'] = $query;
-        // echo "<pre>";
-        // print_r($post_data);
-        // die;
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
+        
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
             ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
-        // echo "<pre>";
-        // print_r(Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user']);
-        // die();
-        $response = json_decode($response, TRUE);
+            ->post($node_url);
+        $response = json_decode($response, TRUE);        
+
         $properties = [];
+
+        if(isset($response) && isset($response['docs']))
         foreach ($response['docs'] as $property) {
             $properties[] = self::formateProperty($property);
         }
@@ -211,30 +219,11 @@ class CommercialProperties extends Model
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
         }
-        if (isset($property['city'])) {
-            $f_property['city_value'] = $property['city_value'];
-        }
-        if (isset($property['country'])) {
-            $f_property['country_value'] = $property['country'];
-        }
-        if (isset($property['province'])) {
-            $f_property['province_value'] = $property['province_value'];
-        }
         if (isset($property['location'])) {
             $f_property['location_key'] = $property['location'];
         }
-        if (isset($property['location_value'])) {
-            $f_property['location_value'] = $property['location_value'];
-        }
-
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
-        }
-        if (isset($property['sale'])) {
-            $f_property['sale'] = true;
-        }
-        if (isset($property['type_one_value'])) {
-            $f_property['type_one_value'] = $property['type_one_value'];
         }
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
