@@ -48,7 +48,6 @@ class CommercialProperties extends Model
                 }
             }
         }
-        
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
@@ -76,8 +75,8 @@ class CommercialProperties extends Model
         
         // echo '<pre>--------';
         // print_r($post_data);
+
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
-        
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
@@ -173,8 +172,8 @@ class CommercialProperties extends Model
             $query['current_price']['$gt'] = (int) $get['price_from'];
             $query['current_price']['$lt'] = (int) 100000000000000000;
         }
-        $query['archived']['$ne'] = true;
 
+        $query['archived']['$ne'] = true;
 
 
 
