@@ -228,12 +228,12 @@ class Properties extends Model
                                 foreach ($property->property->rental_seasons as $seasons) {
                                     /* For price per week */
                                     if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
-                                        if (isset($seasons->new_price)) {
-                                            $gdprice[] = $seasons->new_price;
+                                        if (isset($seasons->gross_price)) {
+                                            $gdprice[] = $seasons->gross_price;
                                         }
                                     } else {
-                                        if (isset($seasons->price_per_day)) {
-                                            $gdprice[] = $seasons->price_per_day;
+                                        if (isset($seasons->gross_day_price)) {
+                                            $gdprice[] = $seasons->gross_day_price;
                                         }
                                     }
                                 }
