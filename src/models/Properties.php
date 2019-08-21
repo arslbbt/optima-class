@@ -2094,4 +2094,39 @@ class Properties extends Model
 
         return $data;
     }
+    public static function displayPrice($price){
+        //echo ‘hellllllllooooo’;
+        $settings = Cms::settings();
+        if (isset($settings[‘custom_settings’])) {
+            foreach ($settings[‘custom_settings’] as $cs) {
+                if (isset($cs[‘key’]) && $cs[‘key’] == ‘dollar’)
+                    $dollar = $cs[‘value’] ? $cs[‘value’] : ‘’;
+                if (isset($cs[‘key’]) && $cs[‘key’] == ‘tl’)
+                    $tl = $cs[‘value’] ? $cs[‘value’] : ‘’;
+                if (isset($cs[‘key’]) && $cs[‘key’] == ‘euro’)
+                    $euro = $cs[‘value’] ? $cs[‘value’] : ‘’;
+                if (isset($cs[‘key’]) && $cs[‘key’] == ‘gbp’)
+                    $gbp = $cs[‘value’] ? $cs[‘value’] : ‘’;
+            }
+        }
+        $rc = preg_match_all(‘/\b\d+\b/‘, $price, $matches);
+        $result = preg_replace(‘/\b\d+\b/‘, ‘’, $price);
+        $result2 = preg_replace(‘/[^A-Za-z0-9\-]/‘, ‘’, $result);
+        if (isset($_SESSION[“pricerate”])) {
+            foreach ($matches as $val) {
+                if ($_SESSION[“pricerate”] == $tl) {
+                    $price_done = number_format((float) $_SESSION[“pricerate”] * $val[0]) . ' ' . ‘₺’ . ' ' . $result2;
+                } elseif ($_SESSION[“pricerate”] == $dollar) {
+                    $price_done = number_format((float) $_SESSION[“pricerate”] * $val[0]) . ' ' . ‘$’ . ' ' . $result2;
+                } elseif ($_SESSION[“pricerate”] == $gbp) {
+                    $price_done = number_format((float) $_SESSION[“pricerate”] * $val[0]) . ' ' . ‘£’ . ' ' . $result2;
+                } elseif ($_SESSION[“pricerate”] == $euro) {
+                    $price_done = number_format((float) $_SESSION[“pricerate”] * $val[0]) . ' ' . ‘€’ . ' ' . $result2;
+                }
+            }
+        } else {
+            $price_done = number_format($result2);
+        }
+        return $price_done;
+    }
 }
