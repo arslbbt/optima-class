@@ -2095,6 +2095,7 @@ class Properties extends Model
         return $data;
     }
     public static function displayPrice($price){
+        return;
         //echo ‘hellllllllooooo’;
         $settings = Cms::settings();
         if (isset($settings[‘custom_settings’])) {
