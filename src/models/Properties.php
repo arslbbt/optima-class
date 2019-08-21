@@ -2094,6 +2094,7 @@ class Properties extends Model
 
         return $data;
     }
+    
     public static function displayPrice($price){
         return;
         /*//echo ‘hellllllllooooo’;
