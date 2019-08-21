@@ -2097,7 +2097,7 @@ class Properties extends Model
     }
 
     public static function displayPrice($price){
-        $price_done = 0;
+        $price_done = $price;
         //echo 'hellllllllooooo';
         $settings = Cms::settings();
 
