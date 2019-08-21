@@ -2112,7 +2112,7 @@ class Properties extends Model
         }
         $rc = preg_match_all(‘/\b\d+\b/‘, $price, $matches);
         $result = preg_replace(‘/\b\d+\b/‘, ‘’, $price);
-        $result2 = preg_replace(‘/[^A-Za-z0-9\-]/‘, ‘’, $result);
+        $result2 = '';//preg_replace(‘/[^A-Za-z0-9\-]/‘, ‘’, $result);
         if (isset($_SESSION[“pricerate”])) {
             foreach ($matches as $val) {
                 if ($_SESSION[“pricerate”] == $tl) {
