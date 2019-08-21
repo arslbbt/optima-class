@@ -42,8 +42,10 @@ class CommercialProperties extends Model
                 if(isset($k[0]) && isset($k[1])){
                     if($k[0] == 'favourite_ids'){
                         $query_array['favourite_ids'] = explode(',', $k[1]);
+                        $query_array['archived']['$ne'] = true;
                     }else{
                         $post_data[$k[0]] = $k[1];
+                        $post_data['archived']['$ne'] = true;
                     }
                 }
             }
@@ -51,16 +53,11 @@ class CommercialProperties extends Model
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
-                // echo '*******';
+                $query['archived']['$ne'] = true;
             }
             if (count($query)){
-                // echo '8888888';
-                // if (isset($query['price_from'])) {
-                //     $query['current_price']['$gt'] = (int) $get['price_from'];
-                //     $query['current_price']['$lt'] = (int) 100000000000000000;
-                // }
-        
                 $query_array = $query;
+                $query_array['archived']['$ne'] = true;
             }
         }
 
