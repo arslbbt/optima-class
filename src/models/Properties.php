@@ -2140,4 +2140,25 @@ class Properties extends Model
         return $price_done;
 
     }
+
+
+    public static function PriceRateCahange(){
+        if (isset($_GET['pricerate'])) {
+            $_SESSION["pricerate"] = $_GET['pricerate'];
+        }
+        elseif (isset($_GET['?pricerate']))
+        {
+            $_SESSION["pricerate"] = $_GET['?pricerate'];
+            if(isset($_GET['test'])){
+                echo $_SESSION["pricerate"];
+            }
+        }
+        //die('1111');
+        if (!isset($_SESSION["pricerate"])) {
+            $_SESSION["pricerate"] = 1;
+        }
+    }
+
+
+
 }
