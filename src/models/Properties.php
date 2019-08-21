@@ -2096,7 +2096,7 @@ class Properties extends Model
     }
     public static function displayPrice($price){
         return;
-        //echo ‘hellllllllooooo’;
+        /*//echo ‘hellllllllooooo’;
         $settings = Cms::settings();
         if (isset($settings[‘custom_settings’])) {
             foreach ($settings[‘custom_settings’] as $cs) {
@@ -2128,6 +2128,6 @@ class Properties extends Model
         } else {
             $price_done = number_format($result2);
         }
-        return $price_done;
+        return $price_done;*/
     }
 }
