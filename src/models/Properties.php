@@ -29,6 +29,7 @@ class Properties extends Model
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
 
+
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -2096,6 +2097,7 @@ class Properties extends Model
     }
 
     public static function displayPrice($price){
+        $price_done = 0;
         //echo 'hellllllllooooo';
         $settings = Cms::settings();
 
