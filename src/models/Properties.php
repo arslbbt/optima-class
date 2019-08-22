@@ -1123,7 +1123,7 @@ class Properties extends Model
             $parking = [];
             $garden = [];
             $pool = [];
-            $pool_size = "";
+            $pool_size = [];
             $condition = [];
             $rooms = [];
             $living_rooms = [];
