@@ -419,8 +419,6 @@ class Properties extends Model
                         }
                         $data['attachments'] = $attachments;
                     }
-                    print_r($property->attachments);
-die;
                     $categories = [];
                     $features = [];
                     $climate_control = [];
@@ -952,8 +950,7 @@ die;
             if (isset($property->property->value_of_custom->basic_info)) {
                 $return_data['basic_info'] = ArrayHelper::toArray($property->property->value_of_custom->basic_info);
             }
-            echo "<pre>";
-                    print_r($property->attachments);
+
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 foreach ($property->attachments as $pic) {
                     $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
@@ -965,8 +962,6 @@ die;
                 $return_data['attachment_desc'] = $attachment_descriptions;
                 $return_data['attachment_alt_desc'] = $attachment_alt_descriptions;
             }
-print_r($return_data['attachments']);
-die;
             if (isset($property->documents) && count($property->documents) > 0) {
                 foreach ($property->documents as $pic) {
                     if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
