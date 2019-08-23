@@ -775,10 +775,28 @@ class Properties extends Model
                     if (isset(Yii::$app->params['rental_logic']) && Yii::$app->params['rental_logic']) {
                         $gdprice = [];
                         $st_price = 0;
+                        $gwprice = [];
+                        $stw_price = 0;
                         foreach ($property->property->rental_seasons as $seasons) {
-                            if (isset($seasons->gross_day_price))
-                                $gdprice[] = $seasons->gross_day_price;
+                             /* For price per week */
+                             if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                                if (isset($seasons->gross_price)) {
+                                    $gwprice[] = $seasons->gross_price;
+                                }
+                            }
+                            if (isset(Yii::$app->params['rental_logic_day']) && Yii::$app->params['rental_logic_day']) {
+                                if (isset($seasons->gross_day_price)) {
+                                    $gdprice[] = $seasons->gross_day_price;
+                                }
+                            }
+                            else {
+                                if (isset($seasons->gross_day_price)) {
+                                    $gdprice[] = $seasons->gross_day_price;
+                                }
+                            }
                         }
+                        if (count($gwprice) > 0)
+                            $stw_price = min($gwprice);
                         if (count($gdprice) > 0)
                             $st_price = min($gdprice);
                         $b_price = 0;
@@ -805,8 +823,11 @@ class Properties extends Model
                             }
                         }
                         $return_data['price'] = number_format($st_price + $b_price, 2);
+                        $return_data['price_week'] = number_format($stw_price + $b_price, 2);
                     } else {
                         $return_data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+
+                        $return_data['price_week'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                     }
                     $return_data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
                     $return_data['season_data'] = ArrayHelper::toArray($property->property->rental_seasons);
@@ -1123,7 +1144,7 @@ class Properties extends Model
             $parking = [];
             $garden = [];
             $pool = [];
-            $pool_size = "";
+            $pool_size = [];
             $condition = [];
             $rooms = [];
             $living_rooms = [];
