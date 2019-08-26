@@ -30,6 +30,8 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
 
 
+
+
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -278,6 +280,7 @@ class Properties extends Model
                             $data['price'] = ($property->property->currentprice != 0) ? number_format((int) $property->property->currentprice, 0, '', '.') : '';
                         }
                     }
+                    
 
 
                     if ($rent) {
@@ -343,7 +346,21 @@ class Properties extends Model
                             $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') : '';
                             $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
                             $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+                            if (isset($property->property->st_rental) && isset($property->property->rental_seasons)){
+                            foreach ($property->property->rental_seasons as $seasons) {
+                                /* For price per week */
+                                if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                                    if (isset($seasons->gross_price)) {
+                                        $gdprice[] = $seasons->gross_price;
+                                    }
+                                }
+                            }
+                            if (count($gdprice) > 0) {
+                                $st_price = min($gdprice);
+                            }
+                            $data['gprice_week'] = $st_price;
                         }
+                    }
                     }
                     if (isset($property->property->dimensions) && $property->property->dimensions != '') {
                         $data['dimensions'] = $property->property->dimensions;
