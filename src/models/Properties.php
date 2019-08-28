@@ -346,19 +346,22 @@ class Properties extends Model
                             $data['price_per_day'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') : '';
                             $data['period'] = (isset($st_price[0]['period']) ? $st_price[0]['period'] : '');
                             $data['stprice'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' € ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
+
+                            $wgprice = [];
+                            $wst_price = 0;
                             if (isset($property->property->st_rental) && isset($property->property->rental_seasons)){
                             foreach ($property->property->rental_seasons as $seasons) {
                                 /* For price per week */
                                 if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
                                     if (isset($seasons->gross_price)) {
-                                        $gdprice[] = $seasons->gross_price;
+                                        $wgprice[] = $seasons->gross_price;
                                     }
                                 }
                             }
-                            if (count($gdprice) > 0) {
-                                $st_price = min($gdprice);
+                            if (count($wgprice) > 0) {
+                                $wst_price = min($wgprice);
                             }
-                            $data['gprice_week'] = $st_price;
+                            $data['gprice_week'] = $wst_price;
                         }
                     }
                     }
@@ -839,11 +842,19 @@ class Properties extends Model
                                     $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                             }
                         }
-                        $return_data['price'] = number_format($st_price + $b_price, 2);
-                        $return_data['price_week'] = number_format($stw_price + $b_price, 2);
+                        if($st_price  == '0'){
+                            $return_data['price'] = number_format($st_price);
+                        }
+                        else{
+                            $return_data['price'] = number_format($st_price + $b_price, 2);
+                        }
+                        if($stw_price == '0'){
+                            $return_data['price_week'] = number_format($stw_price);
+                        }else{
+                            $return_data['price_week'] = number_format($stw_price + $b_price, 2);
+                        }
                     } else {
                         $return_data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
-
                         $return_data['price_week'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                     }
                     $return_data['seasons'] = isset($st_price[0]['seasons']) ? $st_price[0]['seasons'] : '';
