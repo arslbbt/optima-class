@@ -616,9 +616,7 @@ class Properties extends Model
         if (isset($with_count) && $with_count == true) {
             $url = $url . '&view_count=true';
         }
-        $JsonData =
-            //file_get_contents($url);
-            Functions::getCRMData($url);
+        $JsonData = Functions::getCRMData($url,false);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
             $settings = Cms::settings();
