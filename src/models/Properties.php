@@ -2031,14 +2031,14 @@ class Properties extends Model
         $arrival = ($date_from / 1000);
         $departure = ($date_to / 1000);
         $number_sleeps = $nosleeps;
-        $now = $arrival;
-        $your_date = $departure;
-        $datediff = $your_date - $now;
+        $start_date = new \DateTime();
+        $start_date->setTimestamp($arrival);
 
+        $end_date = new \DateTime();
+        $end_date->setTimestamp($departure);
+
+        $number_of_days=$start_date->diff($end_date)->format('%a');
         $end_season_to = [];
-        $number_of_days = round(($datediff + 86400) / (60 * 60 * 24));
-        $number_of_days = $number_of_days - 1;
-
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             $season_data_from = $property['season_data'][0]['period_to'];
