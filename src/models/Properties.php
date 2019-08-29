@@ -2014,8 +2014,7 @@ class Properties extends Model
 
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
-        // this is causing issues BOOKING PRICE (IMP-5873)
-        // \Yii::$app->setTimeZone('Europe/Madrid');
+        \Yii::$app->setTimeZone('Europe/Madrid');
         $agency = Properties::getAgency();
         $rental_prices = [];
         $total_price = 0;
