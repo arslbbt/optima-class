@@ -2014,7 +2014,7 @@ class Properties extends Model
 
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
-        \Yii::$app->setTimeZone('Europe/Madrid');
+        \Yii::$app->setTimeZone('UTC');
         $agency = Properties::getAgency();
         $rental_prices = [];
         $total_price = 0;
