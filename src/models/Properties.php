@@ -1334,6 +1334,13 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->leisures) && count($property->property->value_of_custom->leisures) > 0) {
+                foreach ($property->property->value_of_custom->leisures as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $features[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_climate_control)) {
                 foreach ($property->property->feet_climate_control as $key => $value) {
                     if ($value == true) {
@@ -1376,10 +1383,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->utilities) && count($property->property->value_of_custom->utilities) > 0) {
+                foreach ($property->property->value_of_custom->utilities as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $utilities[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_security)) {
                 foreach ($property->property->feet_security as $key => $value) {
                     if ($value == true) {
                         $security[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->security) && count($property->property->value_of_custom->security) > 0) {
+                foreach ($property->property->value_of_custom->security as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $security[] = $value->key;
                     }
                 }
             }
@@ -1397,6 +1418,13 @@ class Properties extends Model
                             $return_data['parking_quantity'] = $value;
                         }
                         $parking[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->parking) && count($property->property->value_of_custom->parking) > 0) {
+                foreach ($property->property->value_of_custom->parking as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $parking[] = $value->key;
                     }
                 }
             }
