@@ -592,6 +592,8 @@ class Properties extends Model
         } else {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
         }
+
+
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
         }
@@ -735,6 +737,11 @@ class Properties extends Model
             if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
                 $return_data['living_rooms'] = $property->property->living_rooms;
             }
+
+            if (isset($property->property->usefull_area) && $property->property->usefull_area > 0) {
+                $return_data['usefull_area'] = $property->property->usefull_area;
+            }
+            
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $return_data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
             }
