@@ -406,7 +406,7 @@ class ContactUs extends Model
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? implode(',',$this->lgroups) : [],
-            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ?  $this->message : null),
             'language' => strtoupper(\Yii::$app->language)
         );
         $curl = new \linslin\yii2\curl\Curl();
