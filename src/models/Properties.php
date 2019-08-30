@@ -2052,7 +2052,7 @@ class Properties extends Model
 
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
-        \Yii::$app->setTimeZone('UTC');
+        \Yii::$app->setTimeZone('Europe/Paris');
         $agency = Properties::getAgency();
         $rental_prices = [];
         $total_price = 0;
@@ -2108,20 +2108,27 @@ class Properties extends Model
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
                 $end = new \DateTime(date('Y-m-d', $departure));
-                $end->modify('+1 day');
+                // $end->modify('+1 day');
                 $season_data_to = $season['period_to'];
 
                 $interval = \DateInterval::createFromDateString('1 day');
                 $period = new \DatePeriod($begin, $interval, $end);
 
                 foreach ($period as $dt) {
-                    $tdt = $dt->getTimestamp();
+                    $tdt =$dt->getTimestamp();
+                    $period_from = new \DateTime(date('Y-m-d', $season['period_from']));
+                    $period_from =$period_from->getTimestamp();
+
+                    $period_to = new \DateTime(date('Y-m-d', $season['period_to']));
+                    $period_to =$period_to->getTimestamp();
+
                     if ($tdt > max($end_season_to)) {
                         $return_data['undefined_period'] = 1;
                         $return_data['undefined_days'] = $undefined_days++;
                         $return_data['number_of_days'] = $number_of_days;
                     } else {
-                        if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
+                        if ($period_from <= $tdt && $period_to >= $tdt) {
+                            // print_r($season);
                             if ($s_gross_perday_price !== '') {
                                 $rental_bill = $rental_bill + $s_gross_perday_price;
                             } else {
@@ -2136,6 +2143,7 @@ class Properties extends Model
                 }
             }
         }
+
         if (isset($property['booking_extras']) && count($property['booking_extras']) > 0) {
             foreach ($property['booking_extras'] as $booking_extra) {
                 if (isset($booking_extra['type']) && $booking_extra['type'] == 'per_stay') {
@@ -2151,6 +2159,7 @@ class Properties extends Model
                 }
             }
         }
+
         if (isset($property['booking_cleaning']) && count($property['booking_cleaning']) > 0) {
             foreach ($property['booking_cleaning'] as $booking_cleaning) {
                 if (isset($booking_cleaning['type']) && $booking_cleaning['type'] == 'per_stay') {
