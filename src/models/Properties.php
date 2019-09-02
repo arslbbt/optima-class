@@ -2145,7 +2145,7 @@ class Properties extends Model
         }
 
 
-        return str_replace('.', ',', $price_done);
+        return $price_done;
 
     }
 
