@@ -781,7 +781,7 @@ class Properties extends Model
             if (isset($property->property->usefull_area) && $property->property->usefull_area > 0) {
                 $return_data['usefull_area'] = $property->property->usefull_area;
             }
-            
+
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $return_data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
             }
@@ -2240,26 +2240,27 @@ class Properties extends Model
             }
         }
 
+        $price =  str_replace(".", "", $price);
 
         $rc = preg_match_all('/\b\d+\b/', $price, $matches);
         $result = preg_replace('/\b\d+\b/', '', $price);
-        $result2 = preg_replace('/[^A-Za-z0-9\-]/', '', $result);
+        $result1 = preg_replace('/[^A-Za-z0-9\-]/', '', $result);
 
 
         if (isset($_SESSION["pricerate"])) {
             foreach ($matches as $val) {
                 if ($_SESSION["pricerate"] == $tl) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '₺' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '₺' . ' ' . $result1;
                 } elseif ($_SESSION["pricerate"] == $dollar) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '$' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '$' . ' ' . $result1;
                 } elseif ($_SESSION["pricerate"] == $gbp) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '£' . ' ' . $result2;
-                } elseif ($_SESSION["pricerate"] == $euro) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '€' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '£' . ' ' . $result1;
+                } elseif ($_SESSION["pricerate"] == $euro)
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '€' . ' ' . $result1;
                 }
-            }
-        } else {
-            $price_done = number_format($result2);
+
+            } else {
+            $price_done = number_format($result1);
         }
 
 
