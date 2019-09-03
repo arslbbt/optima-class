@@ -1385,6 +1385,14 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->custom_categories) && !empty($property->property->custom_categories)) {
+                $cats = self::Categories();
+                foreach ($property->property->custom_categories as $catdata) {
+                    if (isset($cats[$catdata])) {
+                        $custom_categories[] = $cats[$catdata];
+                    }
+                }
+            }
             if (isset($property->property->feet_features)) {
                 foreach ($property->property->feet_features as $key => $value) {
                     if ($value == true) {
@@ -1399,6 +1407,13 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features) > 0) {
+                foreach ($property->property->value_of_custom->features as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $features[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_climate_control)) {
                 foreach ($property->property->feet_climate_control as $key => $value) {
                     if ($value == true) {
@@ -1406,10 +1421,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control) > 0) {
+                foreach ($property->property->value_of_custom->climate_control as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $climate_control[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_kitchen)) {
                 foreach ($property->property->feet_kitchen as $key => $value) {
                     if ($value == true && $key != 'quantity') {
                         $kitchen[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->kitchen) && count($property->property->value_of_custom->kitchen) > 0) {
+                foreach ($property->property->value_of_custom->kitchen as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $kitchen[] = $value->key;
                     }
                 }
             }
@@ -1431,6 +1460,13 @@ class Properties extends Model
                 foreach ($property->property->feet_views as $key => $value) {
                     if ($value == true) {
                         $views[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_view) && count($property->property->value_of_custom->feet_custom_view) > 0) {
+                foreach ($property->property->value_of_custom->feet_custom_view as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $views[] = $value->key;
                     }
                 }
             }
@@ -1469,6 +1505,13 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->furniture) && count($property->property->value_of_custom->furniture) > 0) {
+                foreach ($property->property->value_of_custom->furniture as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $furniture[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_parking)) {
                 foreach ($property->property->feet_parking as $key => $value) {
                     if ($value == true) {
@@ -1493,6 +1536,13 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->garden) && count($property->property->value_of_custom->garden) > 0) {
+                foreach ($property->property->value_of_custom->garden as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $garden[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_pool)) {
                 foreach ($property->property->feet_pool as $key => $value) {
                     if ($value == true) {
@@ -1503,10 +1553,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool) > 0) {
+                foreach ($property->property->value_of_custom->pool as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $pool[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_condition)) {
                 foreach ($property->property->feet_condition as $key => $value) {
                     if ($value == true) {
                         $condition[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_condition) && count($property->property->value_of_custom->feet_custom_condition) > 0) {
+                foreach ($property->property->value_of_custom->feet_custom_condition as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $condition[] = $value->key;
                     }
                 }
             }
@@ -1584,23 +1648,23 @@ class Properties extends Model
                 }
             }
             $return_data['property_features'] = [];
-            $return_data['property_features']['features'] = $features;
+            $return_data['property_features']['condition'] = $condition;
             $return_data['property_features']['categories'] = $categories;
             $return_data['property_features']['custom_categories'] = $custom_categories;
-            $return_data['property_features']['climate_control'] = $climate_control;
-            $return_data['property_features']['kitchen'] = $kitchen;
             $return_data['property_features']['setting'] = $setting;
             $return_data['property_features']['orientation'] = $orientation;
             $return_data['property_features']['views'] = $views;
+            $return_data['property_features']['distances'] = $distances;
+            $return_data['property_features']['kitchen'] = $kitchen;
             $return_data['property_features']['utilities'] = $utilities;
             $return_data['property_features']['security'] = $security;
+            $return_data['property_features']['furniture'] = $furniture;
+            $return_data['property_features']['climate_control'] = $climate_control;
             $return_data['property_features']['parking'] = $parking;
             $return_data['property_features']['garden'] = $garden;
             $return_data['property_features']['pool'] = $pool;
             $return_data['property_features']['pool_size'] = $pool_size;
-            $return_data['property_features']['furniture'] = $furniture;
-            $return_data['property_features']['condition'] = $condition;
-            $return_data['property_features']['distances'] = $distances;
+            $return_data['property_features']['features'] = $features;
             $return_data['construction_data'] = $construction;
             return $return_data;
         } else {
