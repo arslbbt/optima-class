@@ -848,28 +848,57 @@ class Properties extends Model
                             $stw_price = min($gwprice);
                         if (count($gdprice) > 0)
                             $st_price = min($gdprice);
+                        
                         $b_price = 0;
-                        if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
-                            foreach ($property->bookings_extras as $booking_extra) {
-                                $divider = 1;
-                                if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
-                                    $divider = 7;
-                                if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
-                                    $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                        /* For price per week */
+                        if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                            if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
+                            }
+                            if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                        $multiplyer = 24;
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                                 }
                             }
                         }
-                        if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
-                            foreach ($property->bookings_cleaning as $bookings_cleaning) {
-                                $divider = 1;
-                                $multiplyer = 1;
-                                if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
-                                    $divider = 7;
-                                if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
-                                    $multiplyer = 24;
-                                if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
-                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                        else{
+                            /* For price per day */
+                            if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
+                                        $divider = 7;
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
                             }
+                            if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
+                                        $divider = 7;
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                        $multiplyer = 24;
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                                }
+                            } 
                         }
                         if($st_price  == '0'){
                             $return_data['price'] = number_format($st_price);
