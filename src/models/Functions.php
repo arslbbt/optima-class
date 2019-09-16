@@ -45,6 +45,13 @@ class Functions extends Model
             $model->message = "Friend's Name = ".$_GET['friend_name']."\r\n Friend's Ser Name = ".$_GET['friend_ser_name']."\r\n Friend's Email = ".$_GET['friend_email']."\r\n".$message;
 
         }
+        elseif (isset($_GET['file_link']))
+        {
+            $message = '';
+            $message .= 'Message: ' . $model->message;
+
+            $model->message = "<a href=".$_GET['file_link'].">Download Floor Plan File</a><br>".$message;
+        }
 
         if (!$model->sendMail()) {
             /*if ($model->last_name == 'Request')
