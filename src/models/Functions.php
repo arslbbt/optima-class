@@ -46,14 +46,6 @@ class Functions extends Model
 
         }
 
-        if (isset($_GET['ContactUs']['file_link']))
-        {
-            $message = '';
-            $message .= 'Message: ' . $model->message;
-
-            $model->message = "<a href=".$_GET['ContactUs']['file_link'].">Download Floor Plan File</a><br>".$message;
-        }
-
         if (!$model->sendMail()) {
             /*if ($model->last_name == 'Request')
             {
