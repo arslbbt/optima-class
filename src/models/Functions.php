@@ -9,7 +9,7 @@ use yii\helpers\Url;
 class Functions extends Model
 {
 
-    public static function recaptcha($name= 'reCaptcha')
+    public static function recaptcha($name= 'reCaptcha', $id = '')
     {
         $recaptcha_site_key = isset(Yii::$app->params['recaptcha_site_key'])?Yii::$app->params['recaptcha_site_key']:"6Le9fqsUAAAAAN2KL4FQEogpmHZ_GpdJ9TGmYMrT";
         //View::registerJs(' ');
@@ -28,7 +28,7 @@ class Functions extends Model
         $ret .= \himiklab\yii2\recaptcha\ReCaptcha2::widget([
             'name' => 'reCaptcha',
             'siteKey' => $recaptcha_site_key, // unnecessary is reCaptcha component was set up
-            'widgetOptions' => ['class' => 'col-sm-offset-3'],
+            'widgetOptions' => ['class' => 'col-sm-offset-3', 'id' => $id],
         ]);
         return $ret;
     }
@@ -186,4 +186,3 @@ class Functions extends Model
         return $body;
     }
 }
- 
