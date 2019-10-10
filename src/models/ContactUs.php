@@ -293,10 +293,11 @@ class ContactUs extends Model
                     $html .= '<br>';
                     $html .= 'Message: ' . $this->message;
                 }
-                if (isset($this->price) && $this->price != '')
+
+                if (isset($this->html_content) && $this->html_content !='')
                 {
                     $html .= '<br>';
-                    $html .= 'Price: ' . $this->price;
+                    $html .= 'Price: ' . $this->html_content;
                 }
                 $call_rememeber = '';
                 if (isset($this->call_remember) && $this->call_remember == 0)
