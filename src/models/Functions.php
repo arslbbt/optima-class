@@ -9,7 +9,7 @@ use yii\helpers\Url;
 class Functions extends Model
 {
 
-    public static function recaptcha($name= 'reCaptcha')
+    public static function recaptcha($name= 'reCaptcha', $id = '')
     {
         $recaptcha_site_key = isset(Yii::$app->params['recaptcha_site_key'])?Yii::$app->params['recaptcha_site_key']:"6Le9fqsUAAAAAN2KL4FQEogpmHZ_GpdJ9TGmYMrT";
         //View::registerJs(' ');
@@ -28,7 +28,7 @@ class Functions extends Model
         $ret .= \himiklab\yii2\recaptcha\ReCaptcha2::widget([
             'name' => 'reCaptcha',
             'siteKey' => $recaptcha_site_key, // unnecessary is reCaptcha component was set up
-            'widgetOptions' => ['class' => 'col-sm-offset-3'],
+            'widgetOptions' => ['class' => 'col-sm-offset-3', 'id' => $id],
         ]);
         return $ret;
     }
@@ -36,9 +36,22 @@ class Functions extends Model
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
         $model->verifyCode=true;
-        $model->reCaptcha=Yii::$app->request->get('reCaptcha'); 
-        
+        $model->reCaptcha=Yii::$app->request->get('reCaptcha');
+        if (isset($_GET['friend_name']) && isset($_GET['friend_ser_name']) && isset($_GET['friend_email']))
+        {
+            $message = '';
+            $message .= 'Message: ' . $model->message;
+
+            $model->message = "Friend's Name = ".$_GET['friend_name']."\r\n Friend's Ser Name = ".$_GET['friend_ser_name']."\r\n Friend's Email = ".$_GET['friend_email']."\r\n".$message;
+
+        }
+
         if (!$model->sendMail()) {
+            /*if ($model->last_name == 'Request')
+            {
+                $model->reCaptcha = false;
+                Yii::$app->session->setFlash('success', "Thank you for your message!");
+            }*/
             $errors = 'Message not sent!';
             if(isset($model->errors) and count($model->errors) > 0){
                 $errs = array();
@@ -186,4 +199,3 @@ class Functions extends Model
         return $body;
     }
 }
- 

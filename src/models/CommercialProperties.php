@@ -194,7 +194,7 @@ class CommercialProperties extends Model
 
     public static function formateProperty($property)
     {
-        Yii::$app->language = 'en';
+        //Yii::$app->language = 'en';
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
         $f_property = [];

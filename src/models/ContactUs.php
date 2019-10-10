@@ -177,6 +177,7 @@ class ContactUs extends Model
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf'))
                 {
+
                     Yii::$app->mailer->compose()
                     ->setFrom($from_email)
                     ->setTo($this->email)
@@ -320,8 +321,9 @@ class ContactUs extends Model
                 ->send();
                 $this->saveAccount();
             }
-            else
+            elseif(isset($_GET['ContactUs']['file_link']))
             {
+                $file = $_GET['ContactUs']['file_link'];
                 $subscribe_subject = '';
                $lngn= 0;//isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
             
@@ -351,10 +353,48 @@ class ContactUs extends Model
                 ->setFrom($from_email)
                 ->setTo($this->email)
                 ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
-                ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
+                ->setHtmlBody(isset($htmlBody) && isset($_GET['ContactUs']['file_link']) ? "<a href=".$_GET['ContactUs']['file_link'].">Download File</a><br>".  $htmlBody : 'Thank you for contacting us')
                 ->send();
                 $this->saveAccount();
                 
+                if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
+                    $this->saveSenderAccount();
+            }
+            else
+            {
+                $subscribe_subject = '';
+               $lngn= 0;//isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
+
+                foreach ($settings['custom_settings'] as $setting)
+                {
+                    if (isset($setting['key']) && $setting['key'] == 'enquiry_subject')
+                    {
+                        $subscribe_subject = \Yii::t('app', $setting['value']);
+                    }
+                }
+
+                if (isset($settings['email_response'][strtoupper(\Yii::$app->language)]))
+                {
+                    $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
+                    if ($this->reference != '')
+                    {
+                        $htmlBody = '<br>'. \Yii::t('app', strtolower('Enquiry about property')).' ('. \Yii::t('app', strtolower('Ref')) .' : ' . $this->reference . ')<br><br>' . $htmlBody;
+                    }
+                }
+                Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
+                    ->setFrom(isset($this->email)? $this->email : '')
+                    ->setTo(isset($ae_array) ? $ae_array : '')
+                    ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
+                    ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
+                    ->send();
+                Yii::$app->mailer->compose()
+                ->setFrom($from_email)
+                ->setTo($this->email)
+                ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
+                ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
+                ->send();
+                $this->saveAccount();
+
                 if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
             }
@@ -411,7 +451,7 @@ class ContactUs extends Model
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? implode(',',$this->lgroups) : [],
-            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ?  $this->message : null),
             'language' => strtoupper(\Yii::$app->language)
         );
         $curl = new \linslin\yii2\curl\Curl();

@@ -31,7 +31,6 @@ class Properties extends Model
 
 
 
-
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -361,7 +360,30 @@ class Properties extends Model
                             if (count($wgprice) > 0) {
                                 $wst_price = min($wgprice);
                             }
-                            $data['gprice_week'] = $wst_price;
+                            $b_price = 0;
+                            if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
+                            }
+                            if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                        $multiplyer = 24;
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                                }
+                            }
+                            $data['gprice_week'] = number_format($wst_price + $b_price, 2);
                         }
                     }
                     }
@@ -610,6 +632,8 @@ class Properties extends Model
         } else {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
         }
+
+
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
         }
@@ -753,6 +777,11 @@ class Properties extends Model
             if (isset($property->property->living_rooms) && $property->property->living_rooms > 0) {
                 $return_data['living_rooms'] = $property->property->living_rooms;
             }
+
+            if (isset($property->property->usefull_area) && $property->property->usefull_area > 0) {
+                $return_data['usefull_area'] = $property->property->usefull_area;
+            }
+
             if (isset($property->property->oldprice->price) && $property->property->oldprice->price > 0) {
                 $return_data['oldprice'] = str_replace(',', '.', (number_format((int) ($property->property->oldprice->price))));
             }
@@ -819,28 +848,57 @@ class Properties extends Model
                             $stw_price = min($gwprice);
                         if (count($gdprice) > 0)
                             $st_price = min($gdprice);
+                        
                         $b_price = 0;
-                        if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
-                            foreach ($property->bookings_extras as $booking_extra) {
-                                $divider = 1;
-                                if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
-                                    $divider = 7;
-                                if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
-                                    $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                        /* For price per week */
+                        if (isset(Yii::$app->params['rental_logic_week']) && Yii::$app->params['rental_logic_week']) {
+                            if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
+                            }
+                            if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
+                                        $divider = 7;
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                        $multiplyer = 24;
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                                 }
                             }
                         }
-                        if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
-                            foreach ($property->bookings_cleaning as $bookings_cleaning) {
-                                $divider = 1;
-                                $multiplyer = 1;
-                                if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
-                                    $divider = 7;
-                                if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
-                                    $multiplyer = 24;
-                                if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
-                                    $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                        else{
+                            /* For price per day */
+                            if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
+                                foreach ($property->bookings_extras as $booking_extra) {
+                                    $divider = 1;
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
+                                        $divider = 7;
+                                    if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                        $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                    }
+                                }
                             }
+                            if (isset($property->bookings_cleaning) && count((array) $property->bookings_cleaning) > 0) {
+                                foreach ($property->bookings_cleaning as $bookings_cleaning) {
+                                    $divider = 1;
+                                    $multiplyer = 1;
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
+                                        $divider = 7;
+                                    if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
+                                        $multiplyer = 24;
+                                    if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client')
+                                        $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
+                                }
+                            } 
                         }
                         if($st_price  == '0'){
                             $return_data['price'] = number_format($st_price);
@@ -1327,10 +1385,32 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->custom_categories) && !empty($property->property->custom_categories)) {
+                $cats = self::Categories();
+                foreach ($property->property->custom_categories as $catdata) {
+                    if (isset($cats[$catdata])) {
+                        $custom_categories[] = $cats[$catdata];
+                    }
+                }
+            }
             if (isset($property->property->feet_features)) {
                 foreach ($property->property->feet_features as $key => $value) {
                     if ($value == true) {
                         $features[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->leisures) && count($property->property->value_of_custom->leisures) > 0) {
+                foreach ($property->property->value_of_custom->leisures as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $features[] = $value->key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features) > 0) {
+                foreach ($property->property->value_of_custom->features as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $features[] = $value->key;
                     }
                 }
             }
@@ -1341,10 +1421,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control) > 0) {
+                foreach ($property->property->value_of_custom->climate_control as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $climate_control[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_kitchen)) {
                 foreach ($property->property->feet_kitchen as $key => $value) {
                     if ($value == true && $key != 'quantity') {
                         $kitchen[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->kitchen) && count($property->property->value_of_custom->kitchen) > 0) {
+                foreach ($property->property->value_of_custom->kitchen as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $kitchen[] = $value->key;
                     }
                 }
             }
@@ -1369,10 +1463,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_view) && count($property->property->value_of_custom->feet_custom_view) > 0) {
+                foreach ($property->property->value_of_custom->feet_custom_view as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $views[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_utilities)) {
                 foreach ($property->property->feet_utilities as $key => $value) {
                     if ($value == true) {
                         $utilities[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->utilities) && count($property->property->value_of_custom->utilities) > 0) {
+                foreach ($property->property->value_of_custom->utilities as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $utilities[] = $value->key;
                     }
                 }
             }
@@ -1383,10 +1491,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->security) && count($property->property->value_of_custom->security) > 0) {
+                foreach ($property->property->value_of_custom->security as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $security[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_furniture)) {
                 foreach ($property->property->feet_furniture as $key => $value) {
                     if ($value == true) {
                         $furniture[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->furniture) && count($property->property->value_of_custom->furniture) > 0) {
+                foreach ($property->property->value_of_custom->furniture as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $furniture[] = $value->key;
                     }
                 }
             }
@@ -1400,10 +1522,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->parking) && count($property->property->value_of_custom->parking) > 0) {
+                foreach ($property->property->value_of_custom->parking as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $parking[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_garden)) {
                 foreach ($property->property->feet_garden as $key => $value) {
                     if ($value == true) {
                         $garden[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->garden) && count($property->property->value_of_custom->garden) > 0) {
+                foreach ($property->property->value_of_custom->garden as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $garden[] = $value->key;
                     }
                 }
             }
@@ -1417,10 +1553,24 @@ class Properties extends Model
                     }
                 }
             }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool) > 0) {
+                foreach ($property->property->value_of_custom->pool as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $pool[] = $value->key;
+                    }
+                }
+            }
             if (isset($property->property->feet_condition)) {
                 foreach ($property->property->feet_condition as $key => $value) {
                     if ($value == true) {
                         $condition[] = $key;
+                    }
+                }
+            }
+            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_condition) && count($property->property->value_of_custom->feet_custom_condition) > 0) {
+                foreach ($property->property->value_of_custom->feet_custom_condition as $value) {
+                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
+                        $condition[] = $value->key;
                     }
                 }
             }
@@ -1498,23 +1648,23 @@ class Properties extends Model
                 }
             }
             $return_data['property_features'] = [];
-            $return_data['property_features']['features'] = $features;
+            $return_data['property_features']['condition'] = $condition;
             $return_data['property_features']['categories'] = $categories;
             $return_data['property_features']['custom_categories'] = $custom_categories;
-            $return_data['property_features']['climate_control'] = $climate_control;
-            $return_data['property_features']['kitchen'] = $kitchen;
             $return_data['property_features']['setting'] = $setting;
             $return_data['property_features']['orientation'] = $orientation;
             $return_data['property_features']['views'] = $views;
+            $return_data['property_features']['distances'] = $distances;
+            $return_data['property_features']['kitchen'] = $kitchen;
             $return_data['property_features']['utilities'] = $utilities;
             $return_data['property_features']['security'] = $security;
+            $return_data['property_features']['furniture'] = $furniture;
+            $return_data['property_features']['climate_control'] = $climate_control;
             $return_data['property_features']['parking'] = $parking;
             $return_data['property_features']['garden'] = $garden;
             $return_data['property_features']['pool'] = $pool;
             $return_data['property_features']['pool_size'] = $pool_size;
-            $return_data['property_features']['furniture'] = $furniture;
-            $return_data['property_features']['condition'] = $condition;
-            $return_data['property_features']['distances'] = $distances;
+            $return_data['property_features']['features'] = $features;
             $return_data['construction_data'] = $construction;
             return $return_data;
         } else {
@@ -2024,7 +2174,7 @@ class Properties extends Model
 
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
-        \Yii::$app->setTimeZone('UTC');
+        \Yii::$app->setTimeZone('Europe/Paris');
         $agency = Properties::getAgency();
         $rental_prices = [];
         $total_price = 0;
@@ -2080,20 +2230,27 @@ class Properties extends Model
                 $begin = new \DateTime(date('Y-m-d', $arrival));
                 // $begin->modify('-1 day');
                 $end = new \DateTime(date('Y-m-d', $departure));
-                $end->modify('+1 day');
+                // $end->modify('+1 day');
                 $season_data_to = $season['period_to'];
 
                 $interval = \DateInterval::createFromDateString('1 day');
                 $period = new \DatePeriod($begin, $interval, $end);
 
                 foreach ($period as $dt) {
-                    $tdt = $dt->getTimestamp();
+                    $tdt =$dt->getTimestamp();
+                    $period_from = new \DateTime(date('Y-m-d', $season['period_from']));
+                    $period_from =$period_from->getTimestamp();
+
+                    $period_to = new \DateTime(date('Y-m-d', $season['period_to']));
+                    $period_to =$period_to->getTimestamp();
+
                     if ($tdt > max($end_season_to)) {
                         $return_data['undefined_period'] = 1;
                         $return_data['undefined_days'] = $undefined_days++;
                         $return_data['number_of_days'] = $number_of_days;
                     } else {
-                        if ($season['period_from'] <= $tdt && $season['period_to'] >= $tdt) {
+                        if ($period_from <= $tdt && $period_to >= $tdt) {
+                            // print_r($season);
                             if ($s_gross_perday_price !== '') {
                                 $rental_bill = $rental_bill + $s_gross_perday_price;
                             } else {
@@ -2108,6 +2265,7 @@ class Properties extends Model
                 }
             }
         }
+
         if (isset($property['booking_extras']) && count($property['booking_extras']) > 0) {
             foreach ($property['booking_extras'] as $booking_extra) {
                 if (isset($booking_extra['type']) && $booking_extra['type'] == 'per_stay') {
@@ -2123,6 +2281,7 @@ class Properties extends Model
                 }
             }
         }
+
         if (isset($property['booking_cleaning']) && count($property['booking_cleaning']) > 0) {
             foreach ($property['booking_cleaning'] as $booking_cleaning) {
                 if (isset($booking_cleaning['type']) && $booking_cleaning['type'] == 'per_stay') {
@@ -2174,26 +2333,27 @@ class Properties extends Model
             }
         }
 
+        $price =  str_replace(".", "", $price);
 
         $rc = preg_match_all('/\b\d+\b/', $price, $matches);
         $result = preg_replace('/\b\d+\b/', '', $price);
-        $result2 = preg_replace('/[^A-Za-z0-9\-]/', '', $result);
+        $result1 = preg_replace('/[^A-Za-z0-9\-]/', '', $result);
 
 
         if (isset($_SESSION["pricerate"])) {
             foreach ($matches as $val) {
                 if ($_SESSION["pricerate"] == $tl) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '₺' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '₺' . ' ' . $result1;
                 } elseif ($_SESSION["pricerate"] == $dollar) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '$' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '$' . ' ' . $result1;
                 } elseif ($_SESSION["pricerate"] == $gbp) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '£' . ' ' . $result2;
-                } elseif ($_SESSION["pricerate"] == $euro) {
-                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '€' . ' ' . $result2;
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '£' . ' ' . $result1;
+                } elseif ($_SESSION["pricerate"] == $euro)
+                    $price_done = number_format((float) $_SESSION["pricerate"] * $val[0]) . ' ' . '€' . ' ' . $result1;
                 }
-            }
-        } else {
-            $price_done = number_format($result2);
+
+            } else {
+            $price_done = number_format($result1);
         }
 
 
