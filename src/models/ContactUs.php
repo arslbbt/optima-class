@@ -293,7 +293,7 @@ class ContactUs extends Model
                     $html .= '<br>';
                     $html .= 'Message: ' . $this->message;
                 }
-                if (isset($this->price) && $this->price != '')
+                if (isset($this->price) && $this->price !='')
                 {
                     $html .= '<br>';
                     $html .= 'Price: ' . $this->price;
