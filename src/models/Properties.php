@@ -48,6 +48,7 @@ class Properties extends Model
         $strent = false;
         $ltrent = false;
         $sale = true;
+        $mixed = false;
         if (isset($get["transaction"]) && $get["transaction"] != "") {
             if ($get["transaction"] == '1') {
                 $rent = true;
@@ -57,7 +58,10 @@ class Properties extends Model
             } elseif ($get["transaction"] == '6') {
                 $rent = true;
                 $ltrent = true;
-            } else {
+            }elseif ($get["transaction"] == '8') { // Mixed for Featued properties
+               $mixed = true;
+               $sale = true;
+            }else {
                 $sale = true;
             }
         }
@@ -278,10 +282,11 @@ class Properties extends Model
                         if (isset($property->property->currentprice)) {
                             $data['price'] = ($property->property->currentprice != 0) ? number_format((int) $property->property->currentprice, 0, '', '.') : '';
                         }
+                    } 
+                    if($mixed){
+                       $data['season_data'] = $property->property->rental_seasons ? ArrayHelper::toArray($property->property->rental_seasons) : "";
                     }
                     
-
-
                     if ($rent) {
                         if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
                             $st_price = [];
