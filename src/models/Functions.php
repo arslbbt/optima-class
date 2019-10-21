@@ -37,6 +37,9 @@ class Functions extends Model
         $model->load(Yii::$app->request->get());
         $model->verifyCode=true;
         $model->reCaptcha=Yii::$app->request->get('reCaptcha');
+        if(isset($_GET[‘owner’])){
+           $model->owner = 1;
+        }
         if (isset($_GET['friend_name']) && isset($_GET['friend_ser_name']) && isset($_GET['friend_email']))
         {
             $message = '';
