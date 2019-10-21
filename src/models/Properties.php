@@ -284,7 +284,10 @@ class Properties extends Model
                         }
                     } 
                     if($mixed){
-                       $data['season_data'] = $property->property->rental_seasons ? ArrayHelper::toArray($property->property->rental_seasons) : "";
+                       if (isset($property->property->rental_seasons))
+                       {
+                           $data['season_data'] = $property->property->rental_seasons ? ArrayHelper::toArray($property->property->rental_seasons) : "";
+                       }
                     }
                     
                     if ($rent) {
