@@ -29,8 +29,6 @@ class Properties extends Model
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
 
-
-
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -138,6 +136,11 @@ class Properties extends Model
                     }
                     if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
                         $data['meta_title'] = $property->property->$seo_title->$contentLang;
+                    }
+
+
+                    if (isset($property->property->property_name)) {
+                        $data['property_name'] = $property->property->property_name;
                     }
 
                     if (isset($property->property->status)) {
