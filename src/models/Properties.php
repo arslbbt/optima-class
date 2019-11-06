@@ -1225,13 +1225,18 @@ class Properties extends Model
                 foreach ($property->property->videos as $video) {
                     $url_vid = '';
                     $desc_vid = '';
+                    $type = '';
                     if (isset($video->status) && $video->status == 1 && isset($video->url->$contentLang) && $video->url->$contentLang != '') {
                         $url_vid = $video->url->$contentLang;
                     }
                     if (isset($video->status) && $video->status == 1 && isset($video->description->$contentLang) && $video->description->$contentLang != '') {
                         $desc_vid = $video->description->$contentLang;
                     }
-                    $videosArrDesc[] = ['url' => $url_vid, 'description' => $desc_vid];
+                    if (isset($video->type)  && isset($video->status) && $video->status == 1) {
+                        $type = $video->type;
+                    }
+
+                    $videosArrDesc[] = ['url' => $url_vid, 'description' => $desc_vid,'type'=> $type];
                 }
                 $return_data['videos_with_description'] = $videosArrDesc;
             }
