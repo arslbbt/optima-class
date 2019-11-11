@@ -1394,13 +1394,6 @@ class Properties extends Model
                     }
                 }
             }
-            if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->features) && count($property->property->value_of_custom->features) > 0) {
-                foreach ($property->property->value_of_custom->features as $value) {
-                    if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
-                        $custom_categories[] = $value->key;
-                    }
-                }
-            }
             if (isset($property->property->custom_categories) && !empty($property->property->custom_categories)) {
                 $cats = self::Categories();
                 foreach ($property->property->custom_categories as $catdata) {
