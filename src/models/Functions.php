@@ -12,18 +12,6 @@ class Functions extends Model
     public static function recaptcha($name= 'reCaptcha', $id = '')
     {
         $recaptcha_site_key = isset(Yii::$app->params['recaptcha_site_key'])?Yii::$app->params['recaptcha_site_key']:"6Le9fqsUAAAAAN2KL4FQEogpmHZ_GpdJ9TGmYMrT";
-        //View::registerJs(' ');
-        // $ret = "<script>
-        // var form=document.getElementById('recaptcha_validate');
-        // form.addEventListener(\"submit\",function(event){
-        //     if(grecaptcha.getResponse()===''){
-        //         event.preventDefault();
-        //         alert('Please check the recaptcha');
-        //         //document.getElementById('g-recaptcha-error').innerHTML = '<span style=\"color:red;\">This field is required.</span>';
-        //         return false;
-        //     }
-        // },false);
-        // </script>";
         $ret = "";
         $ret .= \himiklab\yii2\recaptcha\ReCaptcha2::widget([
             'name' => 'reCaptcha',
