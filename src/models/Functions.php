@@ -20,6 +20,7 @@ class Functions extends Model
         ]);
         return $ret;
     }
+    
     public static function siteSendEmail($it){
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
