@@ -805,6 +805,9 @@ class Properties extends Model
             if (isset($property->property->currentprice) && isset($property->property->sale) && $property->property->sale == true) {
                 $return_data['currentprice'] = $property->property->currentprice;
             }
+            if (isset($property->property->featured) && !empty($property->property->featured)) {
+                $return_data['featured'] = $property->property->featured;
+            }
             if (isset($property->property->own) && $property->property->own == true) {
                 $return_data['own'] = true;
             }
