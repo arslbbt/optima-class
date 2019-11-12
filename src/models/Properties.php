@@ -424,7 +424,7 @@ class Properties extends Model
                         $data['created_at'] = $property->property->created_at;
                     }
                     if (isset($property->property->featured) && !empty($property->property->featured)) {
-                        $return_data['featured'] = $property->property->featured;
+                        $data['featured'] = $property->property->featured;
                     }
                     if (isset($property->property->updated_at) && $property->property->updated_at != '') {
                         $data['updated_at'] = $property->property->updated_at;
