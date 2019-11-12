@@ -423,6 +423,9 @@ class Properties extends Model
                     if (isset($property->property->created_at) && !empty($property->property->created_at)) {
                         $data['created_at'] = $property->property->created_at;
                     }
+                    if (isset($property->property->featured) && !empty($property->property->featured)) {
+                        $data['featured'] = $property->property->featured;
+                    }
                     if (isset($property->property->updated_at) && $property->property->updated_at != '') {
                         $data['updated_at'] = $property->property->updated_at;
                     }
