@@ -45,10 +45,12 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function custom_settings(){
+    public static function custom_settings($custom_settings=""){
 
-        $settings = self::settings();
-        $custom_settings = $settings['custom_settings'];
+        if(!$custom_settings){
+          $settings = self::settings();
+          $custom_settings = $settings['custom_settings'];
+        }
         $func = function ($k, $v) {
             return [$v['key'],  $v['value']];
         };

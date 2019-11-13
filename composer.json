@@ -1,28 +1,28 @@
 {
-    "name": "arsl/optima-class",
-    "description": "class for optima crm",
-    "require-dev": {
-        "yiisoft/yii2":  ">=2.0.13.1",
-        "linslin/yii2-curl": "*"
-    },
-    "version": "3.0.5",
-    "minimum-stability": "dev",
-    "authors": [
-        {
-            "name": "arsl",
-            "email": "arsl@optimageeks.com"
-        }
-    ],
-        "autoload": {
-        "psr-4": {
-            "optima\\": "src/"
-        }
-    },
-    "license": [
-       "LGPL-2.1-only",
-       "GPL-3.0-or-later"
-    ],
-    "require": {
-         "yiisoft/yii2": ">=2.0.13.1"
+  "name": "arsl/optima-class",
+  "description": "class for optima crm",
+  "require-dev": {
+    "yiisoft/yii2": ">=2.0.13.1",
+    "linslin/yii2-curl": "*"
+  },
+  "version": "3.0.5",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "arsl",
+      "email": "arsl@optimageeks.com"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "optima\\": "src/"
+    }
+  },
+  "license": [
+    "LGPL-2.1-only",
+    "GPL-3.0-or-later"
+  ],
+  "require": {
+    "yiisoft/yii2": ">=2.0.13.1"
+  }
 }
