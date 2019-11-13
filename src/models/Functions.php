@@ -20,6 +20,7 @@ class Functions extends Model
         ]);
         return $ret;
     }
+    
     public static function siteSendEmail($it){
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
@@ -31,10 +32,28 @@ class Functions extends Model
         if (isset($_GET['friend_name']) && isset($_GET['friend_ser_name']) && isset($_GET['friend_email']))
         {
             $message = '';
+
             $message .= 'Message: ' . $model->message;
 
             $model->message = "Friend's Name = ".$_GET['friend_name']."\r\n Friend's Ser Name = ".$_GET['friend_ser_name']."\r\n Friend's Email = ".$_GET['friend_email']."\r\n".$message;
 
+        }
+
+        if (isset($_GET['morning_call']) || isset($_GET['afternoon_call']))
+        {
+            if (isset($_GET['morning_call']))
+            {
+                $scedual_msg = 'Call me back in the morning';
+            }
+            if (isset($_GET['afternoon_call']))
+            {
+                $scedual_msg = 'Call me back in the afternoon';
+            }
+            $message = '';
+
+            $message .= 'Message: ' . $model->message;
+
+            $model->message = "Call scedual = ".$scedual_msg."\r\n".$message;
         }
 
         if (!$model->sendMail()) {
