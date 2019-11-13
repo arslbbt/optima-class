@@ -1,7 +1,9 @@
+# Change log 
+New Function `Cms::custom_settings` added to get custom settings
+
 # optima-class v 3.0.4
 
 composer require "arsl/optima-class":"dev-master"
-
 
 Properties class
 use optima\models\Properties;

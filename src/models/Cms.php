@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
+use optima\models\Functions;
 
 /**
  * LoginForm is the model behind the login form.
@@ -42,6 +43,18 @@ class Cms extends Model
             //Functions::getCRMData($file);
         }
         return json_decode($file_data, TRUE);
+    }
+
+    public static function custom_settings(){
+
+        $settings = self::settings();
+        $custom_settings = $settings['custom_settings'];
+        $func = function ($k, $v) {
+            return [$v['key'],  $v['value']];
+        };
+
+        return Functions::array_map_assoc($func,$custom_settings);
+
     }
 
     public static function getTranslations()
