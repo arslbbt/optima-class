@@ -189,4 +189,9 @@ class Functions extends Model
         // die;
         return $body;
     }
+
+    public static function array_map_assoc(callable $f, array $a) {
+        return array_column(array_map($f, array_keys($a), $a), 1, 0);
+    }
+
 }

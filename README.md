@@ -11,3 +11,7 @@ use optima\models\Dropdowns;
 
 # Updating Package on packagist instrctions 
 You must update version no. in current repo otherwise changes will not be reflected in packagist.org , it means on composer update changes would not be detected.
+
+
+# Change log 
+New Function `Cms::custom_settings` added to get custom settings
