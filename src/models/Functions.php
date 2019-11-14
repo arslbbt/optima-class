@@ -83,7 +83,7 @@ class Functions extends Model
         $cmsModel = Slugs('page', $params);
         $url = explode('/', Yii::$app->request->url);
         $this_page = end($url);
-
+        $page_data = $it->view->params['page_data'] = Cms::pageBySlug(Yii::$app->request->get('title'));
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
             $cms_page_exists = true;
