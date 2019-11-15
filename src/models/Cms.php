@@ -45,11 +45,17 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
+    // If General settings no need to pass params
+    // If Page settings pass page_data['custom_settings'] as param without language
+
     public static function custom_settings($custom_settings=""){
 
         if(!$custom_settings){
-          $settings = self::settings();
-          $custom_settings = $settings['custom_settings'];
+            $settings = self::settings();
+            $custom_settings = $settings['custom_settings'];
+        }else{
+            $lang = strtoupper(\Yii::$app->language);
+            $custom_settings = $custom_settings[$lang];
         }
         $func = function ($k, $v) {
             return [$v['key'],  $v['value']];
@@ -58,6 +64,7 @@ class Cms extends Model
         return Functions::array_map_assoc($func,$custom_settings);
 
     }
+
 
     public static function getTranslations()
     {
