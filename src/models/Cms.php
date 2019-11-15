@@ -2,6 +2,7 @@
 
 namespace optima\models;
 
+use optima\models\Functions;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -55,7 +56,14 @@ class Cms extends Model
             $custom_settings = $settings['custom_settings'];
         }else{
             $lang = strtoupper(\Yii::$app->language);
-            $custom_settings = $custom_settings[$lang];
+
+            if (isset($custom_settings[$lang])){
+                $custom_settings = $custom_settings[$lang];
+
+            }else{
+                return false;
+            }
+
         }
         $func = function ($k, $v) {
             return [$v['key'],  $v['value']];
@@ -64,6 +72,7 @@ class Cms extends Model
         return Functions::array_map_assoc($func,$custom_settings);
 
     }
+
 
 
     public static function getTranslations()
