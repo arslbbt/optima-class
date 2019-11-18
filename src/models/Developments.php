@@ -69,7 +69,11 @@ class Developments extends Model
 
             if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0)
             {
-                $data['bedrooms'] = $property->property->bedrooms_from;
+                $data['bedrooms_from'] = $property->property->bedrooms_from;
+            }
+            if (isset($property->property->bedrooms_to) && $property->property->bedrooms_to > 0)
+            {
+                $data['bedrooms_to'] = $property->property->bedrooms_to;
             }
             if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
             {
@@ -77,7 +81,11 @@ class Developments extends Model
             }
             if (isset($property->property->built_size_from) && $property->property->built_size_from > 0)
             {
-                $data['built'] = $property->property->built_size_from;
+                $data['built_from'] = $property->property->built_size_from;
+            }
+            if (isset($property->property->built_size_to) && $property->property->built_size_to > 0)
+            {
+                $data['built_to'] = $property->property->built_size_to;
             }
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
