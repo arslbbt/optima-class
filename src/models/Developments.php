@@ -339,6 +339,11 @@ class Developments extends Model
                 $data['location'] = $value->property->location;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
+
+            if (isset($value->property->new_construction) && $value->property->new_construction==true)
+                $data['new_construction'] = $value->property->new_construction;
+
+
             if (isset($value->documents))
             {
                 $fplans = [];
