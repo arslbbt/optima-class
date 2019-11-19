@@ -198,6 +198,10 @@ class Developments extends Model
         {
             $return_data['built_size_to'] = $property->property->built_size_to;
         }
+        if (isset($property->property->videos) && $property->property->videos > 0)
+        {
+            $return_data['videos'] = $property->property->videos;
+        }
         if (isset($property->attachments) && count($property->attachments) > 0)
         {
             foreach ($property->attachments as $pic)
