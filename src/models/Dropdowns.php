@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use linslin\yii2\curl;
+use optima\assets\OptimaAsset;
 
 /**
  * LoginForm is the model behind the login form.
@@ -457,6 +458,10 @@ class Dropdowns extends Model
 
     public static function html_select($data, $options=[]) {
       $path =  dirname(dirname(__FILE__));
+      $view = Yii::$app->controller->view;
+
+      optimaAsset::register($view);
+
       $select_html = '';
       require($path.'/views/partials/selectDropdown.php');
       return $select_html;
