@@ -1,4 +1,5 @@
-<?php $select_html .= '<select name="'.( isset($options['name'])? $options['name'] :'').'" 
+<?php
+$select_html .= '<select data-placeholder="'.( isset($options['placeholder'])? $options['placeholder'] :'Select option:').'" name="'.( isset($options['name'])? $options['name'] :'').'" 
           class="'.( isset($options['class'])? $options['class'] :'' ).'" 
           id="'.( isset($options['id'])? $options['id'] :'' ).'" 
           onchange="'.( isset($options['func'])? $options['func'] :'' ).'" 

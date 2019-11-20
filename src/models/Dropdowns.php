@@ -419,7 +419,7 @@ class Dropdowns extends Model
     * @use      Dropdowns::location_groups_html($options = [name='test'])
     */
 
-    public static function location_groups_html($options){
+    public static function location_groups_html($options = array('name'=>'lg_by_key[]')){
       $locationGroups = self::locationGroups();
       $locationGroups = self::prepare_select_data($locationGroups, 'key_system', 'value');      
       return self::html_select($locationGroups, $options);
