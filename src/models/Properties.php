@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
 class Properties extends Model
 {
 
-    public static function findAll($query, $wm = false, $cache = false)
+    public static function findAll($query, $wm = false, $cache = false, $options=['images_size'=>1200])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -469,11 +469,11 @@ class Properties extends Model
                         $attachments = [];
                         if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' .$options['images_size'] . '/' . $pic->file_md5_name;
                             }
                         } else {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
                             }
                         }
                         $data['attachments'] = $attachments;
