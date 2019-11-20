@@ -41,13 +41,17 @@ class Functions extends Model
 
         if (isset($_GET['morning_call']) || isset($_GET['afternoon_call']))
         {
-            if (isset($_GET['morning_call']))
+            if (isset($_GET['morning_call']) && !isset($_GET['afternoon_call']))
             {
                 $scedual_msg = 'Call me back in the morning';
             }
-            if (isset($_GET['afternoon_call']))
+            elseif (isset($_GET['afternoon_call']) && !isset(($_GET['morning_call'])))
             {
                 $scedual_msg = 'Call me back in the afternoon';
+            }
+            else
+            {
+                $scedual_msg = 'Call me back in the morning.<br>Call me back in the afternoon.';
             }
             $message = '';
 
