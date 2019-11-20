@@ -11,6 +11,7 @@ class OptimaAsset extends \yii\web\AssetBundle{
     ];
     public $js = [
         'js/bootstrap-multiselect.js',
+        'js/scripts.js',
     ];
 
 
