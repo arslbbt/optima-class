@@ -392,4 +392,74 @@ class Dropdowns extends Model
 
         return $data;
     }
+    
+    /**
+    *
+    * Get types html
+    *
+    * @param    array data array e.g for options return html 
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @return   JSON OR html
+    * @use      Dropdowns::typesHTML($data, $options = [name='test'])
+    */
+
+    public static function types_html($options){
+      $types = self::types();
+      $types = self::prepare_select_data($types, 'key', 'value');
+      return self::html_select($types, $options);
+
+    }
+
+    /**
+    *
+    * Get location groups html dropdown
+    *
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @return   html
+    * @use      Dropdowns::location_groups_html($options = [name='test'])
+    */
+
+    public static function location_groups_html($options){
+      $locationGroups = self::locationGroups();
+      $locationGroups = self::prepare_select_data($locationGroups, 'key_system', 'value');      
+      return self::html_select($locationGroups, $options);
+    }
+
+    /**
+    *
+    * Get prepared select data
+    *
+    * @param    array data array e.g for options return html 
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @return   html
+    * @use      Dropdowns::prepare_select_data($dataArray='Data to be formated', $option_key_index='key', $option_value_index='value')
+    */
+
+    public static function prepare_select_data($dataArray, $option_key_index='key', $option_value_index='value'){
+      
+      $finalFormatedSelectArray= array();
+      foreach ($dataArray as $key => $value) {
+        $finalFormatedSelectArray[$key]['option_key']= $value[$option_key_index];
+        $finalFormatedSelectArray[$key]['option_value']= (is_array($value[$option_value_index]) ? $value[$option_value_index]['en']: $value[$option_value_index]);
+      }
+      return $finalFormatedSelectArray;
+    }
+
+    /**
+    *
+    * Get html_select dropdown
+    *
+    * @param    array data array e.g for options return html 
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @return   html
+    * @use      Dropdowns::html_select($data, $options = [name='test'])
+    */
+
+    public static function html_select($data, $options=[]) {
+      $path =  dirname(dirname(__FILE__));
+      $select_html = '';
+      require($path.'/views/partials/selectDropdown.php');
+      return $select_html;
+    }
+
 }
