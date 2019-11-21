@@ -650,13 +650,13 @@ class Properties extends Model
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
         }
 
-
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
         }
         if (isset($with_count) && $with_count == true) {
             $url = $url . '&view_count=true';
         }
+
         $JsonData = Functions::getCRMData($url,false);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
@@ -770,11 +770,16 @@ class Properties extends Model
             if (isset($property->property->property_name)) {
                 $return_data['property_name'] = $property->property->property_name;
             }
+            $agency = Yii::$app->params['agency'];
             if (isset($property->property->latitude)) {
                 $return_data['lat'] = $property->property->latitude;
+            } elseif (isset($property->property->private_info_object->$agency->latitude)) {
+                $return_data['lat'] = $property->property->private_info_object->$agency->latitude;
             }
             if (isset($property->property->longitude)) {
                 $return_data['lng'] = $property->property->longitude;
+            } elseif (isset($property->property->private_info_object->$agency->longitude)) {
+                $return_data['lng'] = $property->property->private_info_object->$agency->longitude;
             }
             if (isset($property->property->bedrooms)) {
                 $return_data['bedrooms'] = $property->property->bedrooms;
