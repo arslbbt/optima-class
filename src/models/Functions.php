@@ -57,7 +57,7 @@ class Functions extends Model
 
             $message .= 'Message: ' . $model->message;
 
-            $model->message = "Call scedual = ".$scedual_msg."\r\n".$message;
+            $model->message = "Preferred time = ".$scedual_msg."\r\n".$message;
         }
 
         if (!$model->sendMail()) {
