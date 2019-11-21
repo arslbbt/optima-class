@@ -1064,6 +1064,25 @@ class Properties extends Model
             } else {
                 $return_data['energy_certificate_two'] = strtolower('In Progress');
             }
+            if (isset($property->property->co2)) {
+                $return_data['co2'] = $property->property->co2;
+            }
+            if (isset($property->property->kilowatt)) {
+                $return_data['kilowatt'] = $property->property->kilowatt;
+            }
+            if (isset($property->property->energy_certificate_two) && $property->property->energy_certificate_two != '') {
+                if ($property->property->energy_certificate_two == 'X' || $property->property->energy_certificate_two == 'x') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } elseif ($property->property->energy_certificate_two == 'Not available') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } elseif ($property->property->energy_certificate_two == 'In Process') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } else {
+                    $return_data['energy_certificate_two'] = $property->property->energy_certificate_two;
+                }
+            } else {
+                $return_data['energy_certificate_two'] = strtolower('In Progress');
+            }
             if (isset($property->property->sale) && $property->property->sale == 1) {
                 $return_data['sale'] = $property->property->sale;
             }
