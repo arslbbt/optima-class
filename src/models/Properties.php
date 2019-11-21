@@ -2103,11 +2103,9 @@ class Properties extends Model
     public static function findAllWithLatLang($type="")
     {
         $webroot = Yii::getAlias('@webroot');
-        
         if(!empty($type)){
           $type='&type='.$type;
         }
-
         $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user_apikey=' . Yii::$app->params['api_key'].$type;
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
