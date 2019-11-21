@@ -262,9 +262,92 @@ class CommercialProperties extends Model
         if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
             foreach ($property['property_attachments'] as $pic) {
+               if(isset($pic['document']) && $pic['document'] != 1){
                 $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
+               }
             }
             $f_property['attachments'] = $attachments;
+        }
+        if (isset($property['buildings']) && $property['buildings'] !='') {
+            $f_property['buildings'] = $property['buildings'];
+        }
+        if (isset($property['sleeps']) && $property['sleeps'] !='') {
+            $f_property['sleeps'] = $property['sleeps'];
+        }
+        if (isset($property['bedrooms']) && $property['bedrooms'] !='') {
+            $f_property['bedrooms'] = $property['bedrooms'];
+        }
+        if (isset($property['bathrooms']) && $property['bathrooms'] !='') {
+            $f_property['bathrooms'] = $property['bathrooms'];
+        }
+        if (isset($property['toilets']) && $property['toilets'] !='') {
+            $f_property['toilets'] = $property['toilets'];
+        }
+        if (isset($property['living_rooms']) && $property['living_rooms'] !='') {
+            $f_property['living_rooms'] = $property['living_rooms'];
+        }
+        if (isset($property['energy_certificate_one']) && $property['energy_certificate_one'] !='') {
+            $f_property['energy_certificate_one'] = $property['energy_certificate_one'];
+        }
+        if (isset($property['energy_certificate_two']) && $property['energy_certificate_two'] !='') {
+            $f_property['energy_certificate_two'] = $property['energy_certificate_two'];
+        }
+        if (isset($property['kilowatt']) && $property['kilowatt'] !='') {
+            $f_property['kilowatt'] = $property['kilowatt'];
+        }
+        if (isset($property['miscellaneous_tax']) && $property['miscellaneous_tax'] !='') {
+            $f_property['miscellaneous_tax'] = $property['miscellaneous_tax'];
+        }
+        if (isset($property['rubbish']) && $property['rubbish'] !='') {
+            $f_property['rubbish'] = $property['rubbish'];
+        }
+        if (isset($property['parking_license']) && $property['parking_license'] !='') {
+            $f_property['parking_license'] = $property['parking_license'];
+        }
+        if (isset($property['community_fees']) && $property['community_fees'] !='') {
+            $f_property['community_fees'] = $property['community_fees'];
+        }
+        if (isset($property['real_estate_tax']) && $property['real_estate_tax'] !='') {
+            $f_property['real_estate_tax '] = $property['real_estate_tax'];
+        }
+        if (isset($property['dimensions']) && $property['dimensions'] !='') {
+            $f_property['dimensions'] = $property['dimensions'];
+        }
+        if (isset($property['plot']) && $property['plot'] !='') {
+            $f_property['plot'] = $property['plot'];
+        }
+        if (isset($property['built']) && $property['built'] !='') {
+            $f_property['built'] = $property['built'];
+        }
+        if (isset($property['usefull_area']) && $property['usefull_area'] !='') {
+            $f_property['usefull_area'] = $property['usefull_area'];
+        }
+        if (isset($property['terrace']) && $property['terrace'] !='') {
+            $f_property['terrace'] = $property['terrace'];
+        }
+        if (isset($property['cee']) && $property['cee'] !='') {
+            $f_property['cee'] = $property['cee'];
+        }
+        if (isset($property['facade_size']) && $property['facade_size'] !='') {
+            $f_property['facade_size'] = $property['facade_size'];
+        }
+        if (isset($property['display_window']) && $property['display_window'] !='') {
+            $f_property['display_window'] = $property['display_window'];
+        }
+        if (isset($property['office_size']) && $property['office_size'] !='') {
+            $f_property['office_size'] = $property['office_size'];
+        }
+        if (isset($property['ground_floor']) && $property['ground_floor'] !='') {
+            $f_property['ground_floor'] = $property['ground_floor'];
+        }
+        if (isset($property['stories_total']) && $property['stories_total'] !='') {
+            $f_property['stories_total'] = $property['stories_total'];
+        }
+        if (isset($property['height']) && $property['height'] !='') {
+            $f_property['height'] = $property['height'];
+        }
+        if (isset($property['storage_size']) && $property['storage_size'] !='') {
+            $f_property['storage_size'] = $property['storage_size'];
         }
         $categories = [];
         $setting = [];
