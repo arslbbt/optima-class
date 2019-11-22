@@ -773,13 +773,15 @@ class Properties extends Model
             $agency = Yii::$app->params['agency'];
             if (isset($property->property->latitude)) {
                 $return_data['lat'] = $property->property->latitude;
-            } elseif (isset($property->property->private_info_object->$agency->latitude)) {
-                $return_data['lat'] = $property->property->private_info_object->$agency->latitude;
+            } 
+            if (isset($property->property->private_info_object->$agency->latitude)) {
+                $return_data['alt_lat'] = $property->property->private_info_object->$agency->latitude;
             }
             if (isset($property->property->longitude)) {
                 $return_data['lng'] = $property->property->longitude;
-            } elseif (isset($property->property->private_info_object->$agency->longitude)) {
-                $return_data['lng'] = $property->property->private_info_object->$agency->longitude;
+            } 
+            if (isset($property->property->private_info_object->$agency->longitude)) {
+                $return_data['alt_lng'] = $property->property->private_info_object->$agency->longitude;
             }
             if (isset($property->property->bedrooms)) {
                 $return_data['bedrooms'] = $property->property->bedrooms;
