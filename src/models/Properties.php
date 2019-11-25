@@ -774,7 +774,6 @@ class Properties extends Model
             if (isset($property->property->property_name)) {
                 $return_data['property_name'] = $property->property->property_name;
             }
-            $agency = Yii::$app->params['agency'];
             if (isset($property->property->latitude)) {
                 $return_data['lat'] = $property->property->latitude;
             } 
