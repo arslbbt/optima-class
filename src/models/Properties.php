@@ -1177,9 +1177,9 @@ class Properties extends Model
             }
 
             if (isset($property->property->vt_ids->$lang)) {
-                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->$lang . '&user_apikey=' . Yii::$app->params['api_key'];
+                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->$lang . '&user_apikey=' . Yii::$app->params['api_key']; 
             }elseif(isset($property->property->vt_ids->{'EN'})){
-                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->$lang . '&user_apikey=' . Yii::$app->params['api_key'];
+                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->{'EN'} . '&user_apikey=' . Yii::$app->params['api_key'];
             }
             if (isset($property->property->license_number)) {
                 $return_data['license_number'] = $property->property->license_number;
