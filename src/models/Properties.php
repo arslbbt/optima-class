@@ -2095,6 +2095,8 @@ class Properties extends Model
                 $query .= '&orderby[]=lt_new_price&orderby[]=DESC';
             } elseif ($get['orderby'] == 'priceASC_lt_rental') {
                 $query .= '&orderby[]=lt_new_price&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'own') {
+                $query .= '&orderby[]=own&orderby[]=DESC&orderby[]=exclusive&orderby[]=DESC';
             }
         }
         return $query;
