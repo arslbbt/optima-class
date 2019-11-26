@@ -792,6 +792,9 @@ class Properties extends Model
             if (isset($property->property->co2)) {
                 $return_data['co2'] = $property->property->co2;
             }
+            if (isset($property->property->basura)) {
+                $return_data['basura'] = $property->property->basura;
+            }
             if (isset($property->property->status)) {
                 $return_data['status'] = $property->property->status;
             }
