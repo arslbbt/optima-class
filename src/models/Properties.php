@@ -2131,6 +2131,26 @@ class Properties extends Model
         return $query;
     }
 
+    public static function findWithLatLang($query, $wm = false, $cache = false, $options=['images_size'=>1200])
+    {
+      $webroot = Yii::getAlias('@webroot');
+
+
+      $file = $webroot . '/uploads/temp/properties-all-latlong.json';
+
+      if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+
+        $data_array = self::findAll($query, $wm,$cache, $options);
+        $json_data =  json_encode($data_array);
+
+        file_put_contents($file, $json_data);
+    } else {
+      $json_data = file_get_contents($file);
+    }
+    return json_decode($json_data, true);
+
+    }
+
     public static function findAllWithLatLang($type="")
     {
         $webroot = Yii::getAlias('@webroot');
