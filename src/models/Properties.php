@@ -845,6 +845,10 @@ class Properties extends Model
                 }
                 $return_data['listing_agency_data'] = $listing_agency_data;
             }
+            $agency = Yii::$app->params['agency'];
+            if(isset($property->property->private_info_object->$agency->address)){
+                $return_data['formatted_address'] = $property->property->private_info_object->$agency->address->formatted_address; 
+            }
 
             if ($price == 'rent') {
                 if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
