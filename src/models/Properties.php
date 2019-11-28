@@ -982,6 +982,9 @@ class Properties extends Model
             if (isset($property->property->currency) && $property->property->currency != '') {
                 $return_data['currency'] = $property->property->currency;
             }
+            if (isset($property->property->extras)) {
+                $return_data['extras'] = $property->property->extras;
+            }
             if (isset($property->property->type_one)) {
                 $return_data['type'] = $property->property->type_one;
             }
