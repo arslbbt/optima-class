@@ -2143,15 +2143,15 @@ class Properties extends Model
       $file = $webroot . '/uploads/temp/properties-all-latlong.json';
 
       if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-
+        $query .= '&latlng=true';
         $data_array = self::findAll($query, $wm,$cache, $options);
         $json_data =  json_encode($data_array);
 
         file_put_contents($file, $json_data);
-    } else {
-      $json_data = file_get_contents($file);
-    }
-    return json_decode($json_data, true);
+      } else {
+        $json_data = file_get_contents($file);
+      }
+      return json_decode($json_data, true);
 
     }
 
