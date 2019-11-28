@@ -985,6 +985,9 @@ class Properties extends Model
             if (isset($property->property->extras)) {
                 $return_data['extras'] = $property->property->extras;
             }
+            if (isset($property->property->value_of_custom->distance)) {
+                $return_data['value_of_custom'] = $property->property->value_of_custom->distance;
+            }
             if (isset($property->property->type_one)) {
                 $return_data['type'] = $property->property->type_one;
             }
