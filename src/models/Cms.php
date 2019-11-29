@@ -461,13 +461,6 @@ class Cms extends Model
         return $file_data;
     }
 
-    public static function clean($string)
-    {
-        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-    }
-
     public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10)
     {
         $file_name= $name;
@@ -478,7 +471,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         if ($name != 'page' && $pageSize == false)
             $file_name = $name.'-all';
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($file_name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::Functions($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
         if(is_numeric($name)) {
             $query = '&post_type_id=' . $name;
         } else {
@@ -581,18 +574,14 @@ class Cms extends Model
         }
         return $users;
     }
-    public static function file_get_contents_curl($url) {
-        $ch = curl_init();
-    
-        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
-    
-        $data = curl_exec($ch);
-        curl_close($ch);
-    
-        return $data;
+
+    public static function clean($string)
+    {
+        trigger_error('Method CMS::' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
+
 }
