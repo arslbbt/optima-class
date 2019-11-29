@@ -630,7 +630,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200')
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -1143,7 +1143,7 @@ class Properties extends Model
 
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 foreach ($property->attachments as $pic) {
-                    $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$image_size.'/' . $pic->file_md5_name;
                     $attachments[] = $url;
                     $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
                     $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
