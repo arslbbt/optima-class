@@ -461,13 +461,6 @@ class Cms extends Model
         return $file_data;
     }
 
-    public static function clean($string)
-    {
-        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-    }
-
     public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10)
     {
         $file_name= $name;
@@ -478,7 +471,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         if ($name != 'page' && $pageSize == false)
             $file_name = $name.'-all';
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::clean($file_name))) . str_replace(' ', '_', strtolower(self::clean($category))) . '.json';
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::Functions($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
         if(is_numeric($name)) {
             $query = '&post_type_id=' . $name;
         } else {
@@ -595,4 +588,13 @@ class Cms extends Model
     
         return $data;
     }
+    public static function clean($string)
+    {
+        trigger_error('Method CMS::' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    }
+
 }
