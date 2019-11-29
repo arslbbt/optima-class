@@ -846,7 +846,7 @@ class Properties extends Model
                 $return_data['listing_agency_data'] = $listing_agency_data;
             }
             $agency = Yii::$app->params['agency'];
-            if(isset($property->property->private_info_object->$agency->address)){
+            if(isset($property->property->private_info_object->$agency->address->formatted_address)){
                 $return_data['formatted_address'] = $property->property->private_info_object->$agency->address->formatted_address; 
             }
 
