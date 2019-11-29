@@ -213,4 +213,21 @@ class Functions extends Model
         return array_column(array_map($f, array_keys($a), $a), 1, 0);
     }
 
+    /**
+     *
+     * return clean url remove space and special charters for slug generation
+     *
+     * @param    string  to clean
+     * @return   strign  $url;
+     *
+     */
+
+    public static function clean($string)
+    {
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    }
+
+
 }

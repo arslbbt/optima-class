@@ -492,13 +492,6 @@ public static function postTypes($name, $category = null, $forRoutes = null, $pa
         return $file_data;
     }
 
-    public static function clean($string)
-    {
-        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-    }
-
     public static function getUsers()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -550,18 +543,11 @@ public static function postTypes($name, $category = null, $forRoutes = null, $pa
         }
         return $users;
     }
-    public static function file_get_contents_curl($url) {
-        $ch = curl_init();
-    
-        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
-    
-        $data = curl_exec($ch);
-        curl_close($ch);
-    
-        return $data;
+
+    public static function clean($string)
+    {
+        trigger_error('Function moved to functions.php to be removed soon', E_USER_WARNING);
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
 }
