@@ -2144,12 +2144,10 @@ class Properties extends Model
     public static function findWithLatLang($query, $wm = false, $cache = false, $options=['images_size'=>1200])
     {
       $webroot = Yii::getAlias('@webroot');
-
-
       $file = $webroot . '/uploads/temp/properties-all-latlong.json';
+      $query .= '&latlng=true';
 
       if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-        $query .= '&latlng=true';
         $data_array = self::findAll($query, $wm,$cache, $options);
         $json_data =  json_encode($data_array);
 
