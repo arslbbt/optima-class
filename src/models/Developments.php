@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use optima\models\Cms;
+use optima\models\Functions;
 
 /**
  * LoginForm is the model behind the login form.
@@ -35,7 +36,7 @@ class Developments extends Model
         }
         else
         {
-            $JsonData = self::file_get_contents_curl($url);
+            $JsonData = Functions::getCRMData($url,false);
         }
         $apiData = json_decode($JsonData);
         $return_data = [];
@@ -132,7 +133,7 @@ class Developments extends Model
         }
         $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
-        $JsonData = self::file_get_contents_curl($url);
+        $JsonData = Functions::getCRMData($url,false);
         $property = json_decode($JsonData);
         $return_data = [];
         $attachments = [];
@@ -499,7 +500,7 @@ class Developments extends Model
         $file = $webroot . '/uploads/temp/develop_' . $query . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = self::file_get_contents_curl($url);
+            $file_data = Functions::getCRMData($url,false);
             file_put_contents($file, $file_data);
         }
         else
@@ -508,19 +509,5 @@ class Developments extends Model
         }
         return $file_data;
     }
-    public static function file_get_contents_curl($url) {
-        return Functions::getCRMData($url);
-        $ch = curl_init();
-    
-        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);       
-    
-        $data = curl_exec($ch);
-        curl_close($ch);
-    
-        return $data;
-    }
+
 }
