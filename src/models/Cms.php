@@ -471,7 +471,7 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         if ($name != 'page' && $pageSize == false)
             $file_name = $name.'-all';
-        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(self::Functions($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
+        $file = $webroot . '/uploads/temp/' . str_replace(' ', '_', strtolower(Functions::clean($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
         if(is_numeric($name)) {
             $query = '&post_type_id=' . $name;
         } else {
@@ -574,6 +574,7 @@ class Cms extends Model
         }
         return $users;
     }
+    
 
     public static function clean($string)
     {
