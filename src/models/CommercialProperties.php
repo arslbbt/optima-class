@@ -202,7 +202,6 @@ class CommercialProperties extends Model
             $ref = $settings['general_settings']['reference'];
             $f_property['reference'] = $property[$ref];
         } else {
-
             $f_property['reference'] = $property['reference'];
         }
         if (isset($property['_id'])) {
@@ -214,8 +213,7 @@ class CommercialProperties extends Model
         if (isset($property['title'][$lang]) && $property['title'][$lang] != '') {
             $f_property['title'] = $property['title'][$lang];
         } else {
-            $f_property['title'] = '';
-            // $f_property['title'] = (isset($property['type_one']) ? \Yii::t('app', $property['type_one']) : '') . ' ' . \Yii::t('app', 'in') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', $property['property_location']['value']['en']) : '');
+            $f_property['title'] = (isset($property['type_one']) ? \Yii::t('app', $property['type_one']) : '') . ' ' . \Yii::t('app', 'in') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', $property['property_location']['value']['en']) : '');
         }
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
