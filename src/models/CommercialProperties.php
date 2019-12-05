@@ -213,7 +213,7 @@ class CommercialProperties extends Model
         if (isset($property['title'][$lang]) && $property['title'][$lang] != '') {
             $f_property['title'] = $property['title'][$lang];
         } else {
-            $f_property['title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . \Yii::t('app', 'in') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', $property['property_location']['value']['en']) : '');
+            $f_property['title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
         }
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
