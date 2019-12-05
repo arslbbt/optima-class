@@ -406,7 +406,6 @@ class CommercialProperties extends Model
         $f_property['property_features']['features'] = (isset($property['features']))?$property['features']:'';
         $f_property['property_features']['rooms'] = (isset($property['rooms']))?$property['rooms']:'';
 
-
         return $f_property;
     }
 }
