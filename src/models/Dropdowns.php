@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use linslin\yii2\curl;
+use optima\assets\OptimaAsset;
 
 /**
  * LoginForm is the model behind the login form.
@@ -376,22 +377,6 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-
-    public static function file_get_contents_curl($url)
-    {
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-
-        $data = curl_exec($ch);
-        curl_close($ch);
-
-        return $data;
-    }
     
     /**
     *
@@ -419,7 +404,7 @@ class Dropdowns extends Model
     * @use      Dropdowns::location_groups_html($options = [name='test'])
     */
 
-    public static function location_groups_html($options){
+    public static function location_groups_html($options = array('name'=>'lg_by_key[]')){
       $locationGroups = self::locationGroups();
       $locationGroups = self::prepare_select_data($locationGroups, 'key_system', 'value');      
       return self::html_select($locationGroups, $options);
@@ -457,6 +442,10 @@ class Dropdowns extends Model
 
     public static function html_select($data, $options=[]) {
       $path =  dirname(dirname(__FILE__));
+      $view = Yii::$app->controller->view;
+
+      optimaAsset::register($view);
+
       $select_html = '';
       require($path.'/views/partials/selectDropdown.php');
       return $select_html;

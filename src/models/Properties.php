@@ -34,7 +34,11 @@ class Properties extends Model
         } else {
             $JsonData = Functions::getCRMData($url,false);
         }
+        if (strpos($query,"&latlng=true")) {
+          return json_decode($JsonData, true);
+        }
         $apiData = json_decode($JsonData);
+        
         $settings = Cms::settings();
 
         $get = Yii::$app->request->get();
@@ -626,7 +630,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false)
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200')
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -650,13 +654,13 @@ class Properties extends Model
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $ref . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
         }
 
-
         if ($with_testimonials) {
             $url = $url . '&with_testimonials=true';
         }
         if (isset($with_count) && $with_count == true) {
             $url = $url . '&view_count=true';
         }
+
         $JsonData = Functions::getCRMData($url,false);
         $property = json_decode($JsonData);
         if (isset($property->property->reference)) {
@@ -788,6 +792,9 @@ class Properties extends Model
             if (isset($property->property->co2)) {
                 $return_data['co2'] = $property->property->co2;
             }
+            if (isset($property->property->basura)) {
+                $return_data['basura'] = $property->property->basura;
+            }
             if (isset($property->property->status)) {
                 $return_data['status'] = $property->property->status;
             }
@@ -837,6 +844,10 @@ class Properties extends Model
                     }
                 }
                 $return_data['listing_agency_data'] = $listing_agency_data;
+            }
+            $agency = Yii::$app->params['agency'];
+            if(isset($property->property->private_info_object->$agency->address->formatted_address)){
+                $return_data['formatted_address'] = $property->property->private_info_object->$agency->address->formatted_address; 
             }
 
             if ($price == 'rent') {
@@ -1070,6 +1081,25 @@ class Properties extends Model
             } else {
                 $return_data['energy_certificate_two'] = strtolower('In Progress');
             }
+            if (isset($property->property->co2)) {
+                $return_data['co2'] = $property->property->co2;
+            }
+            if (isset($property->property->kilowatt)) {
+                $return_data['kilowatt'] = $property->property->kilowatt;
+            }
+            if (isset($property->property->energy_certificate_two) && $property->property->energy_certificate_two != '') {
+                if ($property->property->energy_certificate_two == 'X' || $property->property->energy_certificate_two == 'x') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } elseif ($property->property->energy_certificate_two == 'Not available') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } elseif ($property->property->energy_certificate_two == 'In Process') {
+                    $return_data['energy_certificate_two'] = strtolower('In Progress');
+                } else {
+                    $return_data['energy_certificate_two'] = $property->property->energy_certificate_two;
+                }
+            } else {
+                $return_data['energy_certificate_two'] = strtolower('In Progress');
+            }
             if (isset($property->property->sale) && $property->property->sale == 1) {
                 $return_data['sale'] = $property->property->sale;
             }
@@ -1113,7 +1143,7 @@ class Properties extends Model
 
             if (isset($property->attachments) && count($property->attachments) > 0) {
                 foreach ($property->attachments as $pic) {
-                    $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$image_size.'/' . $pic->file_md5_name;
                     $attachments[] = $url;
                     $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
                     $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
@@ -1155,8 +1185,11 @@ class Properties extends Model
             if (isset($property->property->security_deposit) && $property->property->security_deposit != '') {
                 $return_data['security_deposit'] = $property->property->security_deposit;
             }
-            if (isset($property->property->vt_ids[0])) {
-                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids[0] . '&user_apikey=' . Yii::$app->params['api_key'];
+
+            if (isset($property->property->vt_ids->$lang)) {
+                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->$lang . '&user_apikey=' . Yii::$app->params['api_key'];
+            }elseif(isset($property->property->vt_ids->{'EN'})){
+                $return_data['vt'] = Yii::$app->params['apiUrl'] . 'virtualtours&id=' . $property->property->vt_ids->$lang . '&user_apikey=' . Yii::$app->params['api_key'];
             }
             if (isset($property->property->license_number)) {
                 $return_data['license_number'] = $property->property->license_number;
@@ -1872,8 +1905,8 @@ class Properties extends Model
         if (isset($get["lg_by_key"]) && is_string($get["lg_by_key"]) && $get["lg_by_key"] != '') {
             $query .= '&lg_by_key[]=' . $get["lg_by_key"];
         }
-        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0) {
-            foreach ($get["lg_by_key"] as $key => $value) {
+        if (isset($get["lg_by_key"]) && is_array($get["lg_by_key"]) && count($get["lg_by_key"]) > 0 && !empty($get["lg_by_key"][0])) {
+          foreach ($get["lg_by_key"] as $key => $value) {
                 $query .= '&lg_by_key[]=' . $value;
             }
         }
@@ -2108,10 +2141,31 @@ class Properties extends Model
         return $query;
     }
 
-    public static function findAllWithLatLang()
+    public static function findWithLatLang($query, $wm = false, $cache = false, $options=['images_size'=>1200])
+    {
+      $webroot = Yii::getAlias('@webroot');
+      $file = $webroot . '/uploads/temp/properties-all-latlong.json';
+      $query .= '&latlng=true';
+
+      if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+        $data_array = self::findAll($query, $wm,$cache, $options);
+        $json_data =  json_encode($data_array);
+
+        file_put_contents($file, $json_data);
+      } else {
+        $json_data = file_get_contents($file);
+      }
+      return json_decode($json_data, true);
+
+    }
+
+    public static function findAllWithLatLang($type="")
     {
         $webroot = Yii::getAlias('@webroot');
-        $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user_apikey=' . Yii::$app->params['api_key'];
+        if(!empty($type)){
+          $type='&type='.$type;
+        }
+        $url = Yii::$app->params['apiUrl'] . 'properties/properties-with-latlang&user_apikey=' . Yii::$app->params['api_key'].$type;
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
         }
@@ -2343,21 +2397,6 @@ class Properties extends Model
         $return_data['rental_prices'] = $rental_prices;
         $return_data['total_price'] = $total_price;
         return $return_data;
-    }
-    public static function file_get_contents_curl($url)
-    {
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $data = curl_exec($ch);
-        curl_close($ch);
-
-        return $data;
     }
 
     public static function displayPrice($price){
