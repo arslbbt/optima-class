@@ -6,7 +6,7 @@
           ' . (isset($options['multiple']) ? $options['multiple'] : '') . '>';
 
             foreach ($data as $value) {
-                $select_html .= '<option ' . ((isset($_GET['lg_by_key']) && in_array($value['option_key'], $_GET['lg_by_key'])) || (isset($_GET['types']) && in_array($value['option_key'], $_GET['types'])) ? 'selected' : '') . ' value="' . $value['option_key'] . '">' . Yii::$app->translate->t($value['option_value']) . '</option>';
+                $select_html .= '<option ' . (is_array(Yii::$app->request->get(str_replace("[]","",$options['name'])))? in_array($value['option_key'], Yii::$app->request->get(str_replace("[]","",$options['name'])))? 'selected' : '' : Yii::$app->request->get(str_replace("[]","",$options['name'])) == $value['option_key']? 'selected' : '' ) . ' value="' . $value['option_key'] . '">' . Yii::$app->translate->t($value['option_value']) . '</option>';
             }
 ?>
 
