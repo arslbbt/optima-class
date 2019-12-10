@@ -168,10 +168,10 @@ class Properties extends Model
                     } elseif (isset($property->property->private_info_object->$agency->longitude)) {
                         $data['lng'] = $property->property->private_info_object->$agency->longitude;
                     }
-                    if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$lang) && $property->property->description->$lang != '') {
-                        $data['sale_rent_description'] = $property->property->description->$lang;
-                    } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
-                        $data['sale_rent_description'] = $property->property->rental_description->$lang;
+                    if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
+                        $data['sale_rent_description'] = $property->property->description->$contentLang;
+                    } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
+                        $data['sale_rent_description'] = $property->property->rental_description->$contentLang;
                     }
                     if (isset($property->property->$description->$lang)) {
                         $data['description'] = $property->property->$description->$lang;
@@ -830,6 +830,9 @@ class Properties extends Model
             if (isset($property->property->own) && $property->property->own == true) {
                 $return_data['own'] = true;
             }
+            if (isset($property->property->exclusive) && $property->property->exclusive == true) {
+                $return_data['exclusive'] = true;
+            }
             if (isset($property->property->created_at) && !empty($property->property->created_at)) {
                 $return_data['created_at'] = $property->property->created_at;
             }
@@ -1031,10 +1034,10 @@ class Properties extends Model
             if (isset($property->property->address_country)) {
                 $return_data['country'] = $property->property->address_country;
             }
-            if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$lang) && $property->property->description->$lang != '') {
-                $return_data['sale_rent_description'] = $property->property->description->$lang;
-            } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$lang) && $property->property->rental_description->$lang != '') {
-                $return_data['sale_rent_description'] = $property->property->rental_description->$lang;
+            if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
+                $return_data['sale_rent_description'] = $property->property->description->$contentLang;
+            } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
+                $return_data['sale_rent_description'] = $property->property->rental_description->$contentLang;
             }
             if (isset($property->property->$description->$contentLang) && !empty($property->property->$description->$contentLang)) {
                 $return_data['description'] = $property->property->$description->$contentLang;
