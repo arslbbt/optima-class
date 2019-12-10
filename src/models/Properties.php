@@ -173,8 +173,8 @@ class Properties extends Model
                     } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
                         $data['sale_rent_description'] = $property->property->rental_description->$contentLang;
                     }
-                    if (isset($property->property->$description->$lang)) {
-                        $data['description'] = $property->property->$description->$lang;
+                    if (isset($property->property->$description->$contentLang)) {
+                        $data['description'] = $property->property->$description->$contentLang;
                     }
                     if (isset($property->property->location)) {
                         $data['location'] = $property->property->location;
