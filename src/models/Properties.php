@@ -880,7 +880,9 @@ class Properties extends Model
                             }
                             else {
                                 if (isset($seasons->gross_day_price)) {
-                                    $gdprice[] = $seasons->gross_day_price;
+                                    if(isset($seasons->period_to) && $seasons->period_to >= time()){
+                                        $gdprice[] = $seasons->gross_day_price;
+                                    }
                                 }
                             }
                         }
