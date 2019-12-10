@@ -279,7 +279,7 @@ class Properties extends Model
                                     }
                                 }
                                
-                                $data['price'] = number_format($st_price + $b_price, 2);
+                            $data['price'] = number_format($st_price + $b_price, 2);
                             } else {
                                 $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                             }
@@ -918,7 +918,7 @@ class Properties extends Model
                             if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
                                 foreach ($property->bookings_extras as $booking_extra) {
                                     $divider = 1;
-                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
                                         $divider = 7;
                                     if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
                                         $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
@@ -929,7 +929,7 @@ class Properties extends Model
                                 foreach ($property->bookings_cleaning as $bookings_cleaning) {
                                     $divider = 1;
                                     $multiplyer = 1;
-                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
                                         $divider = 7;
                                     if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
                                         $multiplyer = 24;
