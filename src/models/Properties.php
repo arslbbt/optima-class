@@ -244,10 +244,15 @@ class Properties extends Model
                                         }
                                     } else {
                                         if (isset($seasons->gross_day_price)) {
-                                            $gdprice[] = $seasons->gross_day_price;
+                                            if(isset($seasons->period_to) && $seasons->period_to >= time() ){
+                                                $gdprice[] = $seasons->gross_day_price;
+                                            }
                                         }
                                     }
                                 }
+                                echo '<pre>';
+                                print_r($gdprice);
+                                die();
                                 if (count($gdprice) > 0) {
                                     $st_price = min($gdprice);
                                 }
@@ -255,7 +260,7 @@ class Properties extends Model
                                 if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
                                     foreach ($property->bookings_extras as $booking_extra) {
                                         $divider = 1;
-                                        if (isset($booking_extra->type) && ($booking_extra->type == 'per_week')) {
+                                        if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay')) {
                                             $divider = 7;
                                         }
                                         if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
@@ -267,7 +272,7 @@ class Properties extends Model
                                     foreach ($property->bookings_cleaning as $bookings_cleaning) {
                                         $divider = 1;
                                         $multiplyer = 1;
-                                        if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week')) {
+                                        if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay')) {
                                             $divider = 7;
                                         }
                                         if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour') {
@@ -918,7 +923,7 @@ class Properties extends Model
                             if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
                                 foreach ($property->bookings_extras as $booking_extra) {
                                     $divider = 1;
-                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week'))
+                                    if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay'))
                                         $divider = 7;
                                     if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
                                         $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
@@ -929,7 +934,7 @@ class Properties extends Model
                                 foreach ($property->bookings_cleaning as $bookings_cleaning) {
                                     $divider = 1;
                                     $multiplyer = 1;
-                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week'))
+                                    if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay'))
                                         $divider = 7;
                                     if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour')
                                         $multiplyer = 24;
