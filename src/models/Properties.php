@@ -279,7 +279,7 @@ class Properties extends Model
                                     }
                                 }
                                
-                                $data['price'] = number_format($st_price + $b_price, 2);
+                            $data['price'] = number_format($st_price + $b_price, 2);
                             } else {
                                 $data['price'] = (isset($st_price[0]['price']) && $st_price[0]['price'] != 0) ? number_format((int) $st_price[0]['price'], 0, '', '.') . ' ' . Yii::t('app', str_replace('_', ' ', (isset($st_price[0]['period']) ? $st_price[0]['period'] : ''))) : '';
                             }
