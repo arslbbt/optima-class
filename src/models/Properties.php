@@ -250,9 +250,6 @@ class Properties extends Model
                                         }
                                     }
                                 }
-                                echo '<pre>';
-                                print_r($gdprice);
-                                die();
                                 if (count($gdprice) > 0) {
                                     $st_price = min($gdprice);
                                 }
