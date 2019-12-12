@@ -175,6 +175,9 @@ class Properties extends Model
                     if (isset($property->property->location)) {
                         $data['location'] = $property->property->location;
                     }
+                    if (isset($property->property->p_style)) {
+                        $return_data['p_style'] = $property->property->p_style;
+                    }
                     if (isset($property->property->region)) {
                         $data['region'] = $property->property->region;
                     }
@@ -778,6 +781,9 @@ class Properties extends Model
             }
             if (isset($property->property->bedrooms)) {
                 $return_data['bedrooms'] = $property->property->bedrooms;
+            }
+            if (isset($property->property->p_style)) {
+                $return_data['p_style'] = $property->property->p_style;
             }
             if (isset($property->property->bathrooms)) {
                 $return_data['bathrooms'] = $property->property->bathrooms;
