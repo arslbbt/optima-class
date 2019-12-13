@@ -180,7 +180,7 @@ class Properties extends Model
                         $data['location'] = $property->property->location;
                     }
                     if (isset($property->property->p_style)) {
-                        $return_data['p_style'] = $property->property->p_style;
+                        $data['p_style'] = $property->property->p_style;
                     }
                     if (isset($property->property->region)) {
                         $data['region'] = $property->property->region;
