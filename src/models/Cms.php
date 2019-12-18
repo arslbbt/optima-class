@@ -416,7 +416,7 @@ class Cms extends Model
 
     }
 
-    public static function Slugs($name, $params)
+    public static function Slugs($name)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
