@@ -403,8 +403,8 @@ class Cms extends Model
         ];
     }
 
-    public static function renderPage($viewObjet,$viewFilePath="404"){
-
+    public static function renderPage($viewObjet,$viewFilePath="404")
+    {
       $params = Yii::$app->params;
       $cmsModel = Slugs('page', $params);
       $url = explode('/', Yii::$app->request->url);
@@ -416,7 +416,7 @@ class Cms extends Model
 
     }
 
-    public static function Slugs($name)
+    public static function Slugs($name, $params)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -425,31 +425,27 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
         $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . Yii::$app->params['user'] . $site_id;
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . \Yii::$app->params['user'] . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
-            $file_data = 
-            //file_get_contents($url);
-            Functions::getCRMData($url);
+            $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         }
         else
-        {
-            $file_data = 
-            file_get_contents($file);
-            //Functions::getCRMData($file);
-        }
-        $dataEach = json_decode($file_data, TRUE);
+            $file_data = file_get_contents($file);
+        $dataEach = json_decode($file_data, true);
         $lang = strtoupper(\Yii::$app->language);
-
         $retdata = [];
         $array = [];
+
         foreach ($dataEach as $key => $data)
         {
+            $array['type'] = isset($data['type']) ? $data['type'] : '';
             $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
             $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
             $retdata[] = $array;
         }
+        
         return $retdata;
     }
 
