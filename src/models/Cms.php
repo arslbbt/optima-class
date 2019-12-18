@@ -361,7 +361,7 @@ class Cms extends Model
         ];
     }
 
-    public static function postById($id, $lang = 'EN')
+    public static function postById($id)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
