@@ -361,6 +361,48 @@ class Cms extends Model
         ];
     }
 
+    public static function postById($id, $lang = 'EN')
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+
+        $file = $webroot . '/uploads/temp/' . $id . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id;
+            $file_data = 
+            //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
+            Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data = 
+            file_get_contents($file);
+            //Functions::getCRMData($file);
+        }
+        $data = json_decode($file_data, TRUE);
+        $lang = strtoupper(\Yii::$app->language);
+        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+        return [
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
+            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name, 200) : '',
+            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
+            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
+            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
+            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
+            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
+        ];
+    }
+
     public static function renderPage($viewObjet,$viewFilePath="404"){
 
       $params = Yii::$app->params;
