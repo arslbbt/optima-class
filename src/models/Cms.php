@@ -127,7 +127,7 @@ class Cms extends Model
             //Functions::getCRMData($file);
         }
         $dataArr = json_decode($file_data, TRUE);
-        $items = $dataArr['menu_items'];
+        $items = (isset($dataArr['menu_items']))?$dataArr['menu_items']:'';
         $finalData = [];
         if ($items)
         {
