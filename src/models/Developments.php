@@ -219,7 +219,13 @@ class Developments extends Model
                 {
 
                     if (isset(Yii::$app->params['constructions_doc_url']))
-                        $floor_plans[] = Yii::$app->params['constructions_doc_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                    {
+                        $floor_plans[] = array(
+                          'url' => Yii::$app->params['constructions_doc_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name,
+                          'name' => (isset($pic->file_name))?$pic->file_name:'',
+                          'description' => (isset($pic->description))?$pic->description:''
+                      );
+                    }
                 }
             }
             $return_data['floor_plans'] = $floor_plans;
