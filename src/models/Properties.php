@@ -2166,7 +2166,7 @@ class Properties extends Model
       $query .= '&latlng=true';
 
       if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-        $data_array = self::findAll($query, $wm,$cache, $options);
+        $data_array = self::findAll($query, $wm, $cache, $options);
         $json_data =  json_encode($data_array);
 
         file_put_contents($file, $json_data);
