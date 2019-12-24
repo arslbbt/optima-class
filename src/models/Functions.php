@@ -158,9 +158,11 @@ class Functions extends Model
             ],
         ];
     }
+
     public static function getCRMData($url, $cache = true, $fields = array(), $auth = false){
         return Functions::getCurlData($url, $cache);
     }
+    
     public static function getCurlData($url, $cache = true, $fields = array(), $auth = false){
     
         $curl = curl_init($url);
