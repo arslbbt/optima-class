@@ -16,7 +16,9 @@ use optima\models\Functions;
  */
 class Cms extends Model
 {
-
+    private static $image_url = 'https://images.optima-crm.com/resize/cms_medias/'; // For resize image URLs
+    private static $image_url_users = ' https://images.optima-crm.com/resize/users/'; // For getUsers image URLs
+   
     public static function settings()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -72,8 +74,6 @@ class Cms extends Model
         return Functions::array_map_assoc($func,$custom_settings);
 
     }
-
-
 
     public static function getTranslations()
     {
@@ -345,10 +345,10 @@ class Cms extends Model
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
         $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+        // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
-            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name, 200) : '',
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '',
+            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url, 200) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -387,10 +387,10 @@ class Cms extends Model
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
         $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+        // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
-            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name, 200) : '',
+            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '',
+            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url, 200) : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -459,14 +459,14 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         $filesaved = $webroot . '/uploads/temp/' . $size . '_' . $name;
         if(isset(Yii::$app->params['ImageFrom']) && Yii::$app->params['ImageFrom']=='remote'){
-            return 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
-        }else{
+            return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
+        } else {
             if (!file_exists($filesaved) || (file_exists($filesaved) && time() - filemtime($filesaved) > 360 * 3600))
             {
                 $handle = @fopen($url, 'r');
                 if (!$handle)
                 {
-                    $url = 'https://images.optima-crm.com/resize/cms_medias/' . $settings['site_id'] . '/' . $size . '/' . $name;
+                    $url = self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
                 }
                 $file_data = 
                 //@file_get_contents($url);
@@ -475,6 +475,20 @@ class Cms extends Model
             }
             return '/uploads/temp/' . $size . '_' . $name;
         }
+    }
+
+    public static function ResizeImage($url, $size = 1200, $is_user_img = false)
+    {
+        $settings = self::settings();
+
+        $url_array = explode('/',$url);
+        $name = end($url_array);
+
+        if ($is_user_img) {
+          return str_replace($name, $size . '/' . $name, $url);
+        }
+
+        return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
     }
 
     public static function iconLogo($name)
@@ -540,11 +554,11 @@ class Cms extends Model
         $array = [];
         foreach ($dataEach as $key => $data) {
             $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-            $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+            // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
             if ($forRoutes == true) {
                 $array['featured_image'] = $url;
             } else {
-                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '';
+                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '';
             }
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
@@ -604,7 +618,7 @@ class Cms extends Model
         {
             $users[] = [
                 'name' => (isset($user['firstname']) ? $user['firstname'] : '') . ' ' . (isset($user['lastname']) ? $user['lastname'] : ''),
-                'dp' => (isset($user['dp']) && $user['dp']) ? Cms::CacheImage(Yii::$app->params['cms_img'] . '/' . $user['_id'] . '/' . $user['dp'], $user['dp']) : '',
+                'dp' => (isset($user['dp']) && $user['dp']) ? Cms::ResizeImage(self::$image_url_users . $user['_id'] . '/' . $user['dp'], 300, true) : '',
                 'number_of_listing' => (isset($user['number_of_listing']) ? $user['number_of_listing'] : ''),
                 'number_of_rent' => (isset($user['number_of_rent']) ? $user['number_of_rent'] : ''),
                 'number_of_sales' => (isset($user['number_of_sales']) ? $user['number_of_sales'] : ''),
