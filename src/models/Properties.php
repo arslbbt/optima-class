@@ -28,7 +28,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-echo $url;die;
+
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
