@@ -648,17 +648,18 @@ class Properties extends Model
         }
         if (isset($reference) && !empty($reference)) {
           $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
+          
           if (isset($with_booking) && $with_booking == true) {
-            $url .= '&with_booking=true';
+              $url .= '&with_booking=true';
           }
           if (isset($with_locationgroup) && $with_locationgroup == true) {
-            $url .= '&with_locationgroup=true';
+              $url .= '&with_locationgroup=true';
           }
           if (isset($with_construction) && $with_construction == true) {
-            $url .= '&with_construction=true';
+              $url .= '&with_construction=true';
           }
           if (isset($with_listing_agency) && $with_listing_agency == true) {
-            $url .= '&with_listing_agency=true';
+              $url .= '&with_listing_agency=true';
           }
           if (isset($with_testimonials) && $with_testimonials == true) {
               $url .= '&with_testimonials=true';
