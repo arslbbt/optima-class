@@ -1929,15 +1929,15 @@ class Properties extends Model
                 $query .= '&lg_by_key[]=' . $value;
             }
         }
-        if (isset($get["bedrooms"]) && is_array($get["bedrooms"]) && count($get["bedrooms"]) > 0 && !empty($get["bedrooms"][0])) {
-          foreach ($get["bedrooms"] as $key => $value) {
+        if (isset($get["bedrooms_range"]) && is_array($get["bedrooms_range"]) && count($get["bedrooms_range"]) > 0 && !empty($get["bedrooms_range"][0])) {
+          foreach ($get["bedrooms_range"] as $key => $value) {
                 $query .= '&bedrooms[]=' . $value;
             }
         } elseif (isset($get["bedrooms"]) && $get["bedrooms"] != "") {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
-        if (isset($get["bathrooms"]) && is_array($get["bathrooms"]) && count($get["bathrooms"]) > 0 && !empty($get["bathrooms"][0])) {
-          foreach ($get["bathrooms"] as $key => $value) {
+        if (isset($get["bathrooms_range"]) && is_array($get["bathrooms_range"]) && count($get["bathrooms_range"]) > 0 && !empty($get["bathrooms_range"][0])) {
+          foreach ($get["bathrooms_range"] as $key => $value) {
                 $query .= '&bathrooms[]=' . $value;
             }
         } elseif (isset($get["bathrooms"]) && $get["bathrooms"] != "") {
