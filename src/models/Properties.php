@@ -28,7 +28,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-
+echo $url;die;
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -1929,17 +1929,29 @@ class Properties extends Model
                 $query .= '&lg_by_key[]=' . $value;
             }
         }
-        if (isset($get["bedrooms_range"]) && is_array($get["bedrooms_range"]) && count($get["bedrooms_range"]) > 0 && !empty($get["bedrooms_range"][0])) {
-          foreach ($get["bedrooms_range"] as $key => $value) {
-                $query .= '&bedrooms[]=' . $value;
-            }
+        if (isset($get['bedrooms_from']) && !empty($get['bedrooms_from'])) {
+          $query .= '&bedrooms[]=' . $get['bedrooms_from'];
+          if (isset($get['bedrooms_to']) && !empty($get['bedrooms_to'])) {
+            $query .= '&bedrooms[]=' . $get['bedrooms_to'];
+          } else {
+            $query .= '&bedrooms[]=50';
+          }
+        } elseif (isset($get['bedrooms_to']) && !empty($get['bedrooms_to'])) {
+          $query .= '&bedrooms[]=1';
+          $query .= '&bedrooms[]=' . $get['bedrooms_to'];
         } elseif (isset($get["bedrooms"]) && $get["bedrooms"] != "") {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
-        if (isset($get["bathrooms_range"]) && is_array($get["bathrooms_range"]) && count($get["bathrooms_range"]) > 0 && !empty($get["bathrooms_range"][0])) {
-          foreach ($get["bathrooms_range"] as $key => $value) {
-                $query .= '&bathrooms[]=' . $value;
-            }
+        if (isset($get['bathrooms_from']) && !empty($get['bathrooms_from'])) {
+          $query .= '&bathrooms[]=' . $get['bathrooms_from'];
+          if (isset($get['bathrooms_to']) && !empty($get['bathrooms_to'])) {
+            $query .= '&bathrooms[]=' . $get['bathrooms_to'];
+          } else {
+            $query .= '&bathrooms[]=50';
+          }
+        } elseif (isset($get['bathrooms_to']) && !empty($get['bathrooms_to'])) {
+          $query .= '&bathrooms[]=1';
+          $query .= '&bathrooms[]=' . $get['bathrooms_to'];
         } elseif (isset($get["bathrooms"]) && $get["bathrooms"] != "") {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
