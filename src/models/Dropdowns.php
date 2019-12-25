@@ -432,6 +432,26 @@ class Dropdowns extends Model
 
     /**
     *
+    * Get prepared select data
+    *
+    * @param    array data array e.g for options return html 
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @return   html
+    * @use      Dropdowns::dropdown($dataArray='Data to be formated', $options = [name='test'])
+    */
+
+    public static function dropdown($dataArray, $options){
+      $finalFormatedSelectArray= array();
+      foreach ($dataArray as $key => $value) {
+        $finalFormatedSelectArray[$key]['option_key']= $key;
+        $finalFormatedSelectArray[$key]['option_value']= $value;
+      }
+
+      return self::html_select($finalFormatedSelectArray, $options);
+    }
+
+    /**
+    *
     * Get html_select dropdown
     *
     * @param    array data array e.g for options return html 
