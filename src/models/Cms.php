@@ -477,15 +477,17 @@ class Cms extends Model
         }
     }
 
-    public static function ResizeImage($url, $size = 1200, $is_user_img = false)
+    public static function ResizeImage($url, $size = 1200, $type = 'cms_medias')
     {
         $settings = self::settings();
 
         $url_array = explode('/',$url);
         $name = end($url_array);
 
-        if ($is_user_img) {
+        if ($type == 'user') {
           return str_replace($name, $size . '/' . $name, $url);
+        } else if ($type == 'property') {
+          return str_replace(prev($url_array), $size, $url);
         }
 
         return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
@@ -618,7 +620,7 @@ class Cms extends Model
         {
             $users[] = [
                 'name' => (isset($user['firstname']) ? $user['firstname'] : '') . ' ' . (isset($user['lastname']) ? $user['lastname'] : ''),
-                'dp' => (isset($user['dp']) && $user['dp']) ? Cms::ResizeImage(self::$image_url_users . $user['_id'] . '/' . $user['dp'], 300, true) : '',
+                'dp' => (isset($user['dp']) && $user['dp']) ? Cms::ResizeImage(self::$image_url_users . $user['_id'] . '/' . $user['dp'], 300, 'user') : '',
                 'number_of_listing' => (isset($user['number_of_listing']) ? $user['number_of_listing'] : ''),
                 'number_of_rent' => (isset($user['number_of_rent']) ? $user['number_of_rent'] : ''),
                 'number_of_sales' => (isset($user['number_of_sales']) ? $user['number_of_sales'] : ''),
