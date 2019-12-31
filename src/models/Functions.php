@@ -84,20 +84,19 @@ class Functions extends Model
 
     public static function dynamicPage($it){
         $params = Yii::$app->params;
-        $cmsModel = Slugs('page', $params);
+        $cmsModel = Cms::Slugs('page');
         $url = explode('/', Yii::$app->request->url);
         $this_page = end($url);
         $page_data = $it->view->params['page_data'] = Cms::pageBySlug(Yii::$app->request->get('title'));
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
-            $cms_page_exists = true;
-            if(isset($row['slug_all']) and isset($row['slug_all'][strtoupper(Yii::$app->language)]) and $row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
+            // $cms_page_exists = true;
+            if(isset($row['slug_all'][strtoupper(Yii::$app->language)]) and $row['slug_all'][strtoupper(Yii::$app->language)] == $this_page){
                 $page_data = Cms::pageBySlug($this_page);
-                if(isset($page_data) and isset($page_data['custom_settings']) and isset($page_data['custom_settings'][strtoupper(Yii::$app->language)]) and count($page_data['custom_settings'][strtoupper(Yii::$app->language)]) > 0)
+                if(isset($page_data['custom_settings'][strtoupper(Yii::$app->language)]) and count($page_data['custom_settings'][strtoupper(Yii::$app->language)]) > 0)
                 foreach($page_data['custom_settings'][strtoupper(Yii::$app->language)] as $custom_keys){
                     if($custom_keys['key'] == 'page_template'){
                         $page_template = $custom_keys['value'];
-                        
                     }
                     if($custom_keys['key'] == 'custom_post_id'){
                         $custom_post_id = $custom_keys['value'];   
@@ -119,38 +118,32 @@ class Functions extends Model
                 else
                     $custom_post_id = '';
                 
-                $ret = $it->render($page_template, [
+                return $it->render($page_template, [
                     'page_data' => $page_data,
                     'custom_post_id' => $custom_post_id
                 ]);
-                return $ret;
             }
             catch (ViewNotFoundException $e)
             {
                 //die;
             }
-        }elseif(isset($this_page)){
-            if (is_file($this_page)){
-                $ret = $it->render($this_page, [
-                    'page_data' => isset($page_data)?$page_data:''
-                ]);
-                return $ret;
-            }else{
-              if (empty($page_data['slug'])) {
-                $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');
-              }
-                $ret = $it->render('page', [
-                    'page_data' => isset($page_data)?$page_data:''
-                ]);
-                return $ret;
-            }
-        }elseif(isset($cms_page_exists)){
-            $ret = $it->render('page', [
-                'page_data' => $page_data
+        }elseif(isset($this_page) && is_file($this_page)){
+            return $it->render($this_page, [
+                'page_data' => isset($page_data)?$page_data:''
             ]);
-            return $ret;
+        // }elseif(isset($cms_page_exists)){
+        //     return $it->render('page', [
+        //         'page_data' => $page_data
+        //     ]);
+        } else {
+          if (!array_filter($page_data)) {
+            $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');
+          }
+          return $it->render('page', [
+            'page_data' => isset($page_data)?$page_data:''
+        ]);
         }
-        return $it->render('404', []);
+        // return $it->render('404', []);
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
