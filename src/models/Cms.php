@@ -403,18 +403,18 @@ class Cms extends Model
         ];
     }
 
-    public static function renderPage($viewObjet,$viewFilePath="404")
-    {
-      $params = Yii::$app->params;
-      $cmsModel = Slugs('page', $params);
-      $url = explode('/', Yii::$app->request->url);
-      $this_page_slug = end($url);
-      $page_data = $viewObjet->view->params['page_data'] = Cms::pageBySlug($this_page_slug);
-         return $viewObjet->render($viewFilePath, [
-        'page_data' => $page_data,
-        ]);
+    // public static function renderPage($viewObjet,$viewFilePath="404")
+    // {
+    //   $params = Yii::$app->params;
+    //   $cmsModel = Slugs('page', $params);
+    //   $url = explode('/', Yii::$app->request->url);
+    //   $this_page_slug = end($url);
+    //   $page_data = $viewObjet->view->params['page_data'] = Cms::pageBySlug($this_page_slug);
+    //      return $viewObjet->render($viewFilePath, [
+    //     'page_data' => $page_data,
+    //     ]);
 
-    }
+    // }
 
     public static function Slugs($name)
     {
