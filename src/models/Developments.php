@@ -30,6 +30,7 @@ class Developments extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
+
         if ($cache == true)
         {
             $JsonData = self::DoCache($query, $url);
@@ -87,6 +88,10 @@ class Developments extends Model
             if (isset($property->property->built_size_to) && $property->property->built_size_to > 0)
             {
                 $data['built_to'] = $property->property->built_size_to;
+            }
+            if (isset($property->property->location) && $property->property->location != '')
+            {
+                $data['location'] = $property->property->location;
             }
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
