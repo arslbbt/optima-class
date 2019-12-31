@@ -79,7 +79,11 @@ class Developments extends Model
             }
             if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
             {
-                $data['bathrooms'] = $property->property->bathrooms_from;
+                $data['bathrooms_from'] = $property->property->bathrooms_from;
+            }
+            if (isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0)
+            {
+                $data['bathrooms_to'] = $property->property->bathrooms_to;
             }
             if (isset($property->property->built_size_from) && $property->property->built_size_from > 0)
             {
