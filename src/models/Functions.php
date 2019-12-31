@@ -137,7 +137,7 @@ class Functions extends Model
                 return $ret;
             }else{
               if (empty($page_data['slug'])) {
-                $page_data = $this->view->params['page_data'] = Cms::pageBySlug('404');
+                $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');
               }
                 $ret = $it->render('page', [
                     'page_data' => isset($page_data)?$page_data:''
