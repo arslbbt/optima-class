@@ -322,9 +322,6 @@ class Properties extends Model
                             $data['price'] = ($property->property->currentprice != 0) ? number_format((int) $property->property->currentprice, 0, '', '.') : '';
                         }
                     }
-
-
-
                     if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
                         $data['currentprice'] = str_replace(',', '.', (number_format((int) ($property->property->currentprice))));
                     }
@@ -416,6 +413,9 @@ class Properties extends Model
                     }
                     if (isset($property->property->plot) && $property->property->plot > 0) {
                         $data['plot'] = $property->property->plot;
+                    }
+                    if (isset($property->property->exclusive) && $property->property->exclusive == true) {
+                        $data['exclusive'] = true;
                     }
                     if (isset($property->property->custom_categories) && is_array($property->property->custom_categories)) {
                         $cats = self::Categories();
