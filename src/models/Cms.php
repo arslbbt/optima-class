@@ -417,7 +417,8 @@ class Cms extends Model
 
     // }
 
-    public static function setParams(){
+    public static function setParams()
+    {
       $root =  realpath(dirname(__FILE__).'/../../../../../');
       Yii::setAlias('@webroot', $root.'/web');
       $params = require $root.'/config/params.php';
@@ -426,7 +427,6 @@ class Cms extends Model
       \Yii::$app->params['site_id']= $params['site_id'];
       \Yii::$app->params['apiUrl']=  $params['apiUrl'];
       \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
-
     }
 
 
@@ -447,10 +447,12 @@ class Cms extends Model
         }
         else
             $file_data = file_get_contents($file);
+            
         $dataEach = json_decode($file_data, true);
         $lang = strtoupper(\Yii::$app->language);
         $retdata = [];
         $array = [];
+
         if(!is_array($dataEach) || count($dataEach) <= 0){
           die('Error Getting CMS Data');
         }
@@ -617,20 +619,20 @@ class Cms extends Model
             //Functions::getCRMData($file);
         }
 
-//        $url = Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
-//        $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-//        return [
-//            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
-//            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
-//            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
-//            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
-//            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
-//            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
-//            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
-//            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
-//            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
-//            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
-//        ];
+      //  $url = Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
+      //  $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+      //  return [
+      //      'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::CacheImage($url, $name) : '',
+      //      'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
+      //      'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+      //      'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
+      //      'slug_all' => isset($data['slug']) ? $data['slug'] : '',
+      //      'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+      //      'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+      //      'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+      //      'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
+      //      'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
+      //  ];
         $data = json_decode($file_data, true);
         $users = [];
         foreach ($data['users'] as $user)
