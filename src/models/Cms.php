@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
 use optima\models\Functions;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -416,6 +417,19 @@ class Cms extends Model
 
     // }
 
+    public static function setParams(){
+      $root =  realpath(dirname(__FILE__).'/../../../../../');
+      Yii::setAlias('@webroot', $root.'/web');
+      $params = require $root.'/config/params.php';
+      $url_array = explode('/', $_SERVER['REQUEST_URI']);
+      \Yii::$app->params['user']=    $params['user'];
+      \Yii::$app->params['site_id']= $params['site_id'];
+      \Yii::$app->params['apiUrl']=  $params['apiUrl'];
+      \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
+
+    }
+
+
     public static function Slugs($name)
     {
         $webroot = Yii::getAlias('@webroot');
@@ -437,6 +451,9 @@ class Cms extends Model
         $lang = strtoupper(\Yii::$app->language);
         $retdata = [];
         $array = [];
+        if(!is_array($dataEach) || count($dataEach) <= 0){
+          die('Error Getting CMS Data');
+        }
 
         foreach ($dataEach as $key => $data)
         {
@@ -445,7 +462,7 @@ class Cms extends Model
             $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
             $retdata[] = $array;
         }
-        
+
         return $retdata;
     }
 
