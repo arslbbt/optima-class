@@ -2,8 +2,9 @@
 <?php $select_html .= '<select name="' . (isset($options['name']) ? $options['name'] : '') . '" 
           class="' . (isset($options['class']) ? $options['class'] : '') . '" 
           id="' . (isset($options['id']) ? $options['id'] : '') . '" 
-          onchange="' . (isset($options['func']) ? $options['func'] : '') . '" 
+          onchange="' . (isset($options['onchange']) ? $options['onchange'] : '') . '" 
           data-placeholder="' . Yii::$app->translate->t(isset($options['placeholder']) ? $options['placeholder'] : '') . '"
+          ' . (isset($options['disabled']) ? $options['disabled'] : '') . '
           ' . (isset($options['multiple']) ? $options['multiple'] : '') . '>';
 
             foreach ($data as $value) {
