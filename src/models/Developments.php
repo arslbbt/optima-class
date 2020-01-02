@@ -478,7 +478,7 @@ class Developments extends Model
         {
             foreach ($get['orderby'] as $order)
             {
-                $query .= '&orderby[]=' . $order;
+                $query .= '&orderby[]=phase_low_price_from&orderby[]=' . $order;
             }
         }
         if (isset($get["price_from"]) && $get["price_from"] != "")
