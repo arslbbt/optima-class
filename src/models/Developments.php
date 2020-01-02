@@ -474,6 +474,13 @@ class Developments extends Model
         {
             $query .= '&bathrooms[]=' . $get["bathrooms"] . '&bathrooms[]=50';
         }
+        if (isset($get["orderby"]) && $get["orderby"] != "")
+        {
+            foreach ($get['orderby'] as $order)
+            {
+                $query .= '&orderby[]=' . $order;
+            }
+        }
         if (isset($get["price_from"]) && $get["price_from"] != "")
         {
             $query .= '&phase_low_price_from=' . $get["price_from"];
