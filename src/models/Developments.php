@@ -97,6 +97,14 @@ class Developments extends Model
             {
                 $data['location'] = $property->property->location;
             }
+            if (isset($property->property->latitude))
+            {
+                $data['lat'] = $property->property->latitude;
+            }
+            if (isset($property->property->longitude))
+            {
+                $data['lng'] = $property->property->longitude;
+            }
             if (isset($property->attachments) && count($property->attachments) > 0)
             {
                 $attachments = [];
