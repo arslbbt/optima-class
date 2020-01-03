@@ -208,6 +208,14 @@ class Developments extends Model
         {
             $return_data['plot_size_to'] = $property->property->plot_size_to;
         }
+        if (isset($property->property->terrace_from) && $property->property->terrace_from != '')
+        {
+            $return_data['terrace_from'] = $property->property->terrace_from;
+        }
+        if (isset($property->property->terrace_to) && $property->property->terrace_to !='')
+        {
+            $return_data['terrace_to'] = $property->property->terrace_to;
+        }
         if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
         {
             $return_data['bathrooms_from'] = $property->property->bathrooms_from;
