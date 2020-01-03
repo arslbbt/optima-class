@@ -81,7 +81,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume','application','cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups','feet_setting','feet_views','sub_types','feet_categories'], 'safe'],
+            [['name','mobile_phone', 'phone', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume','application','cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups','feet_setting','feet_views','sub_types','feet_categories'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -461,7 +461,7 @@ class ContactUs extends Model
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? implode(',',$this->lgroups) : [],
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ?  $this->message : null),
-            'language' => strtoupper(\Yii::$app->language),
+            'language' => isset($this->language) ? $this->language : strtoupper(\Yii::$app->language),
             'sub_types' => isset($this->sub_types) ? (is_array($this->sub_types) ? implode(",",$this->sub_types) : $this->sub_types) : null,
             'feet_setting' => isset($this->feet_setting) ? implode(',',$this->feet_setting) : [],
             'feet_categories' => isset($this->feet_categories) ? $this->feet_categories : null,

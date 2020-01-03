@@ -200,6 +200,14 @@ class Developments extends Model
         {
             $return_data['bedrooms_to'] = $property->property->bedrooms_to;
         }
+        if (isset($property->property->plot_size_from) && $property->property->plot_size_from != '')
+        {
+            $return_data['plot_size_from'] = $property->property->plot_size_from;
+        }
+        if (isset($property->property->plot_size_to) && $property->property->plot_size_to !='')
+        {
+            $return_data['plot_size_to'] = $property->property->plot_size_to;
+        }
         if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0)
         {
             $return_data['bathrooms_from'] = $property->property->bathrooms_from;
