@@ -1806,6 +1806,7 @@ class Properties extends Model
             }
         }
 
+
         if (isset($get['orientations']) && $get['orientations'] != '') {
             if (is_array($get['orientations']) && count($get['orientations']) > 0) {
                 foreach ($get["orientations"] as $value) {
@@ -1942,6 +1943,19 @@ class Properties extends Model
         } elseif (isset($get["bedrooms"]) && $get["bedrooms"] != "") {
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
+
+        if (isset($get['built_from']) && !empty($get['built_from'])) {
+            $query .= '&built[]=' . $get['built_from'];
+            if (isset($get['built_to']) && !empty($get['built_to'])) {
+                $query .= '&built[]=' . $get['built_to'];
+            } else {
+                $query .= '&built[]=50';
+            }
+        } elseif (isset($get['built_to']) && !empty($get['built_to'])) {
+            $query .= '&built[]=1';
+            $query .= '&built[]=' . $get['built_to'];
+        }
+
         if (isset($get['bathrooms_from']) && !empty($get['bathrooms_from'])) {
           $query .= '&bathrooms[]=' . $get['bathrooms_from'];
           if (isset($get['bathrooms_to']) && !empty($get['bathrooms_to'])) {
