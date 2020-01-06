@@ -1147,7 +1147,7 @@ class Properties extends Model
                   $catsArr = [];
                   foreach ($property->property->custom_categories as $catdata) {
                       if (isset($cats[$catdata])) {
-                          $catsArr[] = $cats[$catdata];
+                          $catsArr[$catdata] = $cats[$catdata];
                       }
                   }
                   $return_data['categories'] = $catsArr;
