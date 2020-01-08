@@ -300,7 +300,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page')
+    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $imageseo = false)
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/'))
@@ -317,10 +317,11 @@ class Cms extends Model
         }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
+            $seoquery = $imageseo ? '&seoimage=yes' : '';
             if ($id == null)
             {
                 $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id;
+                $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $seoquery;
 
                 //echo $file;
                 
@@ -330,7 +331,7 @@ class Cms extends Model
             }
             else
             {
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id;
+                $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $seoquery;
                 $file_data = 
                 //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
                 Functions::getCRMData($url);
@@ -345,11 +346,17 @@ class Cms extends Model
         }
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
-        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        if ($imageseo) {
+            $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : '';
+        } else {
+            $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+        }
         // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
         return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '',
-            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url, 200) : '',
+            'featured_image' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '',
+            'featured_image_200' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url, 200) : '',
+            'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '',
+            'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '',
             'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
             'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
             'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
@@ -534,7 +541,7 @@ class Cms extends Model
         return $file_data;
     }
 
-    public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10)
+    public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10, $imageseo = false)
     {
         $file_name= $name;
         $webroot = Yii::getAlias('@webroot');
@@ -554,9 +561,10 @@ class Cms extends Model
             $query .= '&page-size=false';
         if ($pageSize != false)
             $query .= '&page-size=' . $pageSize;
-        if ($category != null) {
+        if ($category != null)
             $query .= '&category=' . $category;
-        }
+        if ($imageseo)
+            $query .= '&seoimage=yes';
         $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
@@ -574,13 +582,20 @@ class Cms extends Model
         $retdata = [];
         $array = [];
         foreach ($dataEach as $key => $data) {
-            $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            if ($imageseo) {
+                $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : '';
+            } else {
+                $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            }
             // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
             if ($forRoutes == true) {
-                $array['featured_image'] = $url;
+                $array['featured_image'] = $attachment_url;
             } else {
-                $array['featured_image'] = isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '';
+                $array['featured_image'] = isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '';
             }
+
+            $array['featured_image_seo_alt_desc'] = isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '';
+            $array['featured_image_seo_meta_title'] = isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '';
             $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
             $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
             $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
