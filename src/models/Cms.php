@@ -6,8 +6,6 @@ use optima\models\Functions;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
-use optima\models\Functions;
-use yii\web\NotFoundHttpException;
 
 
 /**
