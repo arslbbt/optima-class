@@ -2,6 +2,7 @@
 
 namespace optima\models;
 
+use optima\models\Functions;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -268,6 +269,31 @@ class Cms extends Model
         {
             $file_data = 
             file_get_contents($file);
+            //Functions::getCRMData($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
+
+    public static function UserLanguages()
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        $file = $webroot . '/uploads/temp/UserLanguages.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
+        {
+            $url = Yii::$app->params['apiUrl'] . 'cms/user-languages&user=' . Yii::$app->params['user'] . '&name=gogo';
+            $file_data =
+                //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/system-languages&user=' . Yii::$app->params['user'] . '&name=gogo');
+                Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        }
+        else
+        {
+            $file_data =
+                file_get_contents($file);
             //Functions::getCRMData($file);
         }
         return json_decode($file_data, TRUE);
