@@ -399,7 +399,7 @@ class Dropdowns extends Model
     *
     * Get location groups html dropdown
     *
-    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id','class'=>'my_class')
     * @return   html
     * @use      Dropdowns::location_groups_html($options = [name='test'])
     */
@@ -412,10 +412,41 @@ class Dropdowns extends Model
 
     /**
     *
+    * Get locations html dropdown
+    *
+    * @param    array selected_locationGroups array e.g array('0'=>'712','1'=>'714')
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id','class'=>'my_class')
+    * @return   html
+    * @use      Dropdowns::locations_html($options = [name='test'])
+    */
+
+    public static function locations_html($selected_locationGroups, $options = array('name'=>'location[]')){
+      $locationGroups = self::locationGroups();
+      $locations = [];
+      $loc = [];
+
+      foreach ($selected_locationGroups as $selected_locationGroup) {
+        foreach ($locationGroups as $locationGroup) {
+          if ($selected_locationGroup == $locationGroup['key_system']) {
+            $lGroups[] = $locationGroup;
+            if (isset($locationGroup['group_value'])) {
+              $locations = self::prepare_select_data($locationGroup['group_value'], 'key', strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language));      
+            }
+          }
+        }
+        foreach ($locations as $value) {
+          $loc[] = $value;
+        }
+      }
+      return self::html_select($loc, $options);
+    }
+
+    /**
+    *
     * Get prepared select data
     *
     * @param    array data array e.g for options return html 
-    * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+    * @param    array options array e.g array('name'=>'test','id'=>'my_id','class'=>'my_class')
     * @return   html
     * @use      Dropdowns::prepare_select_data($dataArray='Data to be formated', $option_key_index='key', $option_value_index='value')
     */

@@ -28,6 +28,7 @@ class Properties extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
+        // echo $url;die;
 
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -322,9 +323,6 @@ class Properties extends Model
                             $data['price'] = ($property->property->currentprice != 0) ? number_format((int) $property->property->currentprice, 0, '', '.') : '';
                         }
                     }
-
-
-
                     if (isset($property->property->currentprice) && $property->property->currentprice > 0) {
                         $data['currentprice'] = str_replace(',', '.', (number_format((int) ($property->property->currentprice))));
                     }
@@ -416,6 +414,9 @@ class Properties extends Model
                     }
                     if (isset($property->property->plot) && $property->property->plot > 0) {
                         $data['plot'] = $property->property->plot;
+                    }
+                    if (isset($property->property->exclusive) && $property->property->exclusive == true) {
+                        $data['exclusive'] = true;
                     }
                     if (isset($property->property->custom_categories) && is_array($property->property->custom_categories)) {
                         $cats = self::Categories();
@@ -1147,7 +1148,7 @@ class Properties extends Model
                   $catsArr = [];
                   foreach ($property->property->custom_categories as $catdata) {
                       if (isset($cats[$catdata])) {
-                          $catsArr[] = $cats[$catdata];
+                          $catsArr[$catdata] = $cats[$catdata];
                       }
                   }
                   $return_data['categories'] = $catsArr;
