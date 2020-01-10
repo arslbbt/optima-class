@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
 class Properties extends Model
 {
 
-    public static function findAll($query, $wm = false, $cache = false, $options=['images_size'=>1200])
+    public static function findAll($query, $wm = false, $cache = false, $options=['images_size' => 1200, 'watermark_size' => ''])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -169,10 +169,13 @@ class Properties extends Model
                     } elseif (isset($property->property->private_info_object->$agency->longitude)) {
                         $data['lng'] = $property->property->private_info_object->$agency->longitude;
                     }
-                    if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
-                        $data['sale_rent_description'] = $property->property->description->$contentLang;
-                    } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
-                        $data['sale_rent_description'] = $property->property->rental_description->$contentLang;
+                    // if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
+                    //     $data['sale_rent_description'] = $property->property->description->$contentLang;
+                    // } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
+                    //     $data['sale_rent_description'] = $property->property->rental_description->$contentLang;
+                    // }
+                    if (isset($property->property->$description->$contentLang)) {
+                        $data['sale_rent_description'] = $property->property->$description->$contentLang;
                     }
                     if (isset($property->property->$description->$contentLang)) {
                         $data['description'] = $property->property->$description->$contentLang;
@@ -478,13 +481,14 @@ class Properties extends Model
                     $data['slug_all'] = $slugs;
                     if (isset($property->attachments) && count($property->attachments) > 0) {
                         $attachments = [];
+                        $watermark_query = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                         if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' .$options['images_size'] . '/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
                             }
                         } else {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_query . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
                             }
                         }
                         $data['attachments'] = $attachments;
@@ -1042,10 +1046,13 @@ class Properties extends Model
               if (isset($property->property->address_country)) {
                   $return_data['country'] = $property->property->address_country;
               }
-              if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
-                  $return_data['sale_rent_description'] = $property->property->description->$contentLang;
-              } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
-                  $return_data['sale_rent_description'] = $property->property->rental_description->$contentLang;
+              // if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
+              //     $return_data['sale_rent_description'] = $property->property->description->$contentLang;
+              // } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
+              //     $return_data['sale_rent_description'] = $property->property->rental_description->$contentLang;
+              // }
+              if (isset($property->property->$description->$contentLang) && !empty($property->property->$description->$contentLang)) {
+                  $return_data['sale_rent_description'] = $property->property->$description->$contentLang;
               }
               if (isset($property->property->$description->$contentLang) && !empty($property->property->$description->$contentLang)) {
                   $return_data['description'] = $property->property->$description->$contentLang;
