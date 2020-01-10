@@ -2300,8 +2300,8 @@ class Properties extends Model
         $Arr = json_decode($file_data, true);
         $return_data = [];
         foreach ($Arr as $data) {
-            if (isset($data['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)]))
-                $return_data[$data['key']] = $data['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)];
+            if (isset($data['value']['en']))
+                $return_data[$data['key']] = $data['value']['en'];
         }
         return $return_data;
     }
