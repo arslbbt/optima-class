@@ -2164,6 +2164,11 @@ class Properties extends Model
         if (isset($get["keywords"]) && $get["keywords"] != "") {
             $query .= '&keywords=' . $get["keywords"];
         }
+        if (isset($get["mooring_type"]) && is_array($get["mooring_type"]) && $get["mooring_type"] != "") {
+          foreach ($get['mooring_type'] as $mooring_type) {
+            $query .= '&mooring_type[]=' . $mooring_type;
+          }
+        }
         if (isset($get["listing_agent"]) && $get["listing_agent"]) {
             if (is_array($get["listing_agent"])) {
                 foreach ($get['listing_agent'] as $agent) {
