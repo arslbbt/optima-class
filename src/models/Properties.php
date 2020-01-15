@@ -481,6 +481,7 @@ class Properties extends Model
                     $data['slug_all'] = $slugs;
                     if (isset($property->attachments) && count($property->attachments) > 0) {
                         $attachments = [];
+                        $attachment_alt_descriptions = [];
                         $watermark_query = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                         if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
                             foreach ($property->attachments as $pic) {
@@ -489,9 +490,11 @@ class Properties extends Model
                         } else {
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_query . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
+                                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
                         }
                         $data['attachments'] = $attachments;
+                        $data['attachment_alt_desc'] = $attachment_alt_descriptions;
                     }
                     $categories = [];
                     $features = [];
