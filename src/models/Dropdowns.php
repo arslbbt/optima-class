@@ -136,6 +136,23 @@ class Dropdowns extends Model
         return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
 
+    public static function mooringTypes()
+    {
+      $curl = new curl\Curl();
+      $response = $curl->setRequestBody(json_encode([]))
+          ->setHeaders([
+              'Content-Type' => 'application/json',
+              'Content-Length' => strlen(json_encode([]))
+          ])
+          ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
+          
+      $data = json_decode($response, TRUE);
+      foreach ($data as $mooring_type) {
+        $mooring_types[$mooring_type['key']] = $mooring_type['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)];
+      }
+      return $mooring_types;
+    }
+
     public static function cities($provinces = [], $to_json = false)
     {
         $webroot = Yii::getAlias('@webroot');
@@ -201,12 +218,8 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-
     public static function CommercialType()
-
     {
-
-
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode([]))
             ->setHeaders([
@@ -214,12 +227,6 @@ class Dropdowns extends Model
                 'Content-Length' => strlen(json_encode([]))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
-
-
-
-        // echo "<pre>";
-        // var_dump($response);
-        // die;
 
         // $webroot = Yii::getAlias('@webroot');
         // if (!is_dir($webroot . '/uploads/')) {
@@ -267,9 +274,6 @@ class Dropdowns extends Model
             $file_data = file_get_contents($file);
         }
         $fdata = json_decode($file_data);
-        //    echo"<pre>";
-        //    print_r($fdata);
-        //    die;
 
         foreach ($fdata as $file) {
             $sub_types = [];
