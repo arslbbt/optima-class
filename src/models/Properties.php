@@ -2170,13 +2170,13 @@ class Properties extends Model
           }
         }
         if (isset($get["listing_agent"]) && $get["listing_agent"]) {
-            if (is_array($get["listing_agent"])) {
-                foreach ($get['listing_agent'] as $agent) {
-                    $query .= '&listing_agent[]=' . $agent;
-                }
-            } else {
-                $query .= '&listing_agent=' . $get["listing_agent"];
-            }
+          if (is_array($get["listing_agent"])) {
+              foreach ($get['listing_agent'] as $agent) {
+                  $query .= '&listing_agent[]=' . $agent;
+              }
+          } else {
+              $query .= '&listing_agent=' . $get["listing_agent"];
+          }
         }
         if (isset($get['orderby']) && !empty($get['orderby'])) {
             if ($get['orderby'] == 'dateASC') {
