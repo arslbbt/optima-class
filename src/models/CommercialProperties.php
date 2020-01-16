@@ -58,21 +58,14 @@ class CommercialProperties extends Model
             if (count($query)){
                 $query_array = $query;
                 $query_array['archived']['$ne'] = true;
+                $query_array['status']['$in'] = ['Available', 'Under Offer', 'Valuation'];
             }
         }
-
-
-
-
         
         $post_data = ["options" => $options];
-        //[ '$gt' =>  100000, '$lt' => 6]
         if(!empty($query_array))
             $post_data["query"] =  $query_array;
         
-        // echo '<pre>--------';
-        // print_r($post_data);
-
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
@@ -83,7 +76,6 @@ class CommercialProperties extends Model
             ->post($node_url);
         $response = json_decode($response, TRUE);
 
-
         $properties = [];
 
         if(isset($response) && isset($response['docs']))
@@ -91,9 +83,7 @@ class CommercialProperties extends Model
             $properties[] = self::formateProperty($property);
         }
         $response['docs'] = $properties;
-        // echo '<pre>';
-        // print_r($response);
-        // print_r($post_data);
+
         return $response;
     }
 
@@ -114,20 +104,11 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
-        // echo "<pre>";
-        // print_r(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
-        // die();
-
         
         $response = json_decode($response, TRUE);
-        // echo '<pre>---';
-        // print_r($response['kitchen']);
-        // die;
 
         $property = self::formateProperty($response);
-        // echo "<pre>";
-        // print_r($property);
-        // die();
+        
         return $property;
     }
 
@@ -172,13 +153,6 @@ class CommercialProperties extends Model
 
         $query['archived']['$ne'] = true;
 
-
-
-
-        // if(isset($get['bedrooms']) && $get['bedrooms'] )
-        // {
-        //     $query['bedrooms']= ['$gte'=> 2, $lte: 3}
-        // }
         if (isset($get['location']) && $get['location']) {
 
             $query['location'] = (int) $get['location'];
@@ -186,15 +160,11 @@ class CommercialProperties extends Model
         if (isset($get['featured']) && $get['featured']) {
             $query['featured'] = true;
         }
-
-
-
         return $query;
     }
 
     public static function formateProperty($property)
     {      
-        //Yii::$app->language = 'en';
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
         $f_property = [];
@@ -202,7 +172,7 @@ class CommercialProperties extends Model
             $ref = $settings['general_settings']['reference'];
             $f_property['reference'] = $property[$ref];
         } else {
-            $f_property['reference'] = $property['reference'];
+            $f_property['reference'] = isset($property['reference']) ? $property['reference'] : '';
         }
         if (isset($property['_id'])) {
             $f_property['_id'] = $property['_id'];
