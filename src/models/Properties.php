@@ -8,15 +8,23 @@ use optima\models\Cms;
 use yii\helpers\ArrayHelper;
 
 /**
- * LoginForm is the model behind the login form.
- *
- * @property User|null $user This property is read-only.
+ * This is the model class for Properties.
  *
  */
 class Properties extends Model
 {
-
-    public static function findAll($query, $wm = false, $cache = false, $options=['images_size' => 1200, 'watermark_size' => ''])
+    /**
+     * LoginForm is the model behind the login form.
+     *
+     * @property string $query    query for properties search.
+     * @property bool   $wm       send true for wm server.
+     * @property bool   $cache    send true for cache response.
+     * @property array  $options  options for data response e.g. 
+     *                            'images_size' => 1200
+     *                            'watermark_size' => 100   range is 100 - 500
+     *
+     */
+    public static function findAll($query, $wm = false, $cache = false, $options=[])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -482,14 +490,15 @@ class Properties extends Model
                     if (isset($property->attachments) && count($property->attachments) > 0) {
                         $attachments = [];
                         $attachment_alt_descriptions = [];
-                        $watermark_query = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
+                        $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
+                        $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
                         if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             }
                         } else {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_query . $pic->model_id . '/' . $options['images_size'] . '/' . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
                         }
