@@ -505,5 +505,28 @@ class Dropdowns extends Model
       require($path.'/views/partials/selectDropdown.php');
       return $select_html;
     }
+    public static function offices()
+    {
+        $webroot = Yii::getAlias('@webroot');
+        if (!is_dir($webroot . '/uploads/')) {
+            mkdir($webroot . '/uploads/');
+        }
+        if (!is_dir($webroot . '/uploads/temp/')) {
+            mkdir($webroot . '/uploads/temp/');
+        }
+        $file = $webroot . '/uploads/temp/offices.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/get-offices&user_apikey=' . Yii::$app->params['api_key'].'&agency_id=' . Yii::$app->params['agency'];
+            // echo $url;
+            // die('---');
+            $file_data =
+                //file_get_contents();
+                Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
 
 }

@@ -51,7 +51,7 @@ class CommercialProperties extends Model
             }
         }
         if(isset($query) && $query != '' && is_array($query)){
-            if (!count($query)) {
+            if (count($query)) {
                 $query = self::setQuery();
                 $query['archived']['$ne'] = true;
             }
@@ -159,6 +159,9 @@ class CommercialProperties extends Model
         }
         if (isset($get['featured']) && $get['featured']) {
             $query['featured'] = true;
+        }
+        if (isset($get['office']) && $get['office']) {
+            $query['offices'] =['$in' => $get['office']];
         }
         return $query;
     }
