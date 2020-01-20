@@ -85,7 +85,8 @@ class Cms extends Model
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/translations_' . $lang . '.json';
         $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang . $site_id;
+        $commercial = isset(\Yii::$app->params['commercial']) ? '&commercial=' . \Yii::$app->params['commercial'] : '';
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons&user=' . Yii::$app->params['user'] . '&lang=' . $lang . $site_id . $commercial;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600))
         {
             $file_data = 
