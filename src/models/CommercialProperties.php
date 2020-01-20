@@ -177,6 +177,9 @@ class CommercialProperties extends Model
         } else {
             $f_property['reference'] = isset($property['reference']) ? $property['reference'] : '';
         }
+        if (isset($property['external_reference'])) {
+            $f_property['external_reference'] = $property['external_reference'];
+        }
         if (isset($property['_id'])) {
             $f_property['_id'] = $property['_id'];
         }
