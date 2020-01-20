@@ -6,6 +6,8 @@
           id="' . (isset($options['id']) ? $options['id'] : '') . '" 
           onchange="' . (isset($options['onchange']) ? $options['onchange'] : '') . '" 
           data-placeholder="' . Yii::$app->translate->t(isset($options['placeholder']) ? $options['placeholder'] : '') . '"
+          data-nselectedtext="' . Yii::$app->translate->t('selected') . '"
+          data-allselectedtext="' . Yii::$app->translate->t('All selected') . '"
           ' . (isset($options['disabled']) ? $options['disabled'] : '') . '
           ' . (isset($options['multiple']) ? $options['multiple'] : '') . '
           >';
