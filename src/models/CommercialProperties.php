@@ -134,7 +134,7 @@ class CommercialProperties extends Model
                 $int_type = (int) $int_type;
             }
             $intArray[] = $int_type;
-            $query['type_one'] = ['$in' => $intArray];
+            $query['type_two'] = ['$in' => $intArray];
         }
 
         if (isset($get['country']) && $get['country']) {
