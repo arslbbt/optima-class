@@ -128,7 +128,13 @@ class CommercialProperties extends Model
         }
 
         if (isset($get['type']) && $get['type'] && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
-            $query['type_one'] = ['$in' => $get['type']];
+            $intArray = array();
+            $int_type = '';
+            foreach ($get['type'] as $int_type) {
+                $int_type = (int) $int_type;
+            }
+            $intArray[] = $int_type;
+            $query['type_one'] = ['$in' => $intArray];
         }
 
         if (isset($get['country']) && $get['country']) {
