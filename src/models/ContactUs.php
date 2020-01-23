@@ -343,7 +343,7 @@ class ContactUs extends Model
                         $subscribe_subject = \Yii::t('app', $setting['value']);
                     }
                 }
-
+                $htmlBody='';
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)]))
                 {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
