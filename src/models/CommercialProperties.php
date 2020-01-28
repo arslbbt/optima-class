@@ -58,7 +58,7 @@ class CommercialProperties extends Model
             if (count($query)){
                 $query_array = $query;
                 $query_array['archived']['$ne'] = true;
-                $query_array['status'] = ['$in' => ['Available', 'Under Offer', 'Valuation']];
+                $query_array['status'] = ['$in' => ['Available', 'Under Offer']];
             }
         }
         
