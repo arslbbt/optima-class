@@ -714,7 +714,16 @@ class Properties extends Model
               if ($rent == true) {
                   $sale_rent = "rent";
               }
-
+              if (isset($property->property->mooring_type)) {
+                  $return_data['mooring_type'] = $property->property->mooring_type;
+              }
+              if (isset($property->property->feet_moorings)) {
+                  foreach($property->property->feet_moorings as $mooring) {
+                      foreach($mooring as $key=>$value){
+                          $return_data['feet_moorings'][$key] = $value;
+                      }
+                  }
+              }
             
               $title = 'title';
               $description = 'description';
