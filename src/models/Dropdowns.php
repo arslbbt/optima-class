@@ -220,11 +220,13 @@ class Dropdowns extends Model
 
     public static function CommercialType()
     {
+        $options = ["page"=> 1, "limit"=> 200];
+        $post_data = ["options" => $options];
         $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode([]))
+        $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
                 'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode([]))
+                'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
 
