@@ -1343,22 +1343,9 @@ class Properties extends Model
                   $return_data['videos_with_description'] = $videosArrDesc;
               }
 
-              if (isset($property->property->mooring_type)) {
-                  $data['mooring_type'] = $property->property->mooring_type;
-              }
-              if (isset($property->property->feet_moorings)) {
-                  foreach($property->property->feet_moorings as $mooring) {
-                      foreach($mooring as $key=>$value){
-                          $data['feet_moorings'][$key] = $value;
-                      }
-                  }
-              }
-              $categorie['mooring_type'] = $data['mooring_type'];
-              $categorie['feet_mooring'] = $data['feet_moorings'];
-
 
               $custom_categories = [];
-              $categories = $categorie;
+              $categories = [];
               $features = [];
               $climate_control = [];
               $kitchen = [];
@@ -1504,6 +1491,18 @@ class Properties extends Model
                       }
                   }
               }
+
+              if (isset($property->property->mooring_type)) {
+                  $categories['mooring_type'] = $property->property->mooring_type;
+              }
+              if (isset($property->property->feet_moorings) && !empty($property->property->feet_moorings)) {
+                  foreach($property->property->feet_moorings as $mooring) {
+                      foreach($mooring as $key=>$value){
+                          $categories['feet_moorings'][$key] = $value;
+                      }
+                  }
+              }
+
               if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories) > 0) {
                   foreach ($property->property->value_of_custom->feet_custom_categories as $value) {
                       if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
