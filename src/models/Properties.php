@@ -1365,6 +1365,8 @@ class Properties extends Model
               $beds = [];
               $baths = [];
               $rental_investment_info = [];
+              $mooring_type = [];
+              $moorings = [];
               if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
                   foreach ($property->property->value_of_custom->basic_info as $value) {
                       if (isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '') {
@@ -1492,14 +1494,18 @@ class Properties extends Model
                   }
               }
 
-              if (isset($property->property->mooring_type)) {
-                  $categories['mooring_type'] = $property->property->mooring_type;
+              if (isset($property->property->mooring_type) && !empty($property->property->mooring_type) && count($property->property->mooring_type) > 0) {
+                  foreach($property->property->mooring_type as $key => $value){
+                      if($value){
+                        $mooring_type[$key] = $value;
+                      }
+                  }
               }
-              if (isset($property->property->feet_moorings) && !empty($property->property->feet_moorings)) {
+              if (isset($property->property->feet_moorings) && !empty($property->property->feet_moorings) && count($property->property->feet_moorings) > 0) {
                   foreach($property->property->feet_moorings as $mooring) {
                       foreach($mooring as $key=>$value){
-                          $categories['feet_moorings'][$key] = $value;
-                      }
+                        $moorings[$key] = $value;
+                    }
                   }
               }
 
@@ -1514,7 +1520,7 @@ class Properties extends Model
                   $cats = self::Categories();
                   foreach ($property->property->custom_categories as $catdata) {
                       if (isset($cats[$catdata])) {
-                          $custom_categories[] = $cats[$catdata];
+                          $categories[] = $cats[$catdata];
                       }
                   }
               }
@@ -1776,6 +1782,8 @@ class Properties extends Model
               $return_data['property_features']['condition'] = $condition;
               $return_data['property_features']['categories'] = $categories;
               $return_data['property_features']['custom_categories'] = $custom_categories;
+              $return_data['property_features']['mooring_type'] = $mooring_type;
+              $return_data['property_features']['moorings'] = $moorings;
               $return_data['property_features']['setting'] = $setting;
               $return_data['property_features']['orientation'] = $orientation;
               $return_data['property_features']['views'] = $views;
