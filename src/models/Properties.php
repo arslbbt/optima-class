@@ -1520,7 +1520,7 @@ class Properties extends Model
                   $cats = self::Categories();
                   foreach ($property->property->custom_categories as $catdata) {
                       if (isset($cats[$catdata])) {
-                          $categories[] = $cats[$catdata];
+                          $custom_categories[] = $cats[$catdata];
                       }
                   }
               }
