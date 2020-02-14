@@ -300,6 +300,9 @@ class CommercialProperties extends Model
         if (isset($property['real_estate_tax']) && $property['real_estate_tax'] !='') {
             $f_property['real_estate_tax '] = $property['real_estate_tax'];
         }
+        if (isset($property['show_on']) && $property['show_on'] !='') {
+            $f_property['show_on '] = $property['show_on'];
+        }
         if (isset($property['dimensions']) && $property['dimensions'] !='') {
             $f_property['dimensions'] = $property['dimensions'];
         }
