@@ -1358,7 +1358,6 @@ class Properties extends Model
               $parking = [];
               $garden = [];
               $pool = [];
-              $pool_size = [];
               $condition = [];
               $rooms = [];
               $living_rooms = [];
@@ -1367,6 +1366,10 @@ class Properties extends Model
               $rental_investment_info = [];
               $mooring_type = [];
               $moorings = [];
+              $communal_pool_size = [];
+              $private_pool_size = [];
+              $childrens_pool_size = [];
+              $indoor_pool_size = [];
               if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->basic_info)) {
                   foreach ($property->property->value_of_custom->basic_info as $value) {
                       if (isset($value->field) && isset($value->value) && $value->field != '' && $value->value != '') {
@@ -1504,11 +1507,12 @@ class Properties extends Model
               if (isset($property->property->feet_moorings) && !empty($property->property->feet_moorings) && count($property->property->feet_moorings) > 0) {
                   foreach($property->property->feet_moorings as $mooring) {
                       foreach($mooring as $key=>$value){
+                        if($value){
                         $moorings[$key] = $value;
+                        }
                     }
                   }
               }
-
               if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->feet_custom_categories) && count($property->property->value_of_custom->feet_custom_categories) > 0) {
                   foreach ($property->property->value_of_custom->feet_custom_categories as $value) {
                       if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
@@ -1676,12 +1680,21 @@ class Properties extends Model
               }
               if (isset($property->property->feet_pool)) {
                   foreach ($property->property->feet_pool as $key => $value) {
-                      if ($value == true) {
+                      if ($value == true &&  $key != 'communal_pool_size' &&  $key != 'private_pool_size' &&  $key != 'childrens_pool_size' &&  $key != 'indoor_pool_size') {
                           $pool[] = $key;
-                      }
-                      if ($key == 'pool_private_size') {
-                          $pool_size = (array) $value;
-                      }
+                        }
+                    if ($key == 'communal_pool_size') {
+                          $communal_pool_size = (array) $value;
+                        }
+                    if ($key == 'private_pool_size') {
+                        $private_pool_size = (array) $value;
+                    }
+                    if ($key == 'childrens_pool_size') {
+                        $childrens_pool_size = (array) $value;
+                    }
+                    if ($key == 'indoor_pool_size') {
+                        $indoor_pool_size = (array) $value;
+                    }
                   }
               }
               if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->pool) && count($property->property->value_of_custom->pool) > 0) {
@@ -1796,7 +1809,10 @@ class Properties extends Model
               $return_data['property_features']['parking'] = $parking;
               $return_data['property_features']['garden'] = $garden;
               $return_data['property_features']['pool'] = $pool;
-              $return_data['property_features']['pool_size'] = $pool_size;
+              $return_data['property_features']['communal_pool_size'] = $communal_pool_size;
+              $return_data['property_features']['private_pool_size'] = $private_pool_size;
+              $return_data['property_features']['childrens_pool_size'] = $childrens_pool_size;
+              $return_data['property_features']['indoor_pool_size'] = $indoor_pool_size;
               $return_data['property_features']['features'] = $features;
               $return_data['construction_data'] = $construction;
               return $return_data;
