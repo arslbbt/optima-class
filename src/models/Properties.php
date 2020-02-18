@@ -235,6 +235,9 @@ class Properties extends Model
                     } elseif (isset($property->property->private_info_object->$agency->address_street)) {
                         $data['address_street'] = $property->property->private_info_object->$agency->address_street;
                     }
+                    if (isset($property->property->vt_ids) && !empty($property->property->vt_ids)) {
+                        $data['vt'] = $property->property->vt_ids;
+                    }
                     if (isset($property->property->address_street_number) && $property->property->address_street_number != '') {
                         $data['address_street_number'] = $property->property->address_street_number;
                     } elseif (isset($property->property->private_info_object->$agency->address_street_number)) {
@@ -512,6 +515,7 @@ class Properties extends Model
                     $setting = [];
                     $orientation = [];
                     $views = [];
+                    $videos = [];
                     $utilities = [];
                     $security = [];
                     $furniture = [];
