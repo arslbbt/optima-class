@@ -86,7 +86,7 @@ class Functions extends Model
         $params = Yii::$app->params;
         $cmsModel = Cms::Slugs('page');
         $url = explode('/', Yii::$app->request->url);
-        $this_page = end($url);
+        $this_page = urldecode(end($url));
         $page_data = $it->view->params['page_data'] = Cms::pageBySlug(Yii::$app->request->get('title'));
         if(isset($cmsModel) and count($cmsModel) > 0)
         foreach($cmsModel as $row){
