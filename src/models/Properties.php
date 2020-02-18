@@ -557,6 +557,11 @@ class Properties extends Model
                             }
                         }
                     }
+                    if (isset($property->property->videos)) {
+                        foreach ($property->property->videos as $key => $value) {
+                            $videos[] = $value;
+                        }
+                    }
                     if (isset($property->property->feet_setting)) {
                         foreach ($property->property->feet_setting as $key => $value) {
                             if ($value == true) {
@@ -646,6 +651,7 @@ class Properties extends Model
                     $data['property_features']['pool'] = $pool;
                     $data['property_features']['pool_size'] = $pool_size;
                     $data['property_features']['condition'] = $condition;
+                    $data['property_features']['videos'] = $videos;
                     $return_data[] = $data;
                 }
             }
