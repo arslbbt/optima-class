@@ -71,7 +71,7 @@ class Cms extends Model
             return [$v['key'],  $v['value']];
         };
 
-        return Functions::array_map_assoc($func,$custom_settings);
+        return Functions::array_map_assoc($func, $custom_settings);
 
     }
 

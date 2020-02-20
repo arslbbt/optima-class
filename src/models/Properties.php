@@ -2240,6 +2240,10 @@ class Properties extends Model
                 $query .= '&orderby[]=created_at&orderby[]=ASC';
             } elseif ($get['orderby'] == 'dateDESC') {
                 $query .= '&orderby[]=created_at&orderby[]=DESC';
+            } elseif ($get['orderby'] == 'updateASC') {
+                $query .= '&orderby[]=updated_at&orderby[]=ASC';
+            } elseif ($get['orderby'] == 'updateDESC') {
+                $query .= '&orderby[]=updated_at&orderby[]=DESC';
             } elseif ($get['orderby'] == 'priceASC') {
                 $query .= '&orderby[]=currentprice&orderby[]=ASC';
             } elseif ($get['orderby'] == 'priceDESC') {
