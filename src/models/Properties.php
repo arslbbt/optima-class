@@ -1068,6 +1068,9 @@ class Properties extends Model
               if (isset($property->property->address_country)) {
                   $return_data['country'] = $property->property->address_country;
               }
+              if (isset($property->property->region) && !empty($property->property->region)) {
+                  $return_data['region'] = $property->property->region;
+              }
               // if (isset($property->property->sale) && $property->property->sale == true && isset($property->property->description->$contentLang) && $property->property->description->$contentLang != '') {
               //     $return_data['sale_rent_description'] = $property->property->description->$contentLang;
               // } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_description->$contentLang) && $property->property->rental_description->$contentLang != '') {
