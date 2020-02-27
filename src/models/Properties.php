@@ -564,7 +564,7 @@ class Properties extends Model
                             }
                         }
                     }
-                    if (isset($property->property->videos)) {
+                    if (isset($property->property->videos) && !empty($property->property->videos)) {
                         foreach ($property->property->videos as $key => $value) {
                             $videos[] = $value;
                         }
@@ -697,6 +697,7 @@ class Properties extends Model
           if (isset($with_count) && $with_count == true) {
               $url .= '&view_count=true';
           }
+        // echo $url;die;
 
           $JsonData = Functions::getCRMData($url,false);
           $property = json_decode($JsonData);
