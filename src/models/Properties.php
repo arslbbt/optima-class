@@ -827,6 +827,9 @@ class Properties extends Model
               if (isset($property->property->bathrooms)) {
                   $return_data['bathrooms'] = $property->property->bathrooms;
               }
+              if (isset($property->property->perma_link)) {
+                  $return_data['perma_link'] = $property->property->perma_link->$lang;
+              }
               if (isset($property->property->kilowatt)) {
                   $return_data['kilowatt'] = $property->property->kilowatt;
               }
