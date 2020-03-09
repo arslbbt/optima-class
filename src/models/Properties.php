@@ -34,7 +34,11 @@ class Properties extends Model
                 $contentLang = $sysLang['key'];
             }
         }
-        $query .= self::setQuery();
+        if(isset($options['set_query']) && $options['set_query'] == false ){
+            $query .= $query;
+        }else{
+            $query .= self::setQuery();
+        }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
         // echo $url;die;
 
