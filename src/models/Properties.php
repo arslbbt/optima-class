@@ -162,7 +162,7 @@ class Properties extends Model
                     if (isset($property->property->type_one)) {
                         $data['type'] = $property->property->type_one;
                     }
-                    if (isset($property->property->perma_link)) {
+                    if (isset($property->property->perma_link->$lang)) {
                         $data['perma_link'] = $property->property->perma_link->$lang;
                     }
                     if (isset($property->property->type_two)) {
