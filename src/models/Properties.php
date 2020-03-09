@@ -1173,6 +1173,9 @@ class Properties extends Model
               if (isset($property->property->sale) && isset($property->property->new_construction) && $property->property->sale == 1 && $property->property->new_construction == 1) {
                   $return_data['new_construction'] = $property->property->new_construction;
               }
+              if (isset($property->property->$seo_title)) {
+                  $return_data['meta_title_all'] = $property->property->$seo_title;
+              }
               if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
                   $return_data['meta_title'] = $property->property->$seo_title->$contentLang;
               }
