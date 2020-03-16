@@ -270,7 +270,20 @@ class Properties extends Model
                                     } else {
                                         if (isset($seasons->gross_day_price)) {
                                             if(isset($seasons->period_to) && $seasons->period_to >= time() ){
-                                                $gdprice[] = $seasons->gross_day_price;
+                                                //$gdprice[] = $seasons->gross_day_price;
+                                                if(isset($seasons->discounts)){
+                                                    foreach ($seasons->discounts as $discount) {
+                                                        if(isset($discount->discount_price) && $discount->discount_price != '' ) {
+                                                            $gdprice[] = $discount->discount_price;
+                                                        }
+                                                        else {
+                                                            $gdprice[] = $seasons->gross_day_price;
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    $gdprice[] = $seasons->gross_day_price;
+                                                }
                                             }
                                         }
                                     }
@@ -929,7 +942,20 @@ class Properties extends Model
                               else {
                                   if (isset($seasons->gross_day_price)) {
                                       if(isset($seasons->period_to) && $seasons->period_to >= time()){
-                                          $gdprice[] = $seasons->gross_day_price;
+                                          //$gdprice[] = $seasons->gross_day_price;
+                                          if(isset($seasons->discounts)){
+                                            foreach ($seasons->discounts as $discount) {
+                                                if(isset($discount->discount_price) && $discount->discount_price != '' ) {
+                                                    $gdprice[] = $discount->discount_price;
+                                                }
+                                                else {
+                                                    $gdprice[] = $seasons->gross_day_price;
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            $gdprice[] = $seasons->gross_day_price;
+                                        }
                                       }
                                   }
                               }
@@ -2076,6 +2102,13 @@ class Properties extends Model
         }
         if (isset($get["st_to"]) && $get["st_to"] == "") {
             $query .= '&st_new_price[]=100000000';
+        }
+        if (isset($get["no_of_days"]) && $get["no_of_days"] != "" && isset($get["st_from"]) && $get["st_from"] != "" && isset($get["st_date_from"]) && $get["st_date_from"] != "" && isset($get["st_date_to"]) && $get["st_date_to"] != "") {
+            $stdf = new \DateTime($get["st_date_from"]);
+            $stdt = new \DateTime($get["st_date_to"]);
+            $query .= '&st_new_price[]=' . $stdf->getTimestamp();
+            $query .= '&st_new_price[]=' . $stdt->getTimestamp();
+            $query .= '&st_new_price[]=' . $get["no_of_days"];
         }
         if (isset($get["sleeps"]) && $get["sleeps"] != "") {
             $query .= '&sleeps=' . $get["sleeps"];
