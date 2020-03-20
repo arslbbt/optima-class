@@ -99,10 +99,11 @@ class ContactUs extends Model
     public $buy_from_date;
     public $min_purchase_budget;
     public $max_purchase_budget;
+    public $condition;
     public function rules()
     {
         return [
-            [['name','mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume','application','cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups','feet_setting','feet_views','sub_types','feet_categories','p_type','year_built_from','year_built_to','plot_size_from','plot_size_to','built_size_to','usefull_area_from','usefull_area_to','building_style','gated_comunity','elevator','settings','orientation','views','garden','only_golf_properties','only_off_plan','buy_from_date','min_purchase_budget','max_purchase_budget'], 'safe'],
+            [['name','mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume','application','cv_file', 'gdpr_status','buyer', 'listing_agency_email', 'lgroups','feet_setting','feet_views','sub_types','feet_categories','p_type','year_built_from','year_built_to','plot_size_from','plot_size_to','built_size_to','usefull_area_from','usefull_area_to','building_style','gated_comunity','elevator','settings','orientation','views','garden','only_golf_properties','only_off_plan','buy_from_date','min_purchase_budget','max_purchase_budget','condition'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -505,6 +506,7 @@ class ContactUs extends Model
             'orientation' => isset($this->orientation) ? $this->orientation : null,
             'views' => isset($this->views) ? $this->views : null,
             'garden' => isset($this->garden) ? $this->garden : null,
+            'condition' => isset($this->condition) ? $this->condition : null,
             'only_golf_properties' => isset($this->only_golf_properties) ? $this->only_golf_properties : null,
             'only_off_plan' => isset($this->only_off_plan) ? $this->only_off_plan : null,
             'buy_from_date' => isset($this->buy_from_date) ? $this->buy_from_date : null,
