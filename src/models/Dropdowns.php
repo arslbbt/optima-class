@@ -16,38 +16,22 @@ use optima\assets\OptimaAsset;
 class Dropdowns extends Model
 {
 
-    public static function provinces()
+    public static function directory()
     {
         $webroot = Yii::getAlias('@webroot');
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
         }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
+        if (!is_dir($webroot . '//uploads/temp/')) {
+            mkdir($webroot . '//uploads/temp/');
         }
-        $file = $webroot . '/uploads/temp/provinces.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents();
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        return $webroot . '//uploads/temp/';
     }
 
     public static function countries()
     {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/countries.json';
+        
+        $file = self::directory() . 'countries.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key'];
             $file_data =
@@ -60,33 +44,27 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function urbanisations()
+    public static function regions($country = '')
     {
         $return_data = [];
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/urbanisations.json';
+        
+        $file = self::directory() . 'regions'.$country.'.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
+            $post_data = ["query" => (object) ['country' => $country], "options" => ["page" => 1, "limit" => 1000, "sort" => ["accent_value.en" => 1]]];
             $curl = new curl\Curl();
             $response = $curl->setRequestBody(json_encode($post_data))
                 ->setHeaders([
                     'Content-Type' => 'application/json',
                     'Content-Length' => strlen(json_encode($post_data))
                 ])
-                ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
+                ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
             $data = json_decode($response, TRUE);
             if (isset($data['docs']) && count($data['docs']) > 0) {
                 foreach ($data['docs'] as $doc) {
-                    if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
-                        $return_data[$doc['key']] = isset($doc['value']) ? $doc['value'] : '';
+                    $return_data[$doc['key']] = $doc['value'][strtolower(\Yii::$app->language)];
                 }
             }
+
             file_put_contents($file, json_encode($return_data));
         } else {
             $return_data = json_decode(file_get_contents($file), TRUE);
@@ -94,76 +72,26 @@ class Dropdowns extends Model
         return $return_data;
     }
 
-    public static function locations($provinces = [], $to_json = false, $cities = [], $country = '')
+    public static function provinces()
     {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/locations_' . implode(',', $provinces) . implode(',', $cities) . '.json';
-
-
+        
+        $file = self::directory() . 'provinces.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $p_q = '';
-            $c_q = '';
-            if (is_array($provinces) && count($provinces)) {
-                foreach ($provinces as $province) {
-                    $p_q .= '&province[]=' . $province;
-                }
-            }
-            if (is_array($cities) && count($cities)) {
-                foreach ($cities as $city) {
-                    $c_q .= '&city[]=' . $city;
-                }
-            }
-            $country_check = '';
-            if ($country) {
-                $country_check = '&country=' . $country;
-            }
-            $url = Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
-
-
+            $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'];
             $file_data =
-                //file_get_contents($url);
+                //file_get_contents();
                 Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
         }
-        return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
-    }
-
-    public static function mooringTypes()
-    {
-      $curl = new curl\Curl();
-      $response = $curl->setRequestBody(json_encode([]))
-          ->setHeaders([
-              'Content-Type' => 'application/json',
-              'Content-Length' => strlen(json_encode([]))
-          ])
-          ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
-          
-      $data = json_decode($response, TRUE);
-      foreach ($data as $mooring_type) {
-        $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)] : '';
-        $mooring_types[$mooring_type['key']] = $value;
-      }
-      return $mooring_types;
+        return json_decode($file_data, TRUE);
     }
 
     public static function cities($provinces = [], $to_json = false)
     {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/cities_' . implode(',', $provinces) . '.json';
+        
+        $file = self::directory() . 'cities_' . implode(',', $provinces) . '.json';
 
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
@@ -197,16 +125,122 @@ class Dropdowns extends Model
         return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
 
+    public static function locationGroups($provinces = [])
+    {
+        
+        $file = self::directory() . 'locationGroups_' . implode(',', $provinces) . '.json';
+
+        if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $p_q = '';
+            foreach ($provinces as $province) {
+                $p_q .= '&province[]=' . $province;
+            }
+            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value' . $p_q . '&user_apikey=' . Yii::$app->params['api_key'];
+            $file_data =
+                //file_get_contents($url);
+                Functions::getCRMData($url);
+
+            file_put_contents($file, $file_data);
+        } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user_apikey=' . Yii::$app->params['api_key'];
+            $file_data =
+                //file_get_contents($url);
+                Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        // echo $file_data;
+        //    die;
+        return json_decode($file_data, true);
+    }
+
+    public static function locations($provinces = [], $to_json = false, $cities = [], $country = '')
+    {
+        
+        $file = self::directory() . 'locations_' . implode(',', $provinces) . implode(',', $cities) . '.json';
+
+
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $p_q = '';
+            $c_q = '';
+            if (is_array($provinces) && count($provinces)) {
+                foreach ($provinces as $province) {
+                    $p_q .= '&province[]=' . $province;
+                }
+            }
+            if (is_array($cities) && count($cities)) {
+                foreach ($cities as $city) {
+                    $c_q .= '&city[]=' . $city;
+                }
+            }
+            $country_check = '';
+            if ($country) {
+                $country_check = '&country=' . $country;
+            }
+            $url = Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
+
+
+            $file_data =
+                //file_get_contents($url);
+                Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
+    }
+
+    public static function urbanisations()
+    {
+        $return_data = [];
+        
+        $file = self::directory() . 'urbanisations.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data))
+                ])
+                ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
+            $data = json_decode($response, TRUE);
+            if (isset($data['docs']) && count($data['docs']) > 0) {
+                foreach ($data['docs'] as $doc) {
+                    if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
+                        $return_data[$doc['key']] = isset($doc['value']) ? $doc['value'] : '';
+                }
+            }
+            file_put_contents($file, json_encode($return_data));
+        } else {
+            $return_data = json_decode(file_get_contents($file), TRUE);
+        }
+        return $return_data;
+    }
+
+    public static function mooringTypes()
+    {
+      $curl = new curl\Curl();
+      $response = $curl->setRequestBody(json_encode([]))
+          ->setHeaders([
+              'Content-Type' => 'application/json',
+              'Content-Length' => strlen(json_encode([]))
+          ])
+          ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
+          
+      $data = json_decode($response, TRUE);
+      foreach ($data as $mooring_type) {
+        $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es'? 'es_AR' : strtolower(Yii::$app->language)] : '';
+        $mooring_types[$mooring_type['key']] = $value;
+      }
+      return $mooring_types;
+    }
+
     public static function types()
     {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/types.json';
+        
+        $file = self::directory() . 'types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
             $file_data =
@@ -235,10 +269,10 @@ class Dropdowns extends Model
         // if (!is_dir($webroot . '/uploads/')) {
         //     mkdir($webroot . '/uploads/');
         // }
-        // if (!is_dir($webroot . '/uploads/temp/')) {
-        //     mkdir($webroot . '/uploads/temp/');
+        // if (!is_dir(self::directory() . '')) {
+        //     mkdir(self::directory() . '');
         // }
-        // $file = $webroot . '/uploads/temp/types.json';
+        // $file = self::directory() . 'types.json';
         // if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
         //     $url = Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key'];
         //     echo $url;
@@ -253,20 +287,12 @@ class Dropdowns extends Model
         return json_decode($response, TRUE);
     }
 
-
-
     public static function typesByLanguage()
     {
         $types = [];
         //        $types['subtypes'] = [];
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/types.json';
+        
+        $file = self::directory() . 'types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
             $file_data =
@@ -296,6 +322,22 @@ class Dropdowns extends Model
         return $types;
     }
 
+    public static function buildingStyles()
+    {
+        
+        $file = self::directory() . 'building-style.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/building-style&user_apikey=' . Yii::$app->params['api_key'];
+            $file_data =
+                //file_get_contents($url);
+                Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
+
     public static function numbers($limit)
     {
         return range(1, $limit);
@@ -322,68 +364,10 @@ class Dropdowns extends Model
         return $to_json ? json_encode($data) : $data;
     }
 
-    public static function locationGroups($provinces = [])
-    {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/locationGroups_' . implode(',', $provinces) . '.json';
-
-        if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $p_q = '';
-            foreach ($provinces as $province) {
-                $p_q .= '&province[]=' . $province;
-            }
-            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value' . $p_q . '&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-
-            file_put_contents($file, $file_data);
-        } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        // echo $file_data;
-        //    die;
-        return json_decode($file_data, true);
-    }
-
     public static function orientations()
     {
         return [['key' => "north", 'value' => \Yii::t('app', 'north')], ['key' => "north_east", 'value' => \Yii::t('app', 'north_east')], ['key' => "east", 'value' => \Yii::t('app', 'east')], ['key' => "south_east", 'value' => \Yii::t('app', 'south_east')], ['key' => "south", 'value' => \Yii::t('app', 'south')], ['key' => "south_west", 'value' => \Yii::t('app', 'south_west')], ['key' => "west", 'value' => \Yii::t('app', 'west')], ['key' => "north_west", 'value' => \Yii::t('app', 'north_west')],];
     }
-    public static function buildingStyles()
-    {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/building-style.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/building-style&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
-    }
-
     
     /**
     *
@@ -394,8 +378,8 @@ class Dropdowns extends Model
     * @return   JSON OR html
     * @use      Dropdowns::typesHTML($data, $options = [name='test'])
     */
-
-    public static function types_html($options){
+    public static function types_html($options)
+    {
       $types = self::types();
       $types = self::prepare_select_data($types, 'key', 'value');
       return self::html_select($types, $options);
@@ -410,8 +394,8 @@ class Dropdowns extends Model
     * @return   html
     * @use      Dropdowns::location_groups_html($options = [name='test'])
     */
-
-    public static function location_groups_html($options = array('name'=>'lg_by_key[]')){
+    public static function location_groups_html($options = array('name'=>'lg_by_key[]'))
+    {
       $locationGroups = self::locationGroups();
       $locationGroups = self::prepare_select_data($locationGroups, 'key_system', 'value');      
       return self::html_select($locationGroups, $options);
@@ -426,8 +410,8 @@ class Dropdowns extends Model
     * @return   html
     * @use      Dropdowns::locations_html($options = [name='test'])
     */
-
-    public static function locations_html($selected_locationGroups, $options = array('name'=>'location[]')){
+    public static function locations_html($selected_locationGroups, $options = array('name'=>'location[]'))
+    {
       $locationGroups = self::locationGroups();
       $locations = [];
       $loc = [];
@@ -457,9 +441,8 @@ class Dropdowns extends Model
     * @return   html
     * @use      Dropdowns::prepare_select_data($dataArray='Data to be formated', $option_key_index='key', $option_value_index='value')
     */
-
-    public static function prepare_select_data($dataArray, $option_key_index='key', $option_value_index='value'){
-      
+    public static function prepare_select_data($dataArray, $option_key_index='key', $option_value_index='value')
+    {
       $finalFormatedSelectArray= array();
       foreach ($dataArray as $key => $value) {
         $finalFormatedSelectArray[$key]['option_key']= $value[$option_key_index];
@@ -477,8 +460,8 @@ class Dropdowns extends Model
     * @return   html
     * @use      Dropdowns::dropdown($dataArray='Data to be formated', $options = [name='test'])
     */
-
-    public static function dropdown($dataArray, $options){
+    public static function dropdown($dataArray, $options)
+    {
       $finalFormatedSelectArray= array();
       foreach ($dataArray as $key => $value) {
         $finalFormatedSelectArray[$key]['option_key']= $key;
@@ -497,8 +480,8 @@ class Dropdowns extends Model
     * @return   html
     * @use      Dropdowns::html_select($data, $options = [name='test'])
     */
-
-    public static function html_select($data, $options=[]) {
+    public static function html_select($data, $options=[])
+    {
       $path =  dirname(dirname(__FILE__));
       $view = Yii::$app->controller->view;
 
@@ -508,16 +491,11 @@ class Dropdowns extends Model
       require($path.'/views/partials/selectDropdown.php');
       return $select_html;
     }
+
     public static function offices()
     {
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/')) {
-            mkdir($webroot . '/uploads/');
-        }
-        if (!is_dir($webroot . '/uploads/temp/')) {
-            mkdir($webroot . '/uploads/temp/');
-        }
-        $file = $webroot . '/uploads/temp/offices.json';
+        
+        $file = self::directory() . 'offices.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/get-offices&user_apikey=' . Yii::$app->params['api_key'].'&agency_id=' . Yii::$app->params['agency'];
             // echo $url;
