@@ -82,6 +82,7 @@ class ContactUs extends Model
     public $p_type;
     public $year_built_from;
     public $year_built_to;
+    public $built_size_from;
     public $built_size_to;
     public $plot_size_from;
     public $plot_size_to;
@@ -100,10 +101,16 @@ class ContactUs extends Model
     public $min_purchase_budget;
     public $max_purchase_budget;
     public $condition;
+    public $countries;
+    public $regions;
+    public $provinces;
+    public $cities;
+    public $locations;
+    public $urbanization;
     public function rules()
     {
         return [
-            [['name', 'mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'min_purchase_budget', 'max_purchase_budget', 'condition'], 'safe'],
+            [['name', 'mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'min_purchase_budget', 'max_purchase_budget', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'condition'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -445,9 +452,10 @@ class ContactUs extends Model
             'pool' => isset($this->pool) ? (is_array($this->pool) ? implode(",", $this->pool) : $this->pool) : null,
             'year_built_from' => isset($this->year_built_from) ? $this->year_built_from : null,
             'year_built_to' => isset($this->year_built_to) ? $this->year_built_to : null,
-            'plot_size_from' => isset($this->plot_size_from) ? $this->plot_size_from : null,
+            'min_plot_size' => isset($this->plot_size_from) ? $this->plot_size_from : null,
             'plot_size_to' => isset($this->plot_size_to) ? $this->plot_size_to : null,
             'built_size_to' => isset($this->built_size_to) ? $this->built_size_to : null,
+            'built_size_from' => isset($this->built_size_from) ? $this->built_size_from : null,
             'usefull_area_from' => isset($this->usefull_area_from) ? $this->usefull_area_from : null,
             'usefull_area_to' => isset($this->usefull_area_to) ? $this->usefull_area_to : null,
             'building_style' => isset($this->building_style) ? $this->building_style : null,
@@ -463,6 +471,12 @@ class ContactUs extends Model
             'buy_from_date' => isset($this->buy_from_date) ? $this->buy_from_date : null,
             'min_purchase_budget' => isset($this->min_purchase_budget) ? $this->min_purchase_budget : null,
             'max_purchase_budget' => isset($this->max_purchase_budget) ? $this->max_purchase_budget : null,
+            'countries' => isset($this->countries) ? (is_array($this->countries) ? implode(",", $this->countries) : $this->countries) : null,
+            'regions' => isset($this->regions) ? (is_array($this->regions) ? implode(",", $this->regions) : $this->regions) : null,
+            'provinces' => isset($this->provinces) ? (is_array($this->provinces) ? implode(",", $this->provinces) : $this->provinces) : null,
+            'cities' => isset($this->cities) ? (is_array($this->cities) ? implode(",", $this->cities) : $this->cities) : null,
+            'locations' => isset($this->locations) ? (is_array($this->locations) ? implode(",", $this->locations) : $this->locations) : null,
+            'urbanization' => isset($this->urbanization) ? (is_array($this->urbanization) ? implode(",", $this->urbanization) : $this->urbanization) : null,
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
