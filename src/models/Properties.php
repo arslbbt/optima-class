@@ -2057,11 +2057,19 @@ class Properties extends Model
         if (isset($get["booking_data"]) && $get["booking_data"] != "") {
             $query .= '&booking_data=' . $get["booking_data"];
         }
-        if (isset($get["st_date_from"]) && $get["st_date_from"] != "" && $get["st_date_from"] != "Arrival" && isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
+        // if (isset($get["st_date_from"]) && $get["st_date_from"] != "" && $get["st_date_from"] != "Arrival" && isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
+        //     $stdf = new \DateTime($get["st_date_from_submit"]);
+        //     $query .= '&booking_from=' . $stdf->getTimestamp();
+        // }
+        // if (isset($get["st_date_to"]) && $get["st_date_to"] != "" && $get["st_date_to"] != "Return" && isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
+        //     $stdt = new \DateTime($get["st_date_to_submit"]);
+        //     $query .= '&booking_to=' . $stdt->getTimestamp();
+        // }
+        if (isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
             $stdf = new \DateTime($get["st_date_from_submit"]);
             $query .= '&booking_from=' . $stdf->getTimestamp();
         }
-        if (isset($get["st_date_to"]) && $get["st_date_to"] != "" && $get["st_date_to"] != "Return" && isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
+        if (isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
             $stdt = new \DateTime($get["st_date_to_submit"]);
             $query .= '&booking_to=' . $stdt->getTimestamp();
         }
