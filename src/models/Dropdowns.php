@@ -32,13 +32,14 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function regions($country = '')
+    public static function getRegions($params = [])
     {
+        $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $return_data = [];
 
-        $file = Functions::directory() . 'regions' . $country . '.json';
+        $file = Functions::directory() . 'regions' . implode(',', $countries) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $post_data = ["query" => (object) ['country' => $country], "options" => ["page" => 1, "limit" => 1000, "sort" => ["accent_value.en" => 1]]];
+            $post_data = ["query" => (object) ['country' => $countries], "options" => ["page" => 1, "limit" => 1000, "sort" => ["accent_value.en" => 1]]];
             $curl = new curl\Curl();
             $response = $curl->setRequestBody(json_encode($post_data))
                 ->setHeaders([
@@ -74,6 +75,42 @@ class Dropdowns extends Model
             $file_data = file_get_contents($file);
         }
         return json_decode($file_data, TRUE);
+    }
+
+    public static function getProvinces($params = [])
+    {
+        $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
+        $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
+        $return_data = [];
+        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . '.json';
+
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+
+            $query = count($countries) > 0 ? array('country' => ['$in' => $countries]) : [];
+            $query = count($regions) > 0 ? array('region' => ['$in' => $regions]) : $query;
+            $options = [
+                "page" => 1,
+                "limit" => 50,
+                "sort" => ["accent_value.en" => 1]
+            ];
+
+            $post_data = ["query" => (object) $query, "options" => $options];
+
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data))
+                ])
+                ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
+
+            $data = json_decode($response, TRUE);
+            $return_data = isset($data['docs']) ? $data['docs'] : [];
+            file_put_contents($file, json_encode($return_data));
+        } else {
+            $return_data = json_decode(file_get_contents($file), TRUE);
+        }
+        return $return_data;
     }
 
     public static function cities($provinces = [], $to_json = false)
@@ -207,46 +244,10 @@ class Dropdowns extends Model
         return $return_data;
     }
 
-    public static function getProvinces($params = [])
-    {
-        $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
-        $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
-        $return_data = [];
-        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . '.json';
-
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-
-            $query = count($countries) > 0 ? array('country' => ['$in' => $countries]) : [];
-            $query = count($regions) > 0 ? array('region' => ['$in' => $regions]) : $query;
-            $options = [
-                "page" => 1,
-                "limit" => 50,
-                "sort" => ["accent_value.en" => 1]
-            ];
-
-            $post_data = ["query" => (object) $query, "options" => $options];
-
-            $curl = new curl\Curl();
-            $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
-                ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
-        }
-        return $return_data;
-    }
-
     public static function getUrbanisations($params = [])
     {
         $return_data = [];
-        $file = Functions::directory() . 'urbanisations.json';
+        $file = Functions::directory() . 'urbanisation.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = [];
