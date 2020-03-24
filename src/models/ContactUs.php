@@ -108,7 +108,6 @@ class ContactUs extends Model
     public $locations;
     public $urbanization;
     public $furniture;
-
     public $occupancy_status;
     public $legal_status;
     public $total_floors;
@@ -117,12 +116,12 @@ class ContactUs extends Model
     public $only_holiday_homes;
     public $only_bank_repossessions;
     public $own;
-
+    public $custom_categories;
 
     public function rules()
     {
         return [
-            [['name', 'mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'min_purchase_budget', 'max_purchase_budget', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own'], 'safe'],
+            [['name', 'mobile_phone', 'phone', 'office', 'call_remember', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'buy_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'min_purchase_budget', 'max_purchase_budget', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'custom_categories'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -450,16 +449,17 @@ class ContactUs extends Model
             'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : null,
             'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : null,
             'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : null,
-            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : null,
+            'transaction_types' => isset($this->transaction_types) ? (is_array($this->transaction_types) ? implode(",", $this->transaction_types) : $this->transaction_types) : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
-            'lgroups' => isset($this->lgroups) ? implode(',', $this->lgroups) : [],
+            'lgroups' => isset($this->lgroups) ? (is_array($this->lgroups) ? implode(",", $this->lgroups) : $this->lgroups) : null,
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ?  $this->message : null),
             'language' => isset($this->language) ? $this->language : strtoupper(\Yii::$app->language),
             'sub_types' => isset($this->sub_types) ? (is_array($this->sub_types) ? implode(",", $this->sub_types) : $this->sub_types) : null,
-            'feet_setting' => isset($this->feet_setting) ? implode(',', $this->feet_setting) : [],
-            'feet_categories' => isset($this->feet_categories) ? $this->feet_categories : null,
-            'feet_views' => isset($this->feet_views) ? implode(',', $this->feet_views) : [],
+            'feet_setting' => isset($this->feet_setting) ? (is_array($this->feet_setting) ? implode(",", $this->feet_setting) : $this->feet_setting) : null,
+            'feet_categories' => isset($this->feet_categories) ? (is_array($this->feet_categories) ? implode(",", $this->feet_categories) : $this->feet_categories) : null,
+            'custom_categories' => isset($this->custom_categories) ? (is_array($this->custom_categories) ? implode(",", $this->custom_categories) : $this->custom_categories) : null,
+            'feet_views' => isset($this->feet_views) ? (is_array($this->feet_views) ? implode(",", $this->feet_views) : $this->feet_views) : null,
             'parking' => isset($this->parking) ? (is_array($this->parking) ? implode(",", $this->parking) : $this->parking) : null,
             'pool' => isset($this->pool) ? (is_array($this->pool) ? implode(",", $this->pool) : $this->pool) : null,
             'year_built_from' => isset($this->year_built_from) ? $this->year_built_from : null,
@@ -500,7 +500,7 @@ class ContactUs extends Model
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
-        echo $response;
+        echo '<pre>';print_r($fields);
     }
 
     public function saveSenderAccount()
@@ -518,7 +518,7 @@ class ContactUs extends Model
             'message' => $this->message,
             'phone' => isset($this->sender_phone) ? $this->sender_phone : null,
             'property' => isset($this->reference) ? $this->reference : null,
-            'transaction_types' => isset($this->transaction_types) ? $this->transaction_types : null,
+            'transaction_types' => isset($this->transaction_types) ? (is_array($this->transaction_types) ? implode(",", $this->transaction_types) : $this->transaction_types) : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
