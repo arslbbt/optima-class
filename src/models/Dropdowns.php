@@ -50,10 +50,10 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
-            $response = $curl->setRequestBody(json_encode($post_data))
+            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
                     'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
+                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ])
                 ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
             $data = json_decode($response, TRUE);
@@ -106,10 +106,10 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
-            $response = $curl->setRequestBody(json_encode($post_data))
+            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
                     'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
+                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ])
                 ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
 
@@ -179,10 +179,10 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
-            $response = $curl->setRequestBody(json_encode($post_data))
+            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
                     'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
+                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ])
                 ->post(Yii::$app->params['node_url'] . 'cities?user=' . Yii::$app->params['user']);
 
@@ -260,6 +260,44 @@ class Dropdowns extends Model
         return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
     }
 
+
+
+    public static function getLocations($params = [])
+    {
+        $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
+        $cities = isset($params['cities']) ? is_array($params['cities']) ? $params['cities'] : explode(',', $params['cities']) : [];
+        $return_data = [];
+        $file = Functions::directory() . 'locations_' . implode(',', $cities) . '.json';
+
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+
+            $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+            $query = count($cities) ? array_merge($query, array('city' => ['$in' => $cities])) : $query;
+            $options = [
+                "page" => 1,
+                "limit" => 50,
+                "sort" => ["accent_value.en" => 1]
+            ];
+
+            $post_data = ["query" => (object) $query, "options" => $options];
+
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
+                ])
+                ->post(Yii::$app->params['node_url'] . 'locations?user=' . Yii::$app->params['user']);
+
+            $data = json_decode($response, TRUE);
+            $return_data = isset($data['docs']) ? $data['docs'] : [];
+            file_put_contents($file, json_encode($return_data));
+        } else {
+            $return_data = json_decode(file_get_contents($file), TRUE);
+        }
+        return $return_data;
+    }
+
     public static function urbanisations()
     {
         $return_data = [];
@@ -305,10 +343,10 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
-            $response = $curl->setRequestBody(json_encode($post_data))
+            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
                     'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
+                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ])
                 ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
 
