@@ -2451,6 +2451,56 @@ class Properties extends Model
         return $file_data;
     }
 
+    public static function calculation($date_from, $date_to, $number_days)
+    {
+        \Yii::$app->setTimeZone('Europe/Paris');
+        $return_data = [];
+        $query = '';
+
+        if (isset($get["no_of_days"]) && $get["no_of_days"] != "" && isset($get["st_from"]) && $get["st_from"] != "" && isset($get["st_date_from"]) && $get["st_date_from"] != "" && isset($get["st_date_to"]) && $get["st_date_to"] != "") {
+            $stdf = new \DateTime($get["st_date_from"]);
+            $stdt = new \DateTime($get["st_date_to"]);
+            $query .= '&st_new_price[]=' . $stdf->getTimestamp();
+            $query .= '&st_new_price[]=' . $stdt->getTimestamp();
+            $query .= '&st_new_price[]=' . $get["no_of_days"];
+        }
+        if (isset($query)) {
+            $properties = Properties::findAll($query, true, false, true);
+        }
+
+        $arrival = ($date_from / 1000);
+        $departure = ($date_to / 1000);
+        $start_date = new \DateTime();
+        $start_date->setTimestamp($arrival);
+
+        foreach($properties as $property) {
+        if (isset($property['season_data']) && count($property['season_data']) > 0) {
+            foreach ($property['season_data'] as $season) {
+                $s_gross_perday_price = isset($season['gross_day_price']) && $season['gross_day_price'] !== '' ? $season['gross_day_price'] : '';
+                if($season['period_from'] <= $arrival && $season['period_to'] >= $departure ) {
+                     // rental discount logic -----STRT-----
+                    if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
+                    asort($season['discounts']);
+                    $discount = array_filter($season['discounts'], function ($var) use ($number_days) {
+                        if (isset($var['number_days'])) {
+                            return ($var['number_days'] <= $number_days);
+                        }
+                    });
+                    $discount = end($discount);
+                    if (!empty($discount)) {
+                        $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] != '') ? $discount['discount_percent'] : 0;
+                        $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100));
+                    }
+                }
+                // rental discount logic -----END-----
+                }
+            }
+        }
+        $return_data[$property['id']] = $s_gross_perday_price;
+    }
+        return $return_data;
+    }
+
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
         \Yii::$app->setTimeZone('Europe/Paris');
