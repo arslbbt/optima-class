@@ -162,7 +162,7 @@ class Dropdowns extends Model
     public static function getCities($params = [])
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
-        $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', intval($params['provinces'])) : [];
+        $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', $params['provinces']) : [];
         $return_data = [];
         $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
 
