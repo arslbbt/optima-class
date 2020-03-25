@@ -43,7 +43,7 @@ class Dropdowns extends Model
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $options = [
                 "page" => 1,
-                "limit" => 50,
+                "limit" => 1000,
                 "sort" => ["accent_value.en" => 1]
             ];
 
@@ -172,7 +172,7 @@ class Dropdowns extends Model
             $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
             $options = [
                 "page" => 1,
-                "limit" => 50,
+                "limit" => 1000,
                 "sort" => ["accent_value.en" => 1]
             ];
 
@@ -275,7 +275,7 @@ class Dropdowns extends Model
             $query = count($cities) ? array_merge($query, array('city' => ['$in' => $cities])) : $query;
             $options = [
                 "page" => 1,
-                "limit" => 50,
+                "limit" => 1000,
                 "sort" => ["accent_value.en" => 1]
             ];
 
@@ -335,7 +335,7 @@ class Dropdowns extends Model
             $query = [];
             $options = [
                 "page" => 1,
-                "limit" => 50,
+                "limit" => 1000,
                 "sort" => ["value" => 1],
                 "select" => "_id key value agency basic_info." . Yii::$app->params['agency']
             ];
