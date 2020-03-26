@@ -68,7 +68,7 @@ class Cms extends Model
 
         }
         $func = function ($k, $v) {
-            return [$v['key'],  $v['value']];
+            return [$v['key'],  isset($v['value']) ? $v['value'] : ''];
         };
 
         return Functions::array_map_assoc($func, $custom_settings);
