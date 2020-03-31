@@ -505,7 +505,6 @@ class ContactUs extends Model
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
-        echo '<pre>';print_r($fields);
     }
 
     public function saveSenderAccount()
