@@ -448,8 +448,17 @@ class Properties extends Model
                         }
                         $data['categories'] = $catsArr;
                     }
-                    if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
-                        $data['terrace'] = $property->property->terrace->{0}->terrace;
+                    if (isset($property->property->terrace)) {
+                        if (is_object($property->property->terrace)) {
+                            if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
+                                $data['terrace'] = $property->property->terrace->{0}->terrace;
+                            }
+                        }
+                        if (is_array($property->property->terrace)) {
+                            if (isset($property->property->terrace[0]->terrace) && $property->property->terrace[0]->terrace > 0) {
+                                $data['terrace'] = $property->property->terrace[0]->terrace;
+                            }
+                        }
                     }
                     if (isset($property->property->created_at) && !empty($property->property->created_at)) {
                         $data['created_at'] = $property->property->created_at;
@@ -845,6 +854,9 @@ class Properties extends Model
                 if (isset($property->property->status)) {
                     $return_data['status'] = $property->property->status;
                 }
+
+                // Code for all terrace sizes
+                
                 // if (isset($property->property->terrace)) {
                 //     if (is_object($property->property->terrace)) {
                 //         foreach ($property->property->terrace as $terrace) {
@@ -853,9 +865,28 @@ class Properties extends Model
                 //             }
                 //         }
                 //     }
+                //     if (is_array($property->property->terrace)) {
+                //         foreach ($property->property->terrace as $terrace) {
+                //             if (isset($terrace->terrace)) {
+                //                 $return_data['terrace'][] = $terrace->terrace;
+                //             }
+                //         }
+                //     }
                 // }
-                if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
-                    $return_data['terrace'] = $property->property->terrace->{0}->terrace;
+
+                // Code for first terrace size
+
+                if (isset($property->property->terrace)) {
+                    if (is_object($property->property->terrace)) {
+                        if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
+                            $return_data['terrace'] = $property->property->terrace->{0}->terrace;
+                        }
+                    }
+                    if (is_array($property->property->terrace)) {
+                        if (isset($property->property->terrace[0]->terrace) && $property->property->terrace[0]->terrace > 0) {
+                            $return_data['terrace'] = $property->property->terrace[0]->terrace;
+                        }
+                    }
                 }
                 if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                     $return_data['sleeps'] = $property->property->sleeps;
