@@ -595,9 +595,9 @@ class Dropdowns extends Model
      * Get prepared select data
      *
      * @param    array data array e.g for options return html 
-     * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
+     * @param    array options array e.g array('name' => 'ContactUs[provinces][]', 'class' => "multiselect", 'multiple' => 'multiple', 'onchange' => 'loadCities()', 'id' => 'provinces', 'placeholder' => 'Provinces', 'noValueTranslation' => true )
      * @return   html
-     * @use      Dropdowns::dropdown($dataArray='Data to be formated', $options = [name='test'])
+     * @use      Dropdowns::dropdown($dataArray='Data to be formated', $options = ['name' => 'ContactUs[provinces][]'])
      */
     public static function dropdown($dataArray, $options)
     {
