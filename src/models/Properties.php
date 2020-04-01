@@ -855,7 +855,7 @@ class Properties extends Model
                 //     }
                 // }
                 if (isset($property->property->terrace->{0}->terrace) && $property->property->terrace->{0}->terrace > 0) {
-                    $data['terrace'] = $property->property->terrace->{0}->terrace;
+                    $return_data['terrace'] = $property->property->terrace->{0}->terrace;
                 }
                 if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                     $return_data['sleeps'] = $property->property->sleeps;
