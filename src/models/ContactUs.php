@@ -444,6 +444,7 @@ class ContactUs extends Model
             'id_number' => isset($this->id_number) ? $this->id_number : null,
             'min_sleeps' => isset($this->min_sleeps) ? $this->min_sleeps : null,
             'postal_code' => isset($this->postal_code) ? $this->postal_code : null,
+            'address' => isset($this->address) ? $this->address : null,
             'property' => isset($this->reference) ? $this->reference : null,
             'newsletter' => isset($this->news_letter) && $this->news_letter == true ? $this->news_letter : false,
             'assigned_to' => isset($this->assigned_to) ? $this->assigned_to : null,
