@@ -97,22 +97,23 @@ class Properties extends Model
         $return_data = [];
         if ($apiData != '') {
             foreach ($apiData as $property) {
-                $title = 'title';
-                $description = 'description';
-                $price = 'sale';
-                $seo_title = 'seo_title';
-                $seo_description = 'seo_description';
-                $keywords = 'keywords';
-                $perma_link = 'perma_link';
+                $title = 'rental_title';
+                $description = 'rental_description';
+                $price = 'rent';
+                $seo_title = 'rental_seo_title';
+                $seo_description = 'rental_seo_description';
+                $keywords = 'rental_keywords';
+                $perma_link = 'rental_perma_link';
+
                 if (isset($property->property)) {
-                    if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale !== true) {
-                        $title = 'rental_title';
-                        $description = 'rental_description';
-                        $price = 'rent';
-                        $seo_title = 'rental_seo_title';
-                        $seo_description = 'rental_seo_description';
-                        $keywords = 'rental_keywords';
-                        $perma_link = 'rental_perma_link';
+                    if (isset($property->property->sale) && $property->property->sale == true) {
+                        $title = 'title';
+                        $description = 'description';
+                        $price = 'sale';
+                        $seo_title = 'seo_title';
+                        $seo_description = 'seo_description';
+                        $keywords = 'keywords';
+                        $perma_link = 'perma_link';
                     }
                     $data = [];
                     $features = [];
@@ -856,7 +857,7 @@ class Properties extends Model
                 }
 
                 // Code for all terrace sizes
-                
+
                 // if (isset($property->property->terrace)) {
                 //     if (is_object($property->property->terrace)) {
                 //         foreach ($property->property->terrace as $terrace) {
