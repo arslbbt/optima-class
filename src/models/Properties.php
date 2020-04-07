@@ -93,6 +93,7 @@ class Properties extends Model
             $rent = true;
             $strent = true;
         }
+        $rent_check = isset($options['rent']) ? $options['rent'] : false;
 
         $return_data = [];
         if ($apiData != '') {
@@ -106,7 +107,7 @@ class Properties extends Model
                 $perma_link = 'rental_perma_link';
 
                 if (isset($property->property)) {
-                    if (isset($property->property->sale) && $property->property->sale == true) {
+                    if (isset($property->property->sale) && $property->property->sale == true && !$rent_check) {
                         $title = 'title';
                         $description = 'description';
                         $price = 'sale';
