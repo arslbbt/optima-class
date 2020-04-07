@@ -749,33 +749,22 @@ class Properties extends Model
                 if (isset($property->property->urbanisation) && $property->property->urbanisation != '') {
                     $data['urbanisation'] = $property->property->urbanisation;
                 }
-                $sale_rent = "sale";
-                if (isset($property->property->rent) && $property->property->rent == true) {
-                    $sale_rent = "rent";
-                }
-                if (isset($property->property->rent) && $property->property->rent == true && isset($property->property->sale) && $property->property->sale == true) {
-                    $sale_rent = "sale";
-                }
-                if ($rent == true) {
-                    $sale_rent = "rent";
-                }
 
-
-                $title = 'title';
-                $description = 'description';
-                $price = 'sale';
-                $seo_title = 'seo_title';
-                $seo_description = 'seo_description';
-                $keywords = 'keywords';
-                $perma_link = 'perma_link';
-                if ($sale_rent == 'rent') {
-                    $title = 'rental_title';
-                    $description = 'rental_description';
-                    $price = 'rent';
-                    $seo_title = 'rental_seo_title';
-                    $seo_description = 'rental_seo_description';
-                    $keywords = 'rental_keywords';
-                    $perma_link = 'rental_perma_link';
+                $title = 'rental_title';
+                $description = 'rental_description';
+                $price = 'rent';
+                $seo_title = 'rental_seo_title';
+                $seo_description = 'rental_seo_description';
+                $keywords = 'rental_keywords';
+                $perma_link = 'rental_perma_link';
+                if (isset($property->property->sale) && $property->property->sale == true && !$rent) {
+                    $title = 'title';
+                    $description = 'description';
+                    $price = 'sale';
+                    $seo_title = 'seo_title';
+                    $seo_description = 'seo_description';
+                    $keywords = 'keywords';
+                    $perma_link = 'perma_link';
                 }
                 //    start slug_all
                 $slugs = [];
