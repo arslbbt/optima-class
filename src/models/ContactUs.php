@@ -212,6 +212,7 @@ class ContactUs extends Model
         } elseif (isset($ae_array[0])) {
             $from_email = trim($ae_array[0]);
         } else {
+            $ae_array = explode(',', Yii::$app->params['from_email']);
             $from_email = Yii::$app->params['from_email'];
         }
 
@@ -376,13 +377,13 @@ class ContactUs extends Model
             } else {
                 $subscribe_subject = '';
                 $lngn = 0; //isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
-
-                foreach ($settings['custom_settings'] as $setting) {
-                    if (isset($setting['key']) && $setting['key'] == 'enquiry_subject') {
-                        $subscribe_subject = \Yii::t('app', $setting['value']);
+                if(isset($settings['custom_settings'])){
+                    foreach ($settings['custom_settings'] as $setting) {
+                        if (isset($setting['key']) && $setting['key'] == 'enquiry_subject') {
+                            $subscribe_subject = \Yii::t('app', $setting['value']);
+                        }
                     }
                 }
-
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)])) {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
                     if ($this->reference != '') {
