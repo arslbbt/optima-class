@@ -40,7 +40,8 @@ class Properties extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-        // echo $url;die;
+         echo $url;
+         //die;
 
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -2352,8 +2353,6 @@ class Properties extends Model
                     $query .= '&rental_new_price=' . $get["st_from"] . ',' . $get["st_to"];
             }
         }
-        echo $query;
-        die;
         return $query;
     }
     public static function removeParam($url, $param) {
@@ -2509,19 +2508,19 @@ class Properties extends Model
                         $s_gross_perday_price = $season['total_gross_day_price'];
                     }
                     // rental discount logic -----STRT-----
-                    else if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
-                        asort($season['discounts']);
-                        $discount = array_filter($season['discounts'], function ($var) use ($number_days) {
-                            if (isset($var['number_days'])) {
-                                return ($var['number_days'] <= $number_days);
-                            }
-                        });
-                        $discount = end($discount);
-                        if (!empty($discount)) {
-                            $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] != '') ? $discount['discount_percent'] : 0;
-                            $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100));
-                        }
-                    }
+                    // else if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
+                    //     asort($season['discounts']);
+                    //     $discount = array_filter($season['discounts'], function ($var) use ($number_days) {
+                    //         if (isset($var['number_days'])) {
+                    //             return ($var['number_days'] <= $number_days);
+                    //         }
+                    //     });
+                    //     $discount = end($discount);
+                    //     if (!empty($discount)) {
+                    //         $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] != '') ? $discount['discount_percent'] : 0;
+                    //         $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100));
+                    //     }
+                    // }
                     // rental discount logic -----END-----
                 }
             }
