@@ -2506,6 +2506,7 @@ class Properties extends Model
                 if ($season['period_from'] <= $arrival && $season['period_to'] >= $departure) {
                     if(isset($season['total_gross_day_price'])){
                         $s_gross_perday_price = $season['total_gross_day_price'];
+                        break;
                     }
                     // rental discount logic -----STRT-----
                     // else if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
