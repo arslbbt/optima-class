@@ -2502,9 +2502,9 @@ class Properties extends Model
 
         if (isset($property['season_data']) && count($property['season_data']) > 0) {
             foreach ($property['season_data'] as $season) {
-                $s_gross_perday_price = isset($season['gross_day_price']) && $season['gross_day_price'] !== '' ? $season['gross_day_price'] : '';
+                $s_gross_perday_price = isset($season['total_day_price']) && $season['total_day_price'] !== '' ? $season['total_day_price'] : '';
                 if ($season['period_from'] <= $arrival && $season['period_to'] >= $departure) {
-                    if(isset($season['total_gross_day_price'])){
+                    if(isset($season['total_day_price'])){
                         $s_gross_perday_price = $season['total_day_price'];
                         break;
                     }
