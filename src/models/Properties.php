@@ -41,7 +41,7 @@ class Properties extends Model
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
         //  echo $url;
-         //die;
+        //  die;
 
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -671,6 +671,7 @@ class Properties extends Model
                             }
                         }
                     }
+                    $data['short_term_rental_price'] = isset($property->property->short_term_rental_price)?$property->property->short_term_rental_price:0;
                     $data['property_features'] = [];
                     $data['property_features']['features'] = $features;
                     $data['property_features']['categories'] = $categories;
