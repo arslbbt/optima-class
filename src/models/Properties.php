@@ -2491,46 +2491,10 @@ class Properties extends Model
         }
         return $file_data;
     }
-
-    public static function calculation($property, $date_from, $date_to, $number_days)
-    {
-        \Yii::$app->setTimeZone('Europe/Paris');
-        $return_data = 'N/A';
-        $arrival = ($date_from / 1000);
-        $departure = ($date_to / 1000);
-        $start_date = new \DateTime();
-        $start_date->setTimestamp($arrival);
-
-        if (isset($property['season_data']) && count($property['season_data']) > 0) {
-            foreach ($property['season_data'] as $season) {
-                $s_gross_perday_price = isset($season['total_day_price']) && $season['total_day_price'] !== '' ? $season['total_day_price'] : '';
-                if ($season['period_from'] <= $arrival && $season['period_to'] >= $departure) {
-                    if(isset($season['total_day_price'])){
-                        $s_gross_perday_price = $season['total_day_price'];
-                        break;
-                    }
-                    // rental discount logic -----STRT-----
-                    // else if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
-                    //     asort($season['discounts']);
-                    //     $discount = array_filter($season['discounts'], function ($var) use ($number_days) {
-                    //         if (isset($var['number_days'])) {
-                    //             return ($var['number_days'] <= $number_days);
-                    //         }
-                    //     });
-                    //     $discount = end($discount);
-                    //     if (!empty($discount)) {
-                    //         $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] != '') ? $discount['discount_percent'] : 0;
-                    //         $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100));
-                    //     }
-                    // }
-                    // rental discount logic -----END-----
-                }
-            }
-            $return_data = $s_gross_perday_price;
-        }
-        return $return_data;
-    }
-
+    /**
+     * calculations
+     * @depricated don't use anywhere 
+     */
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
         \Yii::$app->setTimeZone('Europe/Paris');
@@ -2719,5 +2683,11 @@ class Properties extends Model
         if (!isset($_SESSION["pricerate"])) {
             $_SESSION["pricerate"] = 1;
         }
+    }
+    public static function getPropertyRentalPrice($property, $arrival, $departure)
+    {
+        $url = Yii::$app->params['apiUrl'] . 'properties/calculate-rental-price&user_apikey=' . Yii::$app->params['api_key'].'&property='.$property.'&from='.$arrival.'&to='.$departure;
+        $json = file_get_contents($url);
+        return json_decode($json);
     }
 }
