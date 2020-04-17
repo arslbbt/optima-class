@@ -58,7 +58,7 @@ class Cms extends Model
             }
         }
         $func = function ($k, $v) {
-            return [$v['key'],  isset($v['value']) ? $v['value'] : ''];
+            return [isset($v['key']) ? $v['key'] : '',  isset($v['value']) ? $v['value'] : ''];
         };
 
         return Functions::array_map_assoc($func, $custom_settings);
@@ -383,6 +383,123 @@ class Cms extends Model
 
         return $retdata;
     }
+
+    /* Template Code started  */
+
+    public function updateAgencyPageTemplates()
+    {
+        $files = (array) self::get_files('php', 1, true);
+
+        foreach ($files as $file => $full_path) {
+            if (!preg_match('|Template Name:(.*)$|mi', file_get_contents($full_path), $header)) {
+                continue;
+            }
+
+            preg_match('|Action Path:(.*)$|mi', file_get_contents($full_path), $action);
+
+            /*  For multiple types like page and post Code start */
+
+            $types = array('page');
+            if (preg_match('|Template Post Type:(.*)$|mi', file_get_contents($full_path), $type)) {
+                $types = explode(',', self::_cleanup_header_comment($type[1]));
+            }
+
+            foreach ($types as $type) {
+                $type = self::sanitize_key($type);
+                // if ( ! isset( $post_templates[ $type ] ) ) {
+                // 	$post_templates[ $type ] = array();
+                // }
+
+                $post_templates[$type][str_replace(".php", "", $file)] = array(
+                    "label" => self::_cleanup_header_comment($header[1]),
+                    "action" => isset($action[1]) ? self::_cleanup_header_comment($action[1]) : ''
+                );
+            }
+
+            /*  Multiple types Code ends  */
+        }
+
+        echo '<pre>';
+        print_r($post_templates);
+        die;
+    }
+
+    public function get_files($type = null, $depth = 0, $search_parent = false)
+    {
+        $files = (array) self::scandir(self::getViewPath(), $type, $depth);
+        return $files;
+    }
+
+    public function getViewPath()
+    {
+        return Yii::getAlias('../web/themes/optima_theme/views');
+    }
+
+    private static function scandir($path, $extensions = null, $depth = 0, $relative_path = '')
+    {
+        if (!is_dir($path)) {
+            return false;
+        }
+
+        if ($extensions) {
+            $extensions  = (array) $extensions;
+            $_extensions = implode('|', $extensions);
+        }
+
+        $relative_path = self::trailingslashit($relative_path);
+        if ('/' == $relative_path) {
+            $relative_path = '';
+        }
+
+        $results = scandir($path);
+        $files   = array();
+
+        /**
+         * Filters the array of excluded directories and files while scanning theme folder.
+         *
+         * @since 4.7.4
+         *
+         * @param string[] $exclusions Array of excluded directories and files.
+         */
+        $exclusions = [];
+
+        foreach ($results as $result) {
+            if ('.' == $result[0] || in_array($result, $exclusions, true)) {
+                continue;
+            }
+            if (is_dir($path . '/' . $result)) {
+                if (!$depth) {
+                    continue;
+                }
+                $found = self::scandir($path . '/' . $result, $extensions, $depth - 1, $relative_path . $result);
+                $files = array_merge_recursive($files, $found);
+            } elseif (!$extensions || preg_match('~\.(' . $_extensions . ')$~', $result)) {
+                $files[$relative_path . $result] = $path . '/' . $result;
+            }
+        }
+
+        return $files;
+    }
+
+    private static function trailingslashit($string)
+    {
+        return rtrim($string, '/\\') . '/';
+    }
+
+    private static function sanitize_key($key)
+    {
+        $raw_key = $key;
+        $key     = strtolower($key);
+        $key     = preg_replace('/[^a-z0-9_\-]/', '', $key);
+        return $key;
+    }
+
+    private static function _cleanup_header_comment($str)
+    {
+        return trim(preg_replace('/\s*(?:\*\/|\?>).*/', '', $str));
+    }
+
+    /* Template Code Ended  */
 
     public static function CacheImage($url, $name, $size = 1200)
     {
