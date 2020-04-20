@@ -10,6 +10,7 @@
           data-allselectedtext="' . Yii::$app->translate->t('All selected') . '"
           ' . (isset($options['disabled']) ? $options['disabled'] : '') . '
           ' . (isset($options['multiple']) ? $options['multiple'] : '') . '
+          ' . (isset($options['required']) ? $options['required'] : '') . '
           >';
           
   foreach ($data as $value) {

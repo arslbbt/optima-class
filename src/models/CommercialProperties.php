@@ -347,6 +347,7 @@ class CommercialProperties extends Model
         $orientation = [];
         $views = [];
         $condition = [];
+        $offices = [];
         if (isset($property['categories']) && count($property['categories']) > 0) {
             foreach ($property['categories'] as $key => $value) {
                 if ($value == true) {
@@ -382,6 +383,14 @@ class CommercialProperties extends Model
                 }
             }
         }
+        if (isset($property['offices']) && count($property['offices']) > 0) {
+            foreach ($property['offices'] as $key => $value) {
+                if ($value) {
+                    $offices[] = $value;
+                }
+            }
+        }
+
         $f_property['property_features'] = [];
         $f_property['property_features']['categories'] = $categories;
         $f_property['property_features']['setting'] = $setting;
@@ -399,6 +408,7 @@ class CommercialProperties extends Model
         $f_property['property_features']['leisure'] = (isset($property['leisure']))?$property['leisure']:'';
         $f_property['property_features']['features'] = (isset($property['features']))?$property['features']:'';
         $f_property['property_features']['rooms'] = (isset($property['rooms']))?$property['rooms']:'';
+        $f_property['offices'] = $offices;
 
         return $f_property;
     }
