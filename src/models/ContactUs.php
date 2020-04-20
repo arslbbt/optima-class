@@ -481,7 +481,7 @@ class ContactUs extends Model
             'built_size_from' => isset($this->built_size_from) ? $this->built_size_from : null,
             'usefull_area_from' => isset($this->usefull_area_from) ? $this->usefull_area_from : null,
             'usefull_area_to' => isset($this->usefull_area_to) ? $this->usefull_area_to : null,
-            'building_style' => isset($this->building_style) ? $this->building_style : null,
+            'building_style' => isset($this->building_style) ? (is_array($this->building_style) ? implode(",", $this->building_style) : $this->building_style) : null,
             'gated_comunity' => isset($this->gated_comunity) ? $this->gated_comunity : null,
             'elevator' => isset($this->elevator) ? $this->elevator : null,
             'settings' => isset($this->settings) ? $this->settings : null,

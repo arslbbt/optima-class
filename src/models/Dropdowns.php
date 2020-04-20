@@ -379,7 +379,6 @@ class Dropdowns extends Model
 
     public static function types()
     {
-
         $file = Functions::directory() . 'types.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
@@ -504,9 +503,151 @@ class Dropdowns extends Model
         return $to_json ? json_encode($data) : $data;
     }
 
+    public static function settings()
+    {
+        return [
+            ['key' => "beachfront", 'value' => \Yii::t('app', 'beachfront')],
+            ['key' => "beachside", 'value' => \Yii::t('app', 'beachside')],
+            ['key' => "close_to_airport", 'value' => \Yii::t('app', 'close_to_airport')],
+            ['key' => "close_to_busstop", 'value' => \Yii::t('app', 'close_to_busstop')],
+            ['key' => "close_to_church", 'value' => \Yii::t('app', 'close_to_church')],
+            ['key' => "close_to_forest", 'value' => \Yii::t('app', 'close_to_forest')],
+            ['key' => "close_to_golf", 'value' => \Yii::t('app', 'close_to_golf')],
+            ['key' => "close_to_hotel", 'value' => \Yii::t('app', 'close_to_hotel')],
+            ['key' => "close_to_marina", 'value' => \Yii::t('app', 'close_to_marina')],
+            ['key' => "close_to_mosque", 'value' => \Yii::t('app', 'close_to_mosque')],
+            ['key' => "close_to_port", 'value' => \Yii::t('app', 'close_to_port')],
+            ['key' => "close_to_restaurant", 'value' => \Yii::t('app', 'close_to_restaurant')],
+            ['key' => "close_to_schools", 'value' => \Yii::t('app', 'close_to_schools')],
+            ['key' => "close_to_sea", 'value' => \Yii::t('app', 'close_to_sea')],
+            ['key' => "close_to_shops", 'value' => \Yii::t('app', 'close_to_shops')],
+            ['key' => "close_to_skiing", 'value' => \Yii::t('app', 'close_to_skiing')],
+            ['key' => "close_to_supermarkets", 'value' => \Yii::t('app', 'close_to_supermarkets')],
+            ['key' => "close_to_taxistand", 'value' => \Yii::t('app', 'close_to_taxistand')],
+            ['key' => "close_to_town", 'value' => \Yii::t('app', 'close_to_town')],
+            ['key' => "close_to_train", 'value' => \Yii::t('app', 'close_to_train')],
+            ['key' => "commercial_area", 'value' => \Yii::t('app', 'commercial_area')],
+            ['key' => "countryside", 'value' => \Yii::t('app', 'countryside')],
+            ['key' => "easy_access", 'value' => \Yii::t('app', 'easy_access')],
+            ['key' => "frontline_golf", 'value' => \Yii::t('app', 'frontline_golf')],
+            ['key' => "marina", 'value' => \Yii::t('app', 'marina')],
+            ['key' => "mountain_pueblo", 'value' => \Yii::t('app', 'mountain_pueblo')],
+            ['key' => "no_nearby_neighbours", 'value' => \Yii::t('app', 'no_nearby_neighbours')],
+            ['key' => "not_isolated", 'value' => \Yii::t('app', 'not_isolated')],
+            ['key' => "port", 'value' => \Yii::t('app', 'port')],
+            ['key' => "private", 'value' => \Yii::t('app', 'private')],
+            ['key' => "suburban", 'value' => \Yii::t('app', 'suburban')],
+            ['key' => "town", 'value' => \Yii::t('app', 'town')],
+            ['key' => "tranquil", 'value' => \Yii::t('app', 'tranquil')],
+            ['key' => "urbanisation", 'value' => \Yii::t('app', 'urbanisation')],
+            ['key' => "village", 'value' => \Yii::t('app', 'village')],
+        ];
+    }
+
     public static function orientations()
     {
-        return [['key' => "north", 'value' => \Yii::t('app', 'north')], ['key' => "north_east", 'value' => \Yii::t('app', 'north_east')], ['key' => "east", 'value' => \Yii::t('app', 'east')], ['key' => "south_east", 'value' => \Yii::t('app', 'south_east')], ['key' => "south", 'value' => \Yii::t('app', 'south')], ['key' => "south_west", 'value' => \Yii::t('app', 'south_west')], ['key' => "west", 'value' => \Yii::t('app', 'west')], ['key' => "north_west", 'value' => \Yii::t('app', 'north_west')],];
+        return [
+            ['key' => "north", 'value' => \Yii::t('app', 'north')],
+            ['key' => "north_east", 'value' => \Yii::t('app', 'north_east')],
+            ['key' => "east", 'value' => \Yii::t('app', 'east')],
+            ['key' => "south_east", 'value' => \Yii::t('app', 'south_east')],
+            ['key' => "south", 'value' => \Yii::t('app', 'south')],
+            ['key' => "south_west", 'value' => \Yii::t('app', 'south_west')],
+            ['key' => "west", 'value' => \Yii::t('app', 'west')],
+            ['key' => "north_west", 'value' => \Yii::t('app', 'north_west')],
+        ];
+    }
+
+    public static function views()
+    {
+        return [
+            ['key' => "beach", 'value' => \Yii::t('app', 'beach')],
+            ['key' => "countryside", 'value' => \Yii::t('app', 'countryside')],
+            ['key' => "forest", 'value' => \Yii::t('app', 'forest')],
+            ['key' => "garden", 'value' => \Yii::t('app', 'garden')],
+            ['key' => "golf", 'value' => \Yii::t('app', 'golf')],
+            ['key' => "lake", 'value' => \Yii::t('app', 'lake')],
+            ['key' => "mountain", 'value' => \Yii::t('app', 'mountain')],
+            ['key' => "panoramic", 'value' => \Yii::t('app', 'panoramic')],
+            ['key' => "partial_seaviews", 'value' => \Yii::t('app', 'partial_seaviews')],
+            ['key' => "pool", 'value' => \Yii::t('app', 'pool')],
+            ['key' => "port", 'value' => \Yii::t('app', 'port')],
+            ['key' => "sea", 'value' => \Yii::t('app', 'sea')],
+            ['key' => "ski", 'value' => \Yii::t('app', 'ski')],
+            ['key' => "street", 'value' => \Yii::t('app', 'street')],
+            ['key' => "urban", 'value' => \Yii::t('app', 'urban')],
+        ];
+    }
+
+    public static function conditions()
+    {
+        return [
+            ['key' => "excellent", 'value' => \Yii::t('app', 'excellent')],
+            ['key' => "fair", 'value' => \Yii::t('app', 'fair')],
+            ['key' => "minor_updates_required", 'value' => \Yii::t('app', 'minor_updates_required')],
+            ['key' => "good", 'value' => \Yii::t('app', 'good')],
+            ['key' => "never_lived", 'value' => \Yii::t('app', 'never_lived')],
+            ['key' => "renovation_required", 'value' => \Yii::t('app', 'renovation_required')],
+            ['key' => "recently_renovated", 'value' => \Yii::t('app', 'recently_renovated')],
+            ['key' => "recently_refurbished", 'value' => \Yii::t('app', 'recently_refurbished')],
+            ['key' => "finishing_habitable_required", 'value' => \Yii::t('app', 'finishing_habitable_required')],
+            ['key' => "basically_habitable", 'value' => \Yii::t('app', 'basically_habitable')],
+        ];
+    }
+
+    public static function parkings()
+    {
+        return [
+            ['key' => "communal_garage", 'value' => \Yii::t('app', 'communal_garage')],
+            ['key' => "parking_communal", 'value' => \Yii::t('app', 'parking_communal')],
+            ['key' => "covered", 'value' => \Yii::t('app', 'covered')],
+            ['key' => "private", 'value' => \Yii::t('app', 'private')],
+            ['key' => "more_than_one", 'value' => \Yii::t('app', 'more_than_one')],
+        ];
+    }
+
+    public static function pools()
+    {
+        return [
+            ['key' => "pool_communal", 'value' => \Yii::t('app', 'pool_communal')],
+            ['key' => "pool_indoor", 'value' => \Yii::t('app', 'pool_indoor')],
+            ['key' => "pool_private", 'value' => \Yii::t('app', 'pool_private')],
+        ];
+    }
+
+    public static function gardens()
+    {
+        return [
+            ['key' => "almond_grove", 'value' => \Yii::t('app', 'almond_grove')],
+            ['key' => "garden_communal", 'value' => \Yii::t('app', 'garden_communal')],
+            ['key' => "easy_maintenance", 'value' => \Yii::t('app', 'easy_maintenance')],
+            ['key' => "fenced", 'value' => \Yii::t('app', 'fenced')],
+            ['key' => "fruit_trees_citrus", 'value' => \Yii::t('app', 'fruit_trees_citrus')],
+            ['key' => "fruit_trees_tropical", 'value' => \Yii::t('app', 'fruit_trees_tropical')],
+            ['key' => "irrigation_rights", 'value' => \Yii::t('app', 'irrigation_rights')],
+            ['key' => "landscaped", 'value' => \Yii::t('app', 'landscaped')],
+            ['key' => "Lawn", 'value' => \Yii::t('app', 'Lawn')],
+            ['key' => "olive_grove", 'value' => \Yii::t('app', 'olive_grove')],
+            ['key' => "outdoor_dining", 'value' => \Yii::t('app', 'outdoor_dining')],
+            ['key' => "playground", 'value' => \Yii::t('app', 'playground')],
+            ['key' => "plenty_of_water", 'value' => \Yii::t('app', 'plenty_of_water')],
+            ['key' => "pool_house", 'value' => \Yii::t('app', 'pool_house')],
+            ['key' => "garden_private", 'value' => \Yii::t('app', 'garden_private')],
+            ['key' => "shade_control", 'value' => \Yii::t('app', 'shade_control')],
+            ['key' => "tropical_garden", 'value' => \Yii::t('app', 'tropical_garden')],
+            ['key' => "vegetable", 'value' => \Yii::t('app', 'vegetable')],
+            ['key' => "veranda", 'value' => \Yii::t('app', 'veranda')],
+            ['key' => "vineyard", 'value' => \Yii::t('app', 'vineyard')],
+        ];
+    }
+
+    public static function furnitures()
+    {
+        return [
+            ['key' => "fully_furnished", 'value' => \Yii::t('app', 'fully_furnished')],
+            ['key' => "part_furnished", 'value' => \Yii::t('app', 'part_furnished')],
+            ['key' => "not_furnished", 'value' => \Yii::t('app', 'not_furnished')],
+        ];
     }
 
     /**
