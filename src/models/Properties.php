@@ -40,7 +40,8 @@ class Properties extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-        // echo $url;die;
+        //  echo $url;
+        //  die;
 
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -227,6 +228,9 @@ class Properties extends Model
                     if (isset($property->property->currency) && $property->property->currency != '') {
                         $data['currency'] = $property->property->currency;
                     }
+                    if (isset($property->property->own) && $property->property->own == true) {
+                        $data['own'] = true;
+                    }
                     if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                         $data['bedrooms'] = $property->property->bedrooms;
                     }
@@ -271,8 +275,21 @@ class Properties extends Model
                                         }
                                     } else {
                                         if (isset($seasons->gross_day_price)) {
-                                            if (isset($seasons->period_to) && $seasons->period_to >= time()) {
-                                                $gdprice[] = $seasons->gross_day_price;
+                                            if(isset($seasons->period_to) && $seasons->period_to >= time() ){
+                                                //$gdprice[] = $seasons->gross_day_price;
+                                                if(isset($seasons->discounts)){
+                                                    foreach ($seasons->discounts as $discount) {
+                                                        if(isset($discount->discount_price) && $discount->discount_price != '' ) {
+                                                            $gdprice[] = $discount->discount_price;
+                                                        }
+                                                        else {
+                                                            $gdprice[] = $seasons->gross_day_price;
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    $gdprice[] = $seasons->gross_day_price;
+                                                }
                                             }
                                         }
                                     }
@@ -657,6 +674,7 @@ class Properties extends Model
                             }
                         }
                     }
+                    $data['short_term_rental_price'] = isset($property->property->short_term_rental_price)?$property->property->short_term_rental_price:0;
                     $data['property_features'] = [];
                     $data['property_features']['features'] = $features;
                     $data['property_features']['categories'] = $categories;
@@ -2109,6 +2127,13 @@ class Properties extends Model
         if (isset($get["st_to"]) && $get["st_to"] == "") {
             $query .= '&st_new_price[]=100000000';
         }
+        if (isset($get["no_of_days"]) && $get["no_of_days"] != "" && isset($get["st_from"]) && $get["st_from"] != "" && isset($get["st_date_from"]) && $get["st_date_from"] != "" && isset($get["st_date_to"]) && $get["st_date_to"] != "") {
+            $stdf = new \DateTime($get["st_date_from"]);
+            $stdt = new \DateTime($get["st_date_to"]);
+            $query .= '&st_new_price[]=' . $stdf->getTimestamp();
+            $query .= '&st_new_price[]=' . $stdt->getTimestamp();
+            $query .= '&st_new_price[]=' . $get["no_of_days"];
+        }
         if (isset($get["sleeps"]) && $get["sleeps"] != "") {
             $query .= '&sleeps=' . $get["sleeps"];
         }
@@ -2316,10 +2341,31 @@ class Properties extends Model
             } elseif ($get['orderby'] == 'own') {
                 $query .= '&orderby[]=own&orderby[]=DESC&orderby[]=exclusive&orderby[]=DESC';
             }
+            /**New Rental Query */
+            if (isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
+                $stdf = new \DateTime($get["st_date_from_submit"]);
+                $query .= '&rental_period_from=' . $stdf->getTimestamp();
+            }
+            if (isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
+                $stdt = new \DateTime($get["st_date_to_submit"]);
+                $query .= '&rental_period_to=' . $stdt->getTimestamp();
+            }
+            if ((isset($get["st_to"]) && $get["st_to"] != "") && isset($get["st_from"]) && $get["st_from"] != "") {
+                    $query = Properties::removeParam($query, 'st_new_price[]');
+                    $query = Properties::removeParam($query, 'booking_to');
+                    $query =  Properties::removeParam($query, 'booking_from');
+                    $query .= '&rental_new_price=' . $get["st_from"] . ',' . $get["st_to"];
+            }
         }
         return $query;
     }
-
+    public static function removeParam($url, $param) {
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*$/', '', $url);
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
+        return $url;
+    }
     public static function findWithLatLang($query, $wm = false, $cache = false, $options = ['images_size' => 1200])
     {
         $webroot = Yii::getAlias('@webroot');
@@ -2448,42 +2494,10 @@ class Properties extends Model
         }
         return $file_data;
     }
-
-    public static function calculation($property, $date_from, $date_to, $number_days)
-    {
-        \Yii::$app->setTimeZone('Europe/Paris');
-        $return_data = 'N/A';
-        $arrival = ($date_from / 1000);
-        $departure = ($date_to / 1000);
-        $start_date = new \DateTime();
-        $start_date->setTimestamp($arrival);
-
-        if (isset($property['season_data']) && count($property['season_data']) > 0) {
-            foreach ($property['season_data'] as $season) {
-                $s_gross_perday_price = isset($season['gross_day_price']) && $season['gross_day_price'] !== '' ? $season['gross_day_price'] : '';
-                if ($season['period_from'] <= $arrival && $season['period_to'] >= $departure) {
-                    // rental discount logic -----STRT-----
-                    if (isset($season['discounts']) && count($season['discounts']) && $s_gross_perday_price) {
-                        asort($season['discounts']);
-                        $discount = array_filter($season['discounts'], function ($var) use ($number_days) {
-                            if (isset($var['number_days'])) {
-                                return ($var['number_days'] <= $number_days);
-                            }
-                        });
-                        $discount = end($discount);
-                        if (!empty($discount)) {
-                            $discount_percent = (isset($discount['discount_percent']) && $discount['discount_percent'] != '') ? $discount['discount_percent'] : 0;
-                            $s_gross_perday_price = $s_gross_perday_price - ($s_gross_perday_price * ($discount_percent / 100));
-                        }
-                    }
-                    // rental discount logic -----END-----
-                }
-            }
-            $return_data = $s_gross_perday_price;
-        }
-        return $return_data;
-    }
-
+    /**
+     * calculations
+     * @depricated don't use anywhere 
+     */
     public static function calculations($pref, $date_from, $date_to, $nosleeps)
     {
         \Yii::$app->setTimeZone('Europe/Paris');
@@ -2672,5 +2686,11 @@ class Properties extends Model
         if (!isset($_SESSION["pricerate"])) {
             $_SESSION["pricerate"] = 1;
         }
+    }
+    public static function getPropertyRentalPrice($property, $arrival, $departure)
+    {
+        $url = Yii::$app->params['apiUrl'] . 'properties/calculate-rental-price&user_apikey=' . Yii::$app->params['api_key'].'&property='.$property.'&from='.$arrival.'&to='.$departure;
+        $json = file_get_contents($url);
+        return json_decode($json);
     }
 }
