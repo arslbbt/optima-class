@@ -225,6 +225,9 @@ class Properties extends Model
                     if (isset($property->property->currency) && $property->property->currency != '') {
                         $data['currency'] = $property->property->currency;
                     }
+                    if (isset($property->property->own) && $property->property->own == true) {
+                        $data['own'] = true;
+                    }
                     if (isset($property->property->bedrooms) && $property->property->bedrooms > 0) {
                         $data['bedrooms'] = $property->property->bedrooms;
                     }
