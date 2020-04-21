@@ -240,7 +240,7 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $imageseo = false)
+    public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $options = [])
     {
         if ($id == null) {
             $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
@@ -248,10 +248,11 @@ class Cms extends Model
             $file = Functions::directory() . $id . '.json';
         }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $seoquery = $imageseo ? '&seoimage=yes' : '';
+            $query = isset($options['seoimage']) ? '&seoimage=yes' : '';
+            $query = isset($options['template']) ? '&expand=template' : $query;
             if ($id == null) {
                 $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $seoquery;
+                $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $query;
 
                 //echo $file;
 
@@ -259,7 +260,7 @@ class Cms extends Model
                     //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id);
                     Functions::getCRMData($url);
             } else {
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $seoquery;
+                $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $query;
                 $file_data =
                     //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
                     Functions::getCRMData($url);
@@ -273,7 +274,7 @@ class Cms extends Model
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
         $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-        if ($imageseo) {
+        if (isset($options['seoimage'])) {
             $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : $attachment_url;
         }
         // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
