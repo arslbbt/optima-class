@@ -59,7 +59,7 @@ class Dropdowns extends Model
             $data = json_decode($response, TRUE);
             if (isset($data['docs']) && count($data['docs']) > 0) {
                 foreach ($data['docs'] as $doc) {
-                    $return_data[$doc['key']] = $doc['value'][strtolower(\Yii::$app->language)];
+                    $return_data[$doc['key']] = $doc['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)];
                 }
             }
 
