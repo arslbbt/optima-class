@@ -710,7 +710,7 @@ class Properties extends Model
         }
         if (isset($reference) && !empty($reference)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
-
+            // echo $url;die;
             if (isset($with_booking) && $with_booking == true) {
                 $url .= '&with_booking=true';
             }
@@ -1626,6 +1626,13 @@ class Properties extends Model
                         }
                     }
                 }
+                if (isset($property->property->feet_leisure)) {
+                    foreach ($property->property->feet_leisure as $key => $value) {
+                        if ($value == true) {
+                            $leisure[] = $key;
+                        }
+                    }
+                }
                 if (isset($property->property->value_of_custom) && isset($property->property->value_of_custom->climate_control) && count($property->property->value_of_custom->climate_control) > 0) {
                     foreach ($property->property->value_of_custom->climate_control as $value) {
                         if (isset($value->value) && $value->value == 1 && isset($value->key) && $value->key != '') {
@@ -1876,6 +1883,7 @@ class Properties extends Model
                 $return_data['property_features']['security'] = $security;
                 $return_data['property_features']['furniture'] = $furniture;
                 $return_data['property_features']['climate_control'] = $climate_control;
+                $return_data['property_features']['leisure'] = $leisure;
                 $return_data['property_features']['parking'] = $parking;
                 $return_data['property_features']['garden'] = $garden;
                 $return_data['property_features']['pool'] = $pool;
