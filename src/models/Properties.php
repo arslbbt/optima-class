@@ -775,7 +775,7 @@ class Properties extends Model
                 $seo_description = 'rental_seo_description';
                 $keywords = 'rental_keywords';
                 $perma_link = 'rental_perma_link';
-                if (isset($property->property->sale) && $property->property->sale == true && !$rent) {
+                if ((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true ) && !$rent) {
                     $title = 'title';
                     $description = 'description';
                     $price = 'sale';
@@ -1420,6 +1420,7 @@ class Properties extends Model
                 $climate_control = [];
                 $kitchen = [];
                 $setting = [];
+                $leisure = [];
                 $orientation = [];
                 $views = [];
                 $utilities = [];
