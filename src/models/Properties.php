@@ -2350,20 +2350,30 @@ class Properties extends Model
             } elseif ($get['orderby'] == 'own') {
                 $query .= '&orderby[]=own&orderby[]=DESC&orderby[]=exclusive&orderby[]=DESC';
             }
-            /**New Rental Query */
-            if (isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
-                $stdf = new \DateTime($get["st_date_from_submit"]);
-                $query .= '&rental_period_from=' . $stdf->getTimestamp();
+        }
+        /**New Rental Query */
+        if (isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
+            $stdf = new \DateTime($get["st_date_from_submit"]);
+            $query .= '&rental_period_from=' . $stdf->getTimestamp();
+            $query =  Properties::removeParam($query, 'booking_from');
+        }
+        if (isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
+            $stdt = new \DateTime($get["st_date_to_submit"]);
+            $query .= '&rental_period_to=' . $stdt->getTimestamp();
+            $query = Properties::removeParam($query, 'booking_to');
+        }
+        if (isset($get["st_from"]) && isset($get["st_to"])) {
+            $query = Properties::removeParam($query, 'st_new_price[]');
+            $query .= '&rental_new_price=';
+            if ($get["st_from"] != "" && $get["st_from"] > 0) {
+                $query .= $get["st_from"] . ',';
+            } elseif ($get["st_from"] == "" || $get["st_from"] < 1) {
+                $query .= '1,';
             }
-            if (isset($get["st_date_to_submit"]) && $get["st_date_to_submit"] != "") {
-                $stdt = new \DateTime($get["st_date_to_submit"]);
-                $query .= '&rental_period_to=' . $stdt->getTimestamp();
-            }
-            if ((isset($get["st_to"]) && $get["st_to"] != "") && isset($get["st_from"]) && $get["st_from"] != "") {
-                    $query = Properties::removeParam($query, 'st_new_price[]');
-                    $query = Properties::removeParam($query, 'booking_to');
-                    $query =  Properties::removeParam($query, 'booking_from');
-                    $query .= '&rental_new_price=' . $get["st_from"] . ',' . $get["st_to"];
+            if ($get["st_to"] != "" && $get["st_to"] > 0) {
+                $query .= $get["st_to"];
+            } elseif ($get["st_to"] == "" || $get["st_to"] < 1) {
+                $query .= '100000000000000';
             }
         }
         return $query;
