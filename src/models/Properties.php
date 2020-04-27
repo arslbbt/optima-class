@@ -108,7 +108,7 @@ class Properties extends Model
                 $perma_link = 'rental_perma_link';
 
                 if (isset($property->property)) {
-                    if (isset($property->property->sale) && $property->property->sale == true && !$rent_check) {
+                    if ((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true) && !$rent_check) {
                         $title = 'title';
                         $description = 'description';
                         $price = 'sale';
