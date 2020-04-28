@@ -301,11 +301,15 @@ class Properties extends Model
                                 if (isset($property->bookings_extras) && count((array) $property->bookings_extras) > 0) {
                                     foreach ($property->bookings_extras as $booking_extra) {
                                         $divider = 1;
+                                        $multiplyer = 1;
                                         if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay')) {
                                             $divider = 7;
                                         }
-                                        if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true && !isset(Yii::$app->params['exclude_per_stay_extras'])) {
-                                            $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
+                                        if (isset(Yii::$app->params['exclude_per_stay_extras']) && isset($booking_extra->type) && $booking_extra->type == 'per_stay') {
+                                            $multiplyer = 0;
+                                        }
+                                        if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true) {
+                                            $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider * $multiplyer) : 0);
                                         }
                                     }
                                 }
@@ -316,10 +320,13 @@ class Properties extends Model
                                         if (isset($bookings_cleaning->type) && ($bookings_cleaning->type == 'per_week' || $bookings_cleaning->type == 'per_stay')) {
                                             $divider = 7;
                                         }
+                                        if (isset(Yii::$app->params['exclude_per_stay_extras']) && $bookings_cleaning->type == 'per_stay') {
+                                            $multiplyer = 0;
+                                        }
                                         if (isset($bookings_cleaning->type) && $bookings_cleaning->type == 'per_hour') {
                                             $multiplyer = 24;
                                         }
-                                        if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client' && !isset(Yii::$app->params['exclude_per_stay_extras'])) {
+                                        if (isset($bookings_cleaning->charge_to) && $bookings_cleaning->charge_to == 'client') {
                                             $b_price = $b_price + (isset($bookings_cleaning->price) ? ($bookings_cleaning->price * 1 * $multiplyer / $divider) : 0);
                                         }
                                     }
