@@ -303,7 +303,7 @@ class Properties extends Model
                                         $divider = 1;
                                         if (isset($booking_extra->type) && ($booking_extra->type == 'per_week' || $booking_extra->type == 'per_stay')) {
                                             $divider = 7;
-                                        } 
+                                        }
                                         if (isset($booking_extra->add_to_price) && $booking_extra->add_to_price == true && !isset(Yii::$app->params['exclude_per_stay_extras'])) {
                                             $b_price = $b_price + (isset($booking_extra->price) ? ($booking_extra->price * 1 / $divider) : 0);
                                         }
