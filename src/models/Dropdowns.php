@@ -56,14 +56,23 @@ class Dropdowns extends Model
                     'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ])
                 ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
-            $data = json_decode($response, TRUE);
-            if (isset($data['docs']) && count($data['docs']) > 0) {
-                foreach ($data['docs'] as $doc) {
-                    $return_data[$doc['key']] = $doc['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)];
-                }
-            }
 
+            $data = json_decode($response, TRUE);
+            $return_data = isset($data['docs']) ? $data['docs'] : [];
             file_put_contents($file, json_encode($return_data));
+
+            // $data = json_decode($response, TRUE);
+            // if (isset($data['docs']) && count($data['docs']) > 0) {
+            //     foreach ($data['docs'] as $doc) {
+            //         if (isset($doc['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)])) {
+            //             $return_data[$doc['key']] = $doc['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)];
+            //         } else {
+            //             $return_data[$doc['key']] = $doc['value']['en'];
+            //         }
+            //     }
+            // }
+
+            // file_put_contents($file, json_encode($return_data));
         } else {
             $return_data = json_decode(file_get_contents($file), TRUE);
         }
