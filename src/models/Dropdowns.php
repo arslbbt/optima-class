@@ -380,7 +380,7 @@ class Dropdowns extends Model
 
         $data = json_decode($response, TRUE);
         foreach ($data as $mooring_type) {
-            $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : '';
+            $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : $mooring_type['value']['en'];
             $mooring_types[$mooring_type['key']] = $value;
         }
         return $mooring_types;
