@@ -13,6 +13,8 @@ $select_html .= '<select
           ' . (isset($options['required']) ? $options['required'] : '') . '
           >';
 
+$options['skip_options'] = isset($options['skip_options']) ? $options['skip_options'] : [];
+
 foreach ($data as $value) {
   if (!in_array($value['option_key'], $options['skip_options'])) {
     $select_html .= '<option ' . (is_array(Yii::$app->request->get(str_replace("[]", "", $options['name']))) ? in_array($value['option_key'], Yii::$app->request->get(str_replace("[]", "", $options['name']))) ? 'selected' : '' : Yii::$app->request->get(str_replace("[]", "", $options['name'])) == $value['option_key'] ? 'selected' : '') . ' value="' . $value['option_key'] . '">' . (isset($options['noValueTranslation']) ? $value['option_value'] : Yii::$app->translate->t($value['option_value'])) . '</option>';
