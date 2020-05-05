@@ -108,7 +108,7 @@ class Properties extends Model
                 $perma_link = 'rental_perma_link';
 
                 if (isset($property->property)) {
-                    if ((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true) && !$rent_check) {
+                    if (((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true)) && !$rent_check) {
                         $title = 'title';
                         $description = 'description';
                         $price = 'sale';
@@ -275,19 +275,17 @@ class Properties extends Model
                                         }
                                     } else {
                                         if (isset($seasons->gross_day_price)) {
-                                            if(isset($seasons->period_to) && $seasons->period_to >= time() ){
+                                            if (isset($seasons->period_to) && $seasons->period_to >= time()) {
                                                 //$gdprice[] = $seasons->gross_day_price;
-                                                if(isset($seasons->discounts)){
+                                                if (isset($seasons->discounts)) {
                                                     foreach ($seasons->discounts as $discount) {
-                                                        if(isset($discount->discount_price) && $discount->discount_price != '' ) {
+                                                        if (isset($discount->discount_price) && $discount->discount_price != '') {
                                                             $gdprice[] = $discount->discount_price;
-                                                        }
-                                                        else {
+                                                        } else {
                                                             $gdprice[] = $seasons->gross_day_price;
                                                         }
                                                     }
-                                                }
-                                                else {
+                                                } else {
                                                     $gdprice[] = $seasons->gross_day_price;
                                                 }
                                             }
@@ -681,7 +679,7 @@ class Properties extends Model
                             }
                         }
                     }
-                    $data['short_term_rental_price'] = isset($property->property->short_term_rental_price)?$property->property->short_term_rental_price:0;
+                    $data['short_term_rental_price'] = isset($property->property->short_term_rental_price) ? $property->property->short_term_rental_price : 0;
                     $data['property_features'] = [];
                     $data['property_features']['features'] = $features;
                     $data['property_features']['categories'] = $categories;
@@ -782,7 +780,7 @@ class Properties extends Model
                 $seo_description = 'rental_seo_description';
                 $keywords = 'rental_keywords';
                 $perma_link = 'rental_perma_link';
-                if ( ((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true )) && !$rent) {
+                if (((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true)) && !$rent) {
                     $title = 'title';
                     $description = 'description';
                     $price = 'sale';
@@ -980,22 +978,19 @@ class Properties extends Model
                                     if (isset($seasons->gross_day_price)) {
                                         $gdprice[] = $seasons->gross_day_price;
                                     }
-                                }
-                                else {
+                                } else {
                                     if (isset($seasons->gross_day_price)) {
-                                        if(isset($seasons->period_to) && $seasons->period_to >= time() ){
+                                        if (isset($seasons->period_to) && $seasons->period_to >= time()) {
                                             //$gdprice[] = $seasons->gross_day_price;
-                                            if(isset($seasons->discounts)){
+                                            if (isset($seasons->discounts)) {
                                                 foreach ($seasons->discounts as $discount) {
-                                                    if(isset($discount->discount_price) && $discount->discount_price != '' ) {
+                                                    if (isset($discount->discount_price) && $discount->discount_price != '') {
                                                         $gdprice[] = $discount->discount_price;
-                                                    }
-                                                    else {
+                                                    } else {
                                                         $gdprice[] = $seasons->gross_day_price;
                                                     }
                                                 }
-                                            }
-                                            else {
+                                            } else {
                                                 $gdprice[] = $seasons->gross_day_price;
                                             }
                                         }
@@ -2406,11 +2401,12 @@ class Properties extends Model
         }
         return $query;
     }
-    public static function removeParam($url, $param) {
-        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*$/', '', $url);
-        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
-        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
-        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
+    public static function removeParam($url, $param)
+    {
+        $url = preg_replace('/(&|\?)' . preg_quote($param) . '=[^&]*$/', '', $url);
+        $url = preg_replace('/(&|\?)' . preg_quote($param) . '=[^&]*&/', '$1', $url);
+        $url = preg_replace('/(&|\?)' . preg_quote($param) . '=[^&]*&/', '$1', $url);
+        $url = preg_replace('/(&|\?)' . preg_quote($param) . '=[^&]*&/', '$1', $url);
         return $url;
     }
     public static function findWithLatLang($query, $wm = false, $cache = false, $options = ['images_size' => 1200])
@@ -2736,7 +2732,7 @@ class Properties extends Model
     }
     public static function getPropertyRentalPrice($property, $arrival, $departure)
     {
-        $url = Yii::$app->params['apiUrl'] . 'properties/calculate-rental-price&user_apikey=' . Yii::$app->params['api_key'].'&property='.$property.'&from='.$arrival.'&to='.$departure;
+        $url = Yii::$app->params['apiUrl'] . 'properties/calculate-rental-price&user_apikey=' . Yii::$app->params['api_key'] . '&property=' . $property . '&from=' . $arrival . '&to=' . $departure;
         $json = file_get_contents($url);
         return json_decode($json);
     }
