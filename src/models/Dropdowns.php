@@ -64,6 +64,7 @@ class Dropdowns extends Model
         return $return_data;
     }
 
+    // use Dropdowns::getProvinces() as it will provide more options to handle data in controller and works with countries and regions search too
     public static function provinces()
     {
 
@@ -114,6 +115,7 @@ class Dropdowns extends Model
         return $return_data;
     }
 
+    // use Dropdowns::getCities() as it will provide more options to handle data in controller and works with countries search too
     public static function cities($provinces = [], $to_json = false)
     {
 
@@ -210,6 +212,7 @@ class Dropdowns extends Model
         return json_decode($file_data, true);
     }
 
+    // use Dropdowns::getLocations() as it will provide more options to handle data in controller
     public static function locations($provinces = [], $to_json = false, $cities = [], $country = '')
     {
 
@@ -279,6 +282,7 @@ class Dropdowns extends Model
         return $return_data;
     }
 
+    // use Dropdowns::getUrbanisations() as it will provide more options to handle data in controller
     public static function urbanisations()
     {
         $return_data = [];
@@ -363,12 +367,15 @@ class Dropdowns extends Model
             ])
             ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
 
-        $data = json_decode($response, TRUE);
-        foreach ($data as $mooring_type) {
-            $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : $mooring_type['value']['en'];
-            $mooring_types[$mooring_type['key']] = $value;
+        $return_data = json_decode($response, TRUE);
+        if (!isset($params['allData'])) {
+            foreach ($return_data as $mooring_type) {
+                $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : $mooring_type['value']['en'];
+                $mooring_types[$mooring_type['key']] = $value;
+            }
+            return $mooring_types;
         }
-        return $mooring_types;
+        return $return_data;
     }
 
     public static function types()
