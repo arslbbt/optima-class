@@ -137,7 +137,13 @@ class Functions extends Model
             //         'page_data' => $page_data
             //     ]);
         } else {
+
             if (!array_filter($page_data)) {
+                   $page_data_404 = Cms::pageBySlug('404');
+
+                if(!isset($page_data_404) || !isset($page_data_404['slug_all']['EN'])){
+                    die('Please create 404 page with sluge "404" in CMS');
+                }
                 $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');
             }
             return $it->render('page', [
