@@ -376,7 +376,6 @@ class Cms extends Model
 
     public static function postById($id)
     {
-
         $file = Functions::directory() . $id . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id;
@@ -501,7 +500,7 @@ class Cms extends Model
                         if ($val) {
                             $routeArray[] = [
                                 'pattern'  => $val . '/<title>',
-                                'route'    => 'site/index',
+                                'route'    => $row['template_action'],
                                 'defaults' => ['slug' => $val],
                             ];
                         }
@@ -511,7 +510,7 @@ class Cms extends Model
                         if ($val) {
                             $routeArray[] = [
                                 'pattern'  => $val,
-                                'route'    => 'site/index',
+                                'route'    => $row['template_action'],
                                 'defaults' => ['slug' => $val],
                             ];
                         }
@@ -523,7 +522,7 @@ class Cms extends Model
         /** Site controller */
         $routeArray['/<title>'] = 'site/page';
 
-        // echo '<pre>'; print_r($routeArray); die;
+        // print_r($routeArray); die;
         return $routeArray;
     }
 
@@ -701,11 +700,11 @@ class Cms extends Model
         if ($name != 'page' && $pageSize == false)
             $file_name = $name . '-all';
         $file = Functions::directory() . str_replace(' ', '_', strtolower(Functions::clean($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
-        
+
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $query .= is_numeric($name) ? '&post_type_id=' . $name : '&post_type=' . $name;
-        
+
         if ($name == 'page' || $pageSize == false)
             $query .= '&page-size=false';
         if ($pageSize != false) {
