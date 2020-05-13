@@ -323,17 +323,23 @@ class Cms extends Model
                 $file = Functions::directory() . $id . '.json';
             }
             if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-                $query = '&expand=template';
-                $query .= $imagesSeo ? '&seoimage=yes' : '';
+                $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+                $query .= '&expand=template';
 
                 if ($id == null) {
-                    $query = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : $query;
+                    $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+                    $query .= '&lang=' . $lang;
+                    $query .= '&slug=' . $slug;
+                    $query .= '&type=' . $type;
+                    $query .= $imagesSeo ? '&seoimage=yes' : '';
 
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang . '&slug=' . $slug . '&type=' . $type . $query;
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug' . $query;
 
                     $file_data = Functions::getCRMData($url);
                 } else {
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $query;
+                    $query .= '&id=' . $id;
+
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id' . $query;
 
                     $file_data = Functions::getCRMData($url);
                 }
@@ -363,6 +369,7 @@ class Cms extends Model
                 'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
                 'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
                 'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
+                'view_path' => isset($data['template']['viewPath']) ? $data['template']['viewPath'] : '',
             ];
         }
     }
@@ -444,11 +451,14 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function slugsWithTemplates($name)
+    public static function slugsWithTemplate($name)
     {
         $file = Functions::directory() . 'slugs_with_templates_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $query = '&expand=template';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-with-templates&user=' . Yii::$app->params['user'] . '&site_id=' . Yii::$app->params['site_id'] . $query;
+        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $query .= '&expand=template';
+
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-with-templates' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
@@ -478,7 +488,7 @@ class Cms extends Model
 
         self::setParams(); // to set some config because config not loaded yet in from web
 
-        $cmsModel = self::slugsWithTemplates('page');
+        $cmsModel = self::slugsWithTemplate('page');
         $routeArray = [];
 
         foreach ($cmsModel as $row) {
@@ -494,7 +504,6 @@ class Cms extends Model
                                 'route'    => 'site/index',
                                 'defaults' => ['slug' => $val],
                             ];
-                            // $routeAuray[$val . '/<title>'] = $row['template_action'];
                         }
                     }
                 } else {
@@ -505,7 +514,6 @@ class Cms extends Model
                                 'route'    => 'site/index',
                                 'defaults' => ['slug' => $val],
                             ];
-                            // $routeArray[$val] = $row['template_action'];
                         }
                     }
                 }
@@ -693,11 +701,11 @@ class Cms extends Model
         if ($name != 'page' && $pageSize == false)
             $file_name = $name . '-all';
         $file = Functions::directory() . str_replace(' ', '_', strtolower(Functions::clean($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
-        if (is_numeric($name)) {
-            $query = '&post_type_id=' . $name;
-        } else {
-            $query = '&post_type=' . $name;
-        }
+        
+        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $query .= is_numeric($name) ? '&post_type_id=' . $name : '&post_type=' . $name;
+        
         if ($name == 'page' || $pageSize == false)
             $query .= '&page-size=false';
         if ($pageSize != false) {
@@ -713,18 +721,13 @@ class Cms extends Model
 
         $cache = isset($options['cache']) ? $options['cache'] : true;
 
-        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $url = Yii::$app->params['apiUrl'] . 'cms/posts&user=' . Yii::$app->params['user'] . $query . $site_id;
-        // echo $url;die;
+        $url = Yii::$app->params['apiUrl'] . 'cms/posts' . $query;
+
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600) || !$cache) {
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
+            $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
-            $file_data =
-                file_get_contents($file);
-            //Functions::getCRMData($file);
+            $file_data = file_get_contents($file);
         }
         $header = get_headers($url, 1);
         $dataEach = json_decode($file_data, TRUE);
