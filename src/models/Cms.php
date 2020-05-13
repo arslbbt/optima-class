@@ -425,17 +425,29 @@ class Cms extends Model
         foreach ($cmsModel as $row) {
             if (!empty($row['template_action'])) {
                 if (
-                    strpos($row['template_action'], '/view') ||
-                    strpos($row['template_action'], '/blog-post')
+                    strpos($row['template_action'], '/view')
+                    || strpos($row['template_action'], '/blog-post')
                 ) {
                     foreach ($row['slug_all'] as $key => $val) {
-                        if ($val)
-                            $routeArray[$val . '/<title>'] = $row['template_action'];
+                        if ($val) {
+                            $routeArray[] = [
+                                'pattern'  => $val . '/<title>',
+                                'route'    => 'site/index',
+                                'defaults' => ['slug' => $val],
+                            ];
+                            // $routeAuray[$val . '/<title>'] = $row['template_action'];
+                        }
                     }
                 } else {
                     foreach ($row['slug_all'] as $key => $val) {
-                        if ($val)
-                            $routeArray[$val] = $row['template_action'];
+                        if ($val) {
+                            $routeArray[] = [
+                                'pattern'  => $val,
+                                'route'    => 'site/index',
+                                'defaults' => ['slug' => $val],
+                            ];
+                            // $routeArray[$val] = $row['template_action'];
+                        }
                     }
                 }
             }

@@ -597,6 +597,15 @@ class Dropdowns extends Model
             ['key' => "private", 'value' => \Yii::t('app', 'private')],
             ['key' => "more_than_one", 'value' => \Yii::t('app', 'more_than_one')],
         ];
+        $propertyParkings = [
+            'garage' => Yii::t('app', strtolower('garage')),
+            'open' => Yii::t('app', strtolower('open')),
+            'parking_optional' => Yii::t('app', strtolower('parking_optional')),
+            'private' => Yii::t('app', strtolower('private')),
+            'public_parking_nearby_against_a_fee' => Yii::t('app', strtolower('public_parking_nearby_against_a_fee')),
+            'parking_street' => Yii::t('app', strtolower('parking_street')),
+            'underground' => Yii::t('app', strtolower('underground'))
+        ];
     }
 
     public static function pools()
@@ -605,6 +614,20 @@ class Dropdowns extends Model
             ['key' => "pool_communal", 'value' => \Yii::t('app', 'pool_communal')],
             ['key' => "pool_indoor", 'value' => \Yii::t('app', 'pool_indoor')],
             ['key' => "pool_private", 'value' => \Yii::t('app', 'pool_private')],
+        ];
+        $propertyPools = [
+            'childrens_pool' => Yii::t('app', strtolower('childrens_pool')),
+            'covfenced_poolered' => Yii::t('app', strtolower('fenced_pool')),
+            'freshwater' => Yii::t('app', strtolower('freshwater')),
+            'pool_heated' => Yii::t('app', strtolower('pool_heated')),
+            'ladder_access' => Yii::t('app', strtolower('ladder_access')),
+            'outside_shower' => Yii::t('app', strtolower('outside_shower')),
+            'outside_toilets' => Yii::t('app', strtolower('outside_toilets')),
+            'roman_steps_into_pool' => Yii::t('app', strtolower('roman_steps_into_pool')),
+            'soler_heated_pool' => Yii::t('app', strtolower('soler_heated_pool')),
+            'room_for_pool' => Yii::t('app', strtolower('room_for_pool')),
+            'sun_beds' => Yii::t('app', strtolower('sun_beds')),
+            'whirlpool' => Yii::t('app', strtolower('whirlpool'))
         ];
     }
 
@@ -640,6 +663,9 @@ class Dropdowns extends Model
             ['key' => "fully_furnished", 'value' => \Yii::t('app', 'fully_furnished')],
             ['key' => "part_furnished", 'value' => \Yii::t('app', 'part_furnished')],
             ['key' => "not_furnished", 'value' => \Yii::t('app', 'not_furnished')],
+        ];
+        $propertyFurnitures = [
+            'optional'=>Yii::t('app', strtolower('optional')),
         ];
     }
 
