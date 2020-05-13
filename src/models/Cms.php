@@ -39,8 +39,8 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    // If General settings no need to pass params
-    // If Page settings pass page_data['custom_settings'] as param without language
+    // For General settings no need to pass params
+    // For Page settings pass page_data['custom_settings'] as param without language
 
     public static function custom_settings($custom_settings = "")
     {
@@ -383,6 +383,69 @@ class Cms extends Model
         }
 
         return $retdata;
+    }
+
+    public static function slugsWithTemplates($name)
+    {
+        $file = Functions::directory() . 'slugs_with_templates_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $query = '&expand=template';
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-with-templates&user=' . Yii::$app->params['user'] . '&site_id=' . Yii::$app->params['site_id'] . $query;
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $file_data = file_get_contents($url);
+            file_put_contents($file, $file_data);
+        } else
+            $file_data = file_get_contents($file);
+        $dataEach = json_decode($file_data, true);
+        $retdata = [];
+        foreach ($dataEach as $key => $data) {
+            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
+            $array['type'] = isset($data['type']) ? $data['type'] : '';
+            $array['template_action'] = isset($data['template']['template_action']) ? $data['template']['template_action'] : '';
+            $retdata[] = $array;
+        }
+        return $retdata;
+    }
+
+    public static function cmsRules()
+    {
+        // $redirects = require __DIR__ . '/redirects.php';
+        // $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        // foreach ($redirects as $key => $val) {
+        //     if ($key == $_SERVER['REQUEST_URI']) {
+        //         header('Location:' . $val);
+        //         die;
+        //     }
+        // }
+
+        self::setParams(); // to set some config because config not loaded yet in from web
+
+        $cmsModel = self::slugsWithTemplates('page');
+        $routeArray = [];
+
+        foreach ($cmsModel as $row) {
+            if (!empty($row['template_action'])) {
+                if (
+                    strpos($row['template_action'], '/view') ||
+                    strpos($row['template_action'], '/blog-post')
+                ) {
+                    foreach ($row['slug_all'] as $key => $val) {
+                        if ($val)
+                            $routeArray[$val . '/<title>'] = $row['template_action'];
+                    }
+                } else {
+                    foreach ($row['slug_all'] as $key => $val) {
+                        if ($val)
+                            $routeArray[$val] = $row['template_action'];
+                    }
+                }
+            }
+        }
+
+        /** Site controller */
+        $routeArray['/<title>'] = 'site/page';
+
+        // echo '<pre>'; print_r($routeArray); die;
+        return $routeArray;
     }
 
     /* Template Code started  */
