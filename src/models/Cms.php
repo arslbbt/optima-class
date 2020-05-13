@@ -296,6 +296,8 @@ class Cms extends Model
     }
 
     /**
+     * Cms::getPage($options) For CMS page data by slug or id
+     * 
      * $options =   [
      *                  ['slug'] => 'home',
      *                  ['id'] => '5eb3ebc9fe107a46744d2346',
@@ -398,19 +400,6 @@ class Cms extends Model
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
         ];
     }
-
-    // public static function renderPage($viewObjet,$viewFilePath="404")
-    // {
-    //   $params = Yii::$app->params;
-    //   $cmsModel = Slugs('page', $params);
-    //   $url = explode('/', Yii::$app->request->url);
-    //   $this_page_slug = end($url);
-    //   $page_data = $viewObjet->view->params['page_data'] = Cms::pageBySlug($this_page_slug);
-    //      return $viewObjet->render($viewFilePath, [
-    //     'page_data' => $page_data,
-    //     ]);
-
-    // }
 
     public static function setParams()
     {
