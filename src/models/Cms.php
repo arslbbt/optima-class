@@ -249,7 +249,7 @@ class Cms extends Model
         }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = isset($options['seoimage']) ? '&seoimage=yes' : '';
-            $query = isset($options['template']) ? '&expand=template' : $query;
+            $query .= isset($options['template']) ? '&expand=template' : '';
             if ($id == null) {
                 $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
                 $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $query;
@@ -293,6 +293,76 @@ class Cms extends Model
             'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
         ];
+    }
+
+    /**
+     * $options =   [
+     *                  ['slug'] => 'home',
+     *                  ['id'] => '5eb3ebc9fe107a46744d2346',
+     *                  ['lang'] => 'EN',
+     *                  ['type'] => 'page',
+     *                  ['seoimage'] => true,
+     *                  ['template'] => true,
+     *              ]
+     * 
+     */
+    public static function getPage($options = [])
+    {
+        $slug = isset($options['slug']) ? $options['slug'] : null;
+        $id = isset($options['id']) ? $options['id'] : null;
+        if ($slug !== null || $id !== null) {
+            $lang = isset($options['lang']) ? $options['lang'] : 'EN';
+            $type = isset($options['type']) ? $options['type'] : 'page';
+            $imagesSeo = isset($options['seoimage']) ? $options['seoimage'] : false;
+
+            if ($id == null) {
+                $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
+            } else {
+                $file = Functions::directory() . $id . '.json';
+            }
+            if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+                $query = '&expand=template';
+                $query .= $imagesSeo ? '&seoimage=yes' : '';
+
+                if ($id == null) {
+                    $query = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : $query;
+
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang . '&slug=' . $slug . '&type=' . $type . $query;
+
+                    $file_data = Functions::getCRMData($url);
+                } else {
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $query;
+
+                    $file_data = Functions::getCRMData($url);
+                }
+                file_put_contents($file, $file_data);
+            } else {
+                $file_data = file_get_contents($file);
+            }
+            $data = json_decode($file_data, TRUE);
+            $lang = strtoupper(\Yii::$app->language);
+
+            $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            if ($imagesSeo) {
+                $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : $attachment_url;
+            }
+            // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+            return [
+                'featured_image' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '',
+                'featured_image_200' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url, 200) : '',
+                'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '',
+                'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '',
+                'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
+                'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
+                'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
+                'slug_all' => isset($data['slug']) ? $data['slug'] : '',
+                'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
+                'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
+                'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
+                'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
+                'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
+            ];
+        }
     }
 
     public static function postById($id)
