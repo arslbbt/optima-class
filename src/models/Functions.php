@@ -4,6 +4,7 @@ namespace optima\models;
 
 use Yii;
 use yii\base\Model;
+use yii\base\ViewNotFoundException;
 use yii\helpers\Url;
 
 class Functions extends Model
@@ -85,9 +86,41 @@ class Functions extends Model
         return $it->redirect(Yii::$app->request->referrer);
     }
 
+    public function loadPageDynamically($it)
+    {
+        // Check if page exist
+        if (Yii::$app->request->get('slug')) {
+            $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('slug'), 'lang' => strtoupper(Yii::$app->language)]);
+        } else {
+            $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
+        }
+
+        // redirect if there is no page_data is available
+        if (empty(array_filter($page_data))) {
+            $it->redirect('/404');
+        }
+
+        if ($page_data['view_path']) {
+            try {
+                return $it->render($page_data['view_path'], [
+                    'page_data' => $page_data
+                ]);
+            } catch (ViewNotFoundException $e) {
+                $it->redirect('/404');
+            }
+        } elseif (Yii::$app->request->get('title') == '404') {
+            return $it->render(Yii::$app->request->get('title'), [
+                'page_data' => $page_data
+            ]);
+        } else {
+            return $it->render('page', [
+                'page_data' => $page_data
+            ]);
+        }
+    }
+
     public static function dynamicPage($it)
     {
-        $params = Yii::$app->params;
         $cmsModel = Cms::Slugs('page');
         $url = explode('/', Yii::$app->request->url);
         $this_page = urldecode(end($url));
@@ -139,9 +172,9 @@ class Functions extends Model
         } else {
 
             if (!array_filter($page_data)) {
-                   $page_data_404 = Cms::pageBySlug('404');
+                $page_data_404 = Cms::pageBySlug('404');
 
-                if(!isset($page_data_404) || !isset($page_data_404['slug_all']['EN'])){
+                if (!isset($page_data_404) || !isset($page_data_404['slug_all']['EN'])) {
                     die('Please create 404 page with sluge "404" in CMS');
                 }
                 $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');

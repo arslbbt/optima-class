@@ -312,6 +312,7 @@ class Cms extends Model
     {
         $slug = isset($options['slug']) ? $options['slug'] : null;
         $id = isset($options['id']) ? $options['id'] : null;
+
         if ($slug !== null || $id !== null) {
             $lang = isset($options['lang']) ? $options['lang'] : 'EN';
             $type = isset($options['type']) ? $options['type'] : 'page';
@@ -348,6 +349,7 @@ class Cms extends Model
                 $file_data = file_get_contents($file);
             }
             $data = json_decode($file_data, TRUE);
+
             $lang = strtoupper(\Yii::$app->language);
 
             $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
@@ -521,6 +523,9 @@ class Cms extends Model
 
         /** Site controller */
         $routeArray['/<title>'] = 'site/page';
+        $routeArray['/<title>' . '/<title1>'] = 'site/page';
+        $routeArray['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
+        $routeArray['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
 
         // print_r($routeArray); die;
         return $routeArray;
