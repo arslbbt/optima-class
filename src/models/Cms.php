@@ -452,8 +452,9 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function slugsWithTemplate($name)
+    public static function slugsWithTemplate($params = [])
     {
+        $name = isset($params['name']) ? $params['name'] : 'all';
         $file = Functions::directory() . 'slugs_with_templates_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
@@ -467,7 +468,10 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         $dataEach = json_decode($file_data, true);
         $retdata = [];
-        foreach ($dataEach as $key => $data) {
+
+        if (!is_array($dataEach) || count($dataEach) <= 0)
+            die('Error Getting CMS Data');
+        foreach ($dataEach as $data) {
             $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
             $array['type'] = isset($data['type']) ? $data['type'] : '';
             $array['template_action'] = isset($data['template']['template_action']) ? $data['template']['template_action'] : '';
@@ -489,7 +493,7 @@ class Cms extends Model
 
         self::setParams(); // to set some config because config not loaded yet in from web
 
-        $cmsModel = self::slugsWithTemplate('page');
+        $cmsModel = self::slugsWithTemplate();
         $routeArray = [];
 
         foreach ($cmsModel as $row) {
