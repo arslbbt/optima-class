@@ -452,13 +452,13 @@ class Cms extends Model
         return $retdata;
     }
 
-    public static function slugsWithTemplate($params = [])
+    public static function getSlugs($params = [])
     {
         $name = isset($params['name']) ? $params['name'] : 'all';
-        $file = Functions::directory() . 'slugs_with_templates_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $file = Functions::directory() . 'slugs_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $query .= '&expand=template';
+        $query .= isset($params['with_templates']) ? '&expand=template' : '';
 
         $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-with-templates' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
@@ -466,22 +466,41 @@ class Cms extends Model
             file_put_contents($file, $file_data);
         } else
             $file_data = file_get_contents($file);
-        $dataEach = json_decode($file_data, true);
+        $data = json_decode($file_data, true);
+        $ret_data = [];
+
+        if (!is_array($data) || count($data) <= 0)
+            die('Error Getting CMS Data');
+
+        if (!isset($params['formate_data']))
+            return $data;
+
+        foreach ($data as $data_each) {
+            $array['slug_all'] = isset($data_each['slug']) ? $data_each['slug'] : '';
+            $array['type'] = isset($data_each['type']) ? $data_each['type'] : '';
+            $array['template_action'] = isset($data_each['template']['template_action']) ? $data_each['template']['template_action'] : '';
+            $ret_data[] = $array;
+        }
+        return $ret_data;
+    }
+
+    public static function getSlug($tag)
+    {
+        $lang = strtoupper(\Yii::$app->language);
+        $file_data = self::getSlugs(['with_templates' => true]);
         $retdata = [];
 
-        if (!is_array($dataEach) || count($dataEach) <= 0)
-            die('Error Getting CMS Data');
-        foreach ($dataEach as $data) {
-            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
-            $array['type'] = isset($data['type']) ? $data['type'] : '';
-            $array['template_action'] = isset($data['template']['template_action']) ? $data['template']['template_action'] : '';
-            $retdata[] = $array;
+        foreach ($file_data as $data) {
+            // if ($data['tag'] == $tag) {
+            //     return isset($data['slug'][$lang]) ? $data['slug'][$lang] : $data['slug']['EN'];
+            // }
         }
-        return $retdata;
+        die('Error Getting Slug for ' . $tag);
     }
 
     public static function cmsRules()
     {
+        /* Code for http to https redirect */
         // $redirects = require __DIR__ . '/redirects.php';
         // $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         // foreach ($redirects as $key => $val) {
@@ -493,10 +512,10 @@ class Cms extends Model
 
         self::setParams(); // to set some config because config not loaded yet in from web
 
-        $cmsModel = self::slugsWithTemplate();
-        $routeArray = [];
+        $cmsData = self::getSlugs(['with_templates' => true, 'formate_data' => true]);
+        $routes = [];
 
-        foreach ($cmsModel as $row) {
+        foreach ($cmsData as $row) {
             if (!empty($row['template_action'])) {
                 if (
                     strpos($row['template_action'], '/view')
@@ -504,7 +523,7 @@ class Cms extends Model
                 ) {
                     foreach ($row['slug_all'] as $key => $val) {
                         if ($val) {
-                            $routeArray[] = [
+                            $routes[] = [
                                 'pattern'  => $val . '/<title>',
                                 'route'    => $row['template_action'],
                                 'defaults' => ['slug' => $val],
@@ -514,7 +533,7 @@ class Cms extends Model
                 } else {
                     foreach ($row['slug_all'] as $key => $val) {
                         if ($val) {
-                            $routeArray[] = [
+                            $routes[] = [
                                 'pattern'  => $val,
                                 'route'    => $row['template_action'],
                                 'defaults' => ['slug' => $val],
@@ -526,13 +545,13 @@ class Cms extends Model
         }
 
         /** Site controller */
-        $routeArray['/<title>'] = 'site/page';
-        // $routeArray['/<title>' . '/<title1>'] = 'site/page';
-        // $routeArray['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
-        // $routeArray['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
+        $routes['/<title>'] = 'site/page';
+        // $routes['/<title>' . '/<title1>'] = 'site/page';
+        // $routes['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
+        // $routes['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
 
-        // print_r($routeArray); die;
-        return $routeArray;
+        // print_r($routes); die;
+        return $routes;
     }
 
     /* Template Code started  */
@@ -738,39 +757,39 @@ class Cms extends Model
             $file_data = file_get_contents($file);
         }
         $header = get_headers($url, 1);
-        $dataEach = json_decode($file_data, TRUE);
+        $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
-        $retdata = [];
+        $ret_data = [];
         $array = [];
-        foreach ($dataEach as $key => $data) {
+        foreach ($data as $key => $data_each) {
             if (isset($header['X-Pagination-Total-Count'])) {
                 $array['totalCount'] = $header['X-Pagination-Total-Count'];
             }
-            $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+            $attachment_url = isset($data_each['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data_each['_id'] . '/' . $data_each['featured_image'][$lang]['name'] : '';
             if ($imageseo) {
-                $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : $attachment_url;
+                $attachment_url = isset($data_each['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data_each['_id'] . '/' . $data_each['featured_image'][$lang]['file_md5_name'] : $attachment_url;
             }
-            // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+            // $name = isset($data_each['featured_image'][$lang]['name']) ? $data_each['featured_image'][$lang]['name'] : '';
             if ($forRoutes == true) {
                 $array['featured_image'] = $attachment_url;
             } else {
                 $array['featured_image'] = isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '';
             }
-            $array['featured_image_seo_alt_desc'] = isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '';
-            $array['featured_image_seo_meta_title'] = isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '';
-            $array['content'] = isset($data['content'][$lang]) ? $data['content'][$lang] : '';
-            $array['created_at'] = isset($data['created_at']) ? $data['created_at'] : '';
-            $array['title'] = isset($data['title'][$lang]) ? $data['title'][$lang] : '';
-            $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
-            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
-            $array['meta_title'] = isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '';
-            $array['meta_desc'] = isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '';
-            $array['meta_keywords'] = isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '';
-            $array['custom_settings'] = isset($data['custom_settings']) ? $data['custom_settings'] : '';
-            $array['categories'] = isset($data['categories']) ? $data['categories'] : [];
-            $retdata[] = $array;
+            $array['featured_image_seo_alt_desc'] = isset($data_each['featured_image'][$lang]['seo_alt_desc']) ? $data_each['featured_image'][$lang]['seo_alt_desc'] : '';
+            $array['featured_image_seo_meta_title'] = isset($data_each['featured_image'][$lang]['seo_meta_title']) ? $data_each['featured_image'][$lang]['seo_meta_title'] : '';
+            $array['content'] = isset($data_each['content'][$lang]) ? $data_each['content'][$lang] : '';
+            $array['created_at'] = isset($data_each['created_at']) ? $data_each['created_at'] : '';
+            $array['title'] = isset($data_each['title'][$lang]) ? $data_each['title'][$lang] : '';
+            $array['slug'] = isset($data_each['slug'][$lang]) ? $data_each['slug'][$lang] : '';
+            $array['slug_all'] = isset($data_each['slug']) ? $data_each['slug'] : '';
+            $array['meta_title'] = isset($data_each['meta_title'][$lang]) ? $data_each['meta_title'][$lang] : '';
+            $array['meta_desc'] = isset($data_each['meta_desc'][$lang]) ? $data_each['meta_desc'][$lang] : '';
+            $array['meta_keywords'] = isset($data_each['meta_keywords'][$lang]) ? $data_each['meta_keywords'][$lang] : '';
+            $array['custom_settings'] = isset($data_each['custom_settings']) ? $data_each['custom_settings'] : '';
+            $array['categories'] = isset($data_each['categories']) ? $data_each['categories'] : [];
+            $ret_data[] = $array;
         }
-        return $retdata;
+        return $ret_data;
     }
 
     public static function getUsers()
