@@ -315,7 +315,7 @@ class Cms extends Model
         $pageId = isset($options['page_id']) ? $options['page_id'] : null;
 
         if ($slug !== null || $id !== null || $pageId !== null) {
-            $lang = isset($options['lang']) ? $options['lang'] : 'EN';
+            $slug_lang = isset($options['lang']) ? $options['lang'] : 'EN';
             $type = isset($options['type']) ? $options['type'] : 'page';
             $imagesSeo = isset($options['seoimage']) ? $options['seoimage'] : false;
 
@@ -342,7 +342,7 @@ class Cms extends Model
                     $file_data = Functions::getCRMData($url);
                 } else {
                     $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                    $query .= '&lang=' . $lang;
+                    $query .= '&lang=' . $slug_lang;
                     $query .= '&slug=' . $slug;
                     $query .= '&type=' . $type;
                     $query .= $imagesSeo ? '&seoimage=yes' : '';
