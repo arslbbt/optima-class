@@ -299,8 +299,9 @@ class Cms extends Model
      * Cms::getPage($options) For CMS page data by slug or id
      * 
      * $options =   [
-     *                  ['slug'] => 'home',
      *                  ['id'] => '5eb3ebc9fe107a46744d2346',
+     *                  ['page_id'] => '6425',
+     *                  ['slug'] => 'home',
      *                  ['lang'] => 'EN',
      *                  ['type'] => 'page',
      *                  ['seoimage'] => true,
