@@ -491,9 +491,9 @@ class Cms extends Model
         $retdata = [];
 
         foreach ($file_data as $data) {
-            // if ($data['tag'] == $tag) {
-            //     return isset($data['slug'][$lang]) ? $data['slug'][$lang] : $data['slug']['EN'];
-            // }
+            if ($data['tags'][0] == $tag) {
+                return isset($data['slug'][$lang]) ? $data['slug'][$lang] : $data['slug']['EN'];
+            }
         }
         die('Error Getting Slug for ' . $tag);
     }
