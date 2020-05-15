@@ -496,7 +496,7 @@ class Cms extends Model
                 return isset($data['slug'][$lang]) ? $data['slug'][$lang] : $data['slug']['EN'];
             }
         }
-        die('Error Getting Slug for ' . $tag);
+        return '/tag-not-found';
     }
 
     public static function cmsRules()
