@@ -491,7 +491,7 @@ class Cms extends Model
         $retdata = [];
 
         foreach ($file_data as $data) {
-            if ($data['tags'][0] == $tag) {
+            if (isset($data['tags'][0]) && $data['tags'][0] == $tag) {
                 return isset($data['slug'][$lang]) ? $data['slug'][$lang] : $data['slug']['EN'];
             }
         }
