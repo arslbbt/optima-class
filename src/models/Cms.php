@@ -312,8 +312,9 @@ class Cms extends Model
     {
         $slug = isset($options['slug']) ? $options['slug'] : null;
         $id = isset($options['id']) ? $options['id'] : null;
+        $pageId = isset($options['page_id']) ? $options['page_id'] : null;
 
-        if ($slug !== null || $id !== null) {
+        if ($slug !== null || $id !== null || $pageId !== null) {
             $lang = isset($options['lang']) ? $options['lang'] : 'EN';
             $type = isset($options['type']) ? $options['type'] : 'page';
             $imagesSeo = isset($options['seoimage']) ? $options['seoimage'] : false;
@@ -327,7 +328,19 @@ class Cms extends Model
                 $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
                 $query .= '&expand=template';
 
-                if ($id == null) {
+                if ($id !== null) {
+                    $query .= '&id=' . $id;
+
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id' . $query;
+
+                    $file_data = Functions::getCRMData($url);
+                } elseif ($pageId !== null) {
+                    $query .= '&page_id=' . $pageId;
+
+                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-page-id' . $query;
+
+                    $file_data = Functions::getCRMData($url);
+                } else {
                     $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
                     $query .= '&lang=' . $lang;
                     $query .= '&slug=' . $slug;
@@ -335,12 +348,6 @@ class Cms extends Model
                     $query .= $imagesSeo ? '&seoimage=yes' : '';
 
                     $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug' . $query;
-
-                    $file_data = Functions::getCRMData($url);
-                } else {
-                    $query .= '&id=' . $id;
-
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id' . $query;
 
                     $file_data = Functions::getCRMData($url);
                 }
