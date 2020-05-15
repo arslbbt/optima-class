@@ -459,8 +459,9 @@ class Cms extends Model
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $query .= isset($params['with_templates']) ? '&expand=template' : '';
+        $query .= isset($params['with_tags']) ? '&tags=true' : '';
 
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-with-templates' . $query;
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
@@ -487,7 +488,7 @@ class Cms extends Model
     public static function getSlug($tag)
     {
         $lang = strtoupper(\Yii::$app->language);
-        $file_data = self::getSlugs(['with_templates' => true]);
+        $file_data = self::getSlugs(['with_templates' => true, 'with_tags' => true]);
         $retdata = [];
 
         foreach ($file_data as $data) {
