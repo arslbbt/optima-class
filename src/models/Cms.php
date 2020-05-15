@@ -523,9 +523,9 @@ class Cms extends Model
 
         /** Site controller */
         $routeArray['/<title>'] = 'site/page';
-        $routeArray['/<title>' . '/<title1>'] = 'site/page';
-        $routeArray['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
-        $routeArray['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
+        // $routeArray['/<title>' . '/<title1>'] = 'site/page';
+        // $routeArray['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
+        // $routeArray['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
 
         // print_r($routeArray); die;
         return $routeArray;
