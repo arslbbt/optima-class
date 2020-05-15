@@ -486,7 +486,7 @@ class Cms extends Model
         return $ret_data;
     }
 
-    public static function getSlugByTag($tag)
+    public static function getSlugByTagName($tag)
     {
         $lang = strtoupper(\Yii::$app->language);
         $file_data = self::getSlugs(['with_templates' => true, 'with_tags' => true]);
