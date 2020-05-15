@@ -456,13 +456,14 @@ class Cms extends Model
     {
         $name = isset($params['name']) ? $params['name'] : 'all';
         $file = Functions::directory() . 'slugs_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $query .= isset($params['with_templates']) ? '&expand=template' : '';
-        $query .= isset($params['with_tags']) ? '&tags=true' : '';
-
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+            $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+            $query .= isset($params['with_templates']) ? '&expand=template' : '';
+            $query .= isset($params['with_tags']) ? '&tags=true' : '';
+
+            $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
+
             $file_data = file_get_contents($url);
             file_put_contents($file, $file_data);
         } else
@@ -485,11 +486,10 @@ class Cms extends Model
         return $ret_data;
     }
 
-    public static function getSlug($tag)
+    public static function getSlugByTag($tag)
     {
         $lang = strtoupper(\Yii::$app->language);
         $file_data = self::getSlugs(['with_templates' => true, 'with_tags' => true]);
-        $retdata = [];
 
         foreach ($file_data as $data) {
             if (isset($data['tags'][0]) && $data['tags'][0] == $tag) {
@@ -513,7 +513,7 @@ class Cms extends Model
 
         self::setParams(); // to set some config because config not loaded yet in from web
 
-        $cmsData = self::getSlugs(['with_templates' => true, 'formate_data' => true]);
+        $cmsData = self::getSlugs(['with_templates' => true, 'with_tags' => true, 'formate_data' => true]);
         $routes = [];
 
         foreach ($cmsData as $row) {
