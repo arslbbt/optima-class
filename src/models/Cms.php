@@ -67,7 +67,7 @@ class Cms extends Model
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $query .= isset(\Yii::$app->params['commercial']) ? '&commercial=' . \Yii::$app->params['commercial'] : '';
-        $query .= $lang;
+        $query .= '&lang=' . $lang;
 
         $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
