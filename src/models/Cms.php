@@ -522,11 +522,21 @@ class Cms extends Model
                         }
                     }
                 }
+            } elseif ($row['type'] == 'page') {
+                foreach ($row['slug_all'] as $key => $val) {
+                    if ($val) {
+                        $routes[] = [
+                            'pattern'  => $val,
+                            'route'    => 'site/page',
+                            'defaults' => ['slug' => $val],
+                        ];
+                    }
+                }
             }
         }
 
         /** Site controller */
-        $routes['/<title>'] = 'site/page';
+        // $routes['/<title>'] = 'site/page';
         // $routes['/<title>' . '/<title1>'] = 'site/page';
         // $routes['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
         // $routes['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
