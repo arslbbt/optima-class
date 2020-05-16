@@ -71,7 +71,7 @@ class Urlhelper extends Component
      */
     public static function getPropertyUrl($property)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . Urlhelper::propertyDetailsSlug() . '/' . Urlhelper::getPropertyTitle($property);
+        return '/' . strtolower(Yii::$app->language) . '/' . self::propertyDetailsSlug() . '/' . self::getPropertyTitle($property);
     }
 
     /**
@@ -100,7 +100,7 @@ class Urlhelper extends Component
      */
     public static function getDevelopmentUrl($development)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . Urlhelper::developmentDetailsSlug() . '/' . Urlhelper::getDevelopmentTitle($development);
+        return '/' . strtolower(Yii::$app->language) . '/' . self::developmentDetailsSlug() . '/' . self::getDevelopmentTitle($development);
     }
 
     /**
@@ -130,6 +130,6 @@ class Urlhelper extends Component
      */
     public static function getBlogUrl($post)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . Urlhelper::blogDetailsSlug() . '/' . Urlhelper::getPostTitle($post);
+        return '/' . strtolower(Yii::$app->language) . '/' . self::blogDetailsSlug() . '/' . self::getPostTitle($post);
     }
 }
