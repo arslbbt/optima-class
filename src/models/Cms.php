@@ -500,11 +500,11 @@ class Cms extends Model
             foreach ($cmsData as $row) {
                 if (isset($row['template']['template_action']) && !empty($row['template']['template_action']) && isset($row['slug']) && is_array($row['slug'])) {
                     if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
-                        foreach ($row['slug_all'] as $key => $val) {
+                        foreach ($row['slug'] as $key => $val) {
                             if ($val) {
                                 $rules[] = [
-                                    'pattern'  => $val . $row['template_pattern'],
-                                    'route'    => $row['template_action'],
+                                    'pattern'  => $val . $row['template']['template_pattern'],
+                                    'route'    => $row['template']['template_action'],
                                     'defaults' => ['slug' => $val],
                                 ];
                             }
@@ -512,15 +512,14 @@ class Cms extends Model
                     }
                     /* Need to remove after ['template_pattern'] added */
                     if (
-                        isset($row['template']['template_action']) &&
-                        (strpos($row['template_action'], '/view')
-                            || strpos($row['template_action'], '/blog-post'))
+                        strpos($row['template']['template_action'], '/view')
+                        || strpos($row['template']['template_action'], '/blog-post')
                     ) {
-                        foreach ($row['slug_all'] as $key => $val) {
+                        foreach ($row['slug'] as $key => $val) {
                             if ($val) {
                                 $rules[] = [
                                     'pattern'  => $val . '/<title>',
-                                    'route'    => $row['template_action'],
+                                    'route'    => $row['template']['template_action'],
                                     'defaults' => ['slug' => $val],
                                 ];
                             }
@@ -530,7 +529,7 @@ class Cms extends Model
                             if ($val) {
                                 $rules[] = [
                                     'pattern'  => $val,
-                                    'route'    => $row['template_action'],
+                                    'route'    => $row['template']['template_action'],
                                     'defaults' => ['slug' => $val],
                                 ];
                             }
