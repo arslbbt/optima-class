@@ -315,7 +315,7 @@ class Cms extends Model
                     $file_data = Functions::getCRMData($url);
                 } else {
                     $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                    $query .= '&lang=' . $slug_lang;
+                    $query .= '&lang=' . strtoupper($slug_lang);
                     $query .= '&slug=' . $slug;
                     $query .= '&type=' . $type;
                     $query .= $imagesSeo ? '&seoimage=yes' : '';

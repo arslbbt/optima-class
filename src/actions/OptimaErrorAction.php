@@ -15,7 +15,7 @@ class OptimaErrorAction extends ErrorAction
     public function run()
     {
         if (!YII_DEBUG) {
-            return $this->controller->redirect(array('/404', 'language' => strtolower(Yii::$app->language)));
+            return $this->controller->redirect(array('language' => strtolower(Yii::$app->language), '/404'));
         }
 
         if ($this->layout !== null) {
