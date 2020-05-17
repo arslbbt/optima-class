@@ -89,7 +89,6 @@ class Functions extends Model
     public function loadPageDynamically($it)
     {
         $slug = Yii::$app->request->get('slug', '');
-        // Check if page exist
         if ($slug) {
             $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => $slug, 'lang' => Yii::$app->language]);
         // } else {
@@ -109,10 +108,10 @@ class Functions extends Model
             } catch (ViewNotFoundException $error) {
                 throw $error;
             }
-        // } elseif ($slug == '404') {
-        //     return $it->render($slug, [
-        //         'page_data' => $page_data
-        //     ]);
+        } elseif ($slug == '404') {
+            return $it->render($slug, [
+                'page_data' => $page_data
+            ]);
         } else {
             return $it->render('page', [
                 'page_data' => $page_data
