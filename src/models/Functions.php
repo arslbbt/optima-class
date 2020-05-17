@@ -98,7 +98,7 @@ class Functions extends Model
 
         // redirect if there is no page_data is available
         if (!isset($page_data) || empty(array_filter($page_data))) {
-            $it->redirect(array('language' => strtolower(Yii::$app->language), '/404'));
+            $it->redirect('/404');
         }
 
         if ($page_data['view_path']) {
