@@ -109,10 +109,10 @@ class Functions extends Model
             } catch (ViewNotFoundException $error) {
                 throw $error;
             }
-        } elseif ($slug == '404') {
-            return $it->render($slug, [
-                'page_data' => $page_data
-            ]);
+        // } elseif ($slug == '404') {
+        //     return $it->render($slug, [
+        //         'page_data' => $page_data
+        //     ]);
         } else {
             return $it->render('page', [
                 'page_data' => $page_data
