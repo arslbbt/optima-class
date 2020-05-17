@@ -528,30 +528,42 @@ class Cms extends Model
             $rules = [];
 
             foreach ($cmsData as $row) {
-                if (isset($row['template']['template_action']) && !empty($row['template']['template_action']) && isset($row['slug']) && is_array($row['slug'])) {
-                    if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
-                        foreach ($row['slug'] as $key => $val) {
-                            if ($val) {
-                                $rules[] = [
-                                    'pattern'  => $val . $row['template']['template_pattern'],
-                                    'route'    => $row['template']['template_action'],
-                                    'defaults' => ['slug' => $val],
-                                ];
+                if (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
+                    if (isset($row['template']['template_action']) && !empty($row['template']['template_action'])) {
+                        if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
+                            foreach ($row['slug'] as $key => $val) {
+                                if ($val) {
+                                    $rules[] = [
+                                        'pattern'  => $val . $row['template']['template_pattern'],
+                                        'route'    => $row['template']['template_action'],
+                                        'defaults' => ['slug' => $val],
+                                    ];
+                                }
                             }
                         }
-                    }
-                    /* Need to remove after ['template_pattern'] added */
-                    if (
-                        strpos($row['template']['template_action'], '/view')
-                        || strpos($row['template']['template_action'], '/blog-post')
-                    ) {
-                        foreach ($row['slug'] as $key => $val) {
-                            if ($val) {
-                                $rules[] = [
-                                    'pattern'  => $val . '/<title>',
-                                    'route'    => $row['template']['template_action'],
-                                    'defaults' => ['slug' => $val],
-                                ];
+                        /* Need to remove after ['template_pattern'] added */
+                        if (
+                            strpos($row['template']['template_action'], '/view')
+                            || strpos($row['template']['template_action'], '/blog-post')
+                        ) {
+                            foreach ($row['slug'] as $key => $val) {
+                                if ($val) {
+                                    $rules[] = [
+                                        'pattern'  => $val . '/<title>',
+                                        'route'    => $row['template']['template_action'],
+                                        'defaults' => ['slug' => $val],
+                                    ];
+                                }
+                            }
+                        } else {
+                            foreach ($row['slug'] as $key => $val) {
+                                if ($val) {
+                                    $rules[] = [
+                                        'pattern'  => $val,
+                                        'route'    => $row['template']['template_action'],
+                                        'defaults' => ['slug' => $val],
+                                    ];
+                                }
                             }
                         }
                     } else {
@@ -559,20 +571,10 @@ class Cms extends Model
                             if ($val) {
                                 $rules[] = [
                                     'pattern'  => $val,
-                                    'route'    => $row['template']['template_action'],
+                                    'route'    => 'site/page',
                                     'defaults' => ['slug' => $val],
                                 ];
                             }
-                        }
-                    }
-                } elseif (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
-                    foreach ($row['slug'] as $key => $val) {
-                        if ($val) {
-                            $rules[] = [
-                                'pattern'  => $val,
-                                'route'    => 'site/page',
-                                'defaults' => ['slug' => $val],
-                            ];
                         }
                     }
                 }
