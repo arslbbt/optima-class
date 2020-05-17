@@ -268,18 +268,19 @@ class Cms extends Model
     }
 
     /**
-     * Cms::getPage($params) For CMS page data by slug, id or page_id
+     * Get CMS page data by id, page_id or slug
      * 
-     * $params =   [
-     *                  ['id'] => '5eb3ebc9fe107a46744d2346',
-     *                  ['page_id'] => '6425',
-     *                  ['slug'] => 'home',
-     *                  ['lang'] => 'EN',
-     *                  ['type'] => 'page',
-     *                  ['seoimage'] => true,
-     *                  ['template'] => true,
-     *              ]
+     * @param array $params =   [
+     *                              ['id'] => '5eb3ebc9fe107a46744d2346',
+     *                              ['page_id'] => '6425',
+     *                              ['slug'] => 'home',
+     *                              ['lang'] => 'EN',
+     *                              ['type'] => 'page',
+     *                              ['seoimage'] => true,
+     *                              ['template'] => true,
+     *                          ]
      * 
+     * @return array|void
      */
     public static function getPage($params = [])
     {
@@ -389,6 +390,9 @@ class Cms extends Model
         ];
     }
 
+    /**
+     * Set some params if needed before params.php get loaded in web
+     */
     public static function setParams()
     {
         $root =  realpath(dirname(__FILE__) . '/../../../../../');
@@ -432,6 +436,16 @@ class Cms extends Model
         return $retdata;
     }
 
+    /**
+     * Get slug data for all pages and posts for current site
+     * @param array $params =   [
+     *                              ['name'] => 'page',
+     *                              ['without_templates'] => true,
+     *                              ['without_tags'] => true,
+     *                          ]
+     * 
+     * @return array
+     */
     public static function getSlugs($params = [])
     {
         $name = isset($params['name']) ? $params['name'] : 'all';
@@ -463,6 +477,12 @@ class Cms extends Model
         return $data;
     }
 
+    /**
+     * Get page slug by tag assigned to page
+     * @param mixed $tag = 'propertyDetails'
+     * 
+     * @return mixed|string
+     */
     public static function getSlugByTagName($tag)
     {
         $lang = strtoupper(\Yii::$app->language);
@@ -476,6 +496,11 @@ class Cms extends Model
         return 'tag-not-found';
     }
 
+    /**
+     * Get Rules for web
+     * 
+     * @return array|mixed
+     */
     public static function cmsRules()
     {
         /* Code for http to https redirect */
