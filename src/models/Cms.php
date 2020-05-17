@@ -286,21 +286,26 @@ class Cms extends Model
     {
         $slug = isset($params['slug']) ? $params['slug'] : null;
         $id = isset($params['id']) ? $params['id'] : null;
-        $pageId = isset($params['page_id']) ? $params['page_id'] : null;
+        $page_id = isset($params['page_id']) ? $params['page_id'] : null;
 
-        if ($slug !== null || $id !== null || $pageId !== null) {
+        if ($slug !== null || $id !== null || $page_id !== null) {
             $slug_lang = isset($params['lang']) ? $params['lang'] : 'EN';
             $type = isset($params['type']) ? $params['type'] : 'page';
             $imagesSeo = isset($params['seoimage']) ? true : false;
+            $template = isset($params['without_template']) ? false : true;
 
-            if ($id == null) {
-                $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
+            if ($id) {
+                $file = Functions::directory() . $id;
+            } elseif ($page_id) {
+                $file = Functions::directory() . $page_id;
             } else {
-                $file = Functions::directory() . $id . '.json';
+                $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type;
             }
+            $file .= $template ? '_with_template' : '';
+            $file .= '.json';
             if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
                 $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-                $query .= '&expand=template';
+                $query .= $template ? '&expand=template' : '';
 
                 if ($id !== null) {
                     $query .= '&id=' . $id;
@@ -308,8 +313,8 @@ class Cms extends Model
                     $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id' . $query;
 
                     $file_data = Functions::getCRMData($url);
-                } elseif ($pageId !== null) {
-                    $query .= '&page_id=' . $pageId;
+                } elseif ($page_id !== null) {
+                    $query .= '&page_id=' . $page_id;
 
                     $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-page-id' . $query;
 
