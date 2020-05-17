@@ -268,9 +268,9 @@ class Cms extends Model
     }
 
     /**
-     * Cms::getPage($options) For CMS page data by slug or id
+     * Cms::getPage($params) For CMS page data by slug, id or page_id
      * 
-     * $options =   [
+     * $params =   [
      *                  ['id'] => '5eb3ebc9fe107a46744d2346',
      *                  ['page_id'] => '6425',
      *                  ['slug'] => 'home',
@@ -281,16 +281,16 @@ class Cms extends Model
      *              ]
      * 
      */
-    public static function getPage($options = [])
+    public static function getPage($params = [])
     {
-        $slug = isset($options['slug']) ? $options['slug'] : null;
-        $id = isset($options['id']) ? $options['id'] : null;
-        $pageId = isset($options['page_id']) ? $options['page_id'] : null;
+        $slug = isset($params['slug']) ? $params['slug'] : null;
+        $id = isset($params['id']) ? $params['id'] : null;
+        $pageId = isset($params['page_id']) ? $params['page_id'] : null;
 
         if ($slug !== null || $id !== null || $pageId !== null) {
-            $slug_lang = isset($options['lang']) ? $options['lang'] : 'EN';
-            $type = isset($options['type']) ? $options['type'] : 'page';
-            $imagesSeo = isset($options['seoimage']) ? $options['seoimage'] : false;
+            $slug_lang = isset($params['lang']) ? $params['lang'] : 'EN';
+            $type = isset($params['type']) ? $params['type'] : 'page';
+            $imagesSeo = isset($params['seoimage']) ? true : false;
 
             if ($id == null) {
                 $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
@@ -435,12 +435,19 @@ class Cms extends Model
     public static function getSlugs($params = [])
     {
         $name = isset($params['name']) ? $params['name'] : 'all';
-        $file = Functions::directory() . 'slugs_for_' . str_replace(' ', '_', strtolower($name)) . '.json';
+        $with_templates = isset($params['without_templates']) ? false : true;
+        $with_tags = isset($params['without_tags']) ? false : true;
+        $file = Functions::directory() . 'slugs_for_';
+        $file .= str_replace(' ', '_', strtolower($name));
+        $file .= $with_templates ? '_with_templates' : '';
+        $file .= $with_tags ? '_with_tags' : '';
+        $file .= '.json';
+
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
             $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $query .= !isset($params['without_templates']) ? '&expand=template' : '';
-            $query .= !isset($params['without_tags']) ? '&tags=true' : '';
+            $query .= $with_templates ? '&expand=template' : '';
+            $query .= $with_tags ? '&tags=true' : '';
 
             $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
 
