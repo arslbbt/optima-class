@@ -439,8 +439,8 @@ class Cms extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
             $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $query .= isset($params['with_templates']) ? '&expand=template' : '';
-            $query .= isset($params['with_tags']) ? '&tags=true' : '';
+            $query .= !isset($params['without_templates']) ? '&expand=template' : '';
+            $query .= !isset($params['without_tags']) ? '&tags=true' : '';
 
             $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
 
@@ -449,27 +449,17 @@ class Cms extends Model
         } else
             $file_data = file_get_contents($file);
         $data = json_decode($file_data, true);
-        $ret_data = [];
 
         if (!is_array($data) || count($data) <= 0)
             die('Error Getting CMS Data');
 
-        if (!isset($params['formate_data']))
-            return $data;
-
-        foreach ($data as $data_each) {
-            $array['slug_all'] = isset($data_each['slug']) ? $data_each['slug'] : '';
-            $array['type'] = isset($data_each['type']) ? $data_each['type'] : '';
-            $array['template_action'] = isset($data_each['template']['template_action']) ? $data_each['template']['template_action'] : '';
-            $ret_data[] = $array;
-        }
-        return $ret_data;
+        return $data;
     }
 
     public static function getSlugByTagName($tag)
     {
         $lang = strtoupper(\Yii::$app->language);
-        $file_data = self::getSlugs(['with_templates' => true, 'with_tags' => true]);
+        $file_data = self::getSlugs();
 
         foreach ($file_data as $data) {
             if (isset($data['tags'][0]) && $data['tags'][0] == $tag) {
@@ -492,57 +482,74 @@ class Cms extends Model
         // }
 
         self::setParams(); // to set some config because config not loaded yet in from web
+        $file = Functions::directory() . 'rules.json';
 
-        $cmsData = self::getSlugs(['with_templates' => true, 'with_tags' => true, 'formate_data' => true]);
-        $routes = [];
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
 
-        foreach ($cmsData as $row) {
-            if (!empty($row['template_action'])) {
-                if (
-                    strpos($row['template_action'], '/view')
-                    || strpos($row['template_action'], '/blog-post')
-                ) {
-                    foreach ($row['slug_all'] as $key => $val) {
-                        if ($val) {
-                            $routes[] = [
-                                'pattern'  => $val . '/<title>',
-                                'route'    => $row['template_action'],
-                                'defaults' => ['slug' => $val],
-                            ];
+            $cmsData = self::getSlugs();
+            $rules = [];
+
+            foreach ($cmsData as $row) {
+                if (isset($row['template']['template_action']) && !empty($row['template']['template_action']) && isset($row['slug']) && is_array($row['slug'])) {
+                    if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
+                        foreach ($row['slug_all'] as $key => $val) {
+                            if ($val) {
+                                $rules[] = [
+                                    'pattern'  => $val . $row['template_pattern'],
+                                    'route'    => $row['template_action'],
+                                    'defaults' => ['slug' => $val],
+                                ];
+                            }
                         }
                     }
-                } else {
-                    foreach ($row['slug_all'] as $key => $val) {
+                    /* Need to remove after ['template_pattern'] added */
+                    if (
+                        isset($row['template']['template_action']) &&
+                        (strpos($row['template_action'], '/view')
+                            || strpos($row['template_action'], '/blog-post'))
+                    ) {
+                        foreach ($row['slug_all'] as $key => $val) {
+                            if ($val) {
+                                $rules[] = [
+                                    'pattern'  => $val . '/<title>',
+                                    'route'    => $row['template_action'],
+                                    'defaults' => ['slug' => $val],
+                                ];
+                            }
+                        }
+                    } else {
+                        foreach ($row['slug'] as $key => $val) {
+                            if ($val) {
+                                $rules[] = [
+                                    'pattern'  => $val,
+                                    'route'    => $row['template_action'],
+                                    'defaults' => ['slug' => $val],
+                                ];
+                            }
+                        }
+                    }
+                } elseif (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
+                    foreach ($row['slug'] as $key => $val) {
                         if ($val) {
-                            $routes[] = [
+                            $rules[] = [
                                 'pattern'  => $val,
-                                'route'    => $row['template_action'],
+                                'route'    => 'site/page',
                                 'defaults' => ['slug' => $val],
                             ];
                         }
-                    }
-                }
-            } elseif ($row['type'] == 'page') {
-                foreach ($row['slug_all'] as $key => $val) {
-                    if ($val) {
-                        $routes[] = [
-                            'pattern'  => $val,
-                            'route'    => 'site/page',
-                            'defaults' => ['slug' => $val],
-                        ];
                     }
                 }
             }
+            $file_data = json_encode($rules);
+
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+            $rules = json_decode($file_data, true);
         }
 
-        /** Site controller */
-        // $routes['/<title>'] = 'site/page';
-        // $routes['/<title>' . '/<title1>'] = 'site/page';
-        // $routes['/<title>' . '/<title1>' . '/<title2>'] = 'site/page';
-        // $routes['/<title>' . '/<title1>' . '/<title2>' . '/<title3>'] = 'site/page';
-
-        // print_r($routes); die;
-        return $routes;
+        // print_r($rules); die;
+        return $rules;
     }
 
     /* Template Code started  */
