@@ -9,9 +9,7 @@ use yii\helpers\Url;
 
 
 /**
- * LoginForm is the model behind the login form.
- *
- * @property User|null $user This property is read-only.
+ * Cms Functions to get CMS data
  *
  */
 class Cms extends Model
@@ -35,12 +33,16 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
-    // For General settings no need to pass params
-    // For Page settings pass page_data['custom_settings'] as param without language
-
+    /**
+     * For General settings no need to pass params
+     * and
+     * For Page settings pass page_data['custom_settings'] as param without language
+     * @param string $custom_settings
+     * 
+     * @return false|array
+     */
     public static function custom_settings($custom_settings = "")
     {
-
         if (!$custom_settings) {
             $settings = self::settings();
             $custom_settings = $settings['custom_settings'];
@@ -62,12 +64,12 @@ class Cms extends Model
 
     public static function getTranslations()
     {
-        $lang = strtoupper(\Yii::$app->language);
+        $lang = \Yii::$app->language;
         $file = Functions::directory() . 'translations_' . $lang . '.json';
         $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $query .= isset(\Yii::$app->params['commercial']) ? '&commercial=' . \Yii::$app->params['commercial'] : '';
-        $query .= '&lang=' . $lang;
+        $query .= '&lang=' . strtoupper($lang);
 
         $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons' . $query;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
