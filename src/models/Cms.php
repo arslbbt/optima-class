@@ -488,7 +488,8 @@ class Cms extends Model
         //     }
         // }
 
-        self::setParams(); // to set some config because config not loaded yet in from web
+        /* to set some config because config not loaded yet in from web */
+        self::setParams();
         $file = Functions::directory() . 'rules.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
