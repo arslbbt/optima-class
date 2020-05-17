@@ -99,7 +99,6 @@ class Functions extends Model
         if (empty(array_filter($page_data))) {
             $it->redirect('/404');
         }
-        $page_data['view_path'] = 'site/abkk';
 
         if ($page_data['view_path']) {
             try {
