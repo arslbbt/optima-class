@@ -91,14 +91,15 @@ class Functions extends Model
         // Check if page exist
         if (Yii::$app->request->get('slug')) {
             $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('slug'), 'lang' => strtoupper(Yii::$app->language)]);
-        } else {
-            $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
+        // } else {
+        //     $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
         }
 
         // redirect if there is no page_data is available
         if (empty(array_filter($page_data))) {
             $it->redirect('/404');
         }
+        $page_data['view_path'] = 'site/abkk';
 
         if ($page_data['view_path']) {
             try {
@@ -106,10 +107,11 @@ class Functions extends Model
                     'page_data' => $page_data
                 ]);
             } catch (ViewNotFoundException $e) {
-                $it->redirect('/404');
+                throw new ViewNotFoundException();
+                // $it->redirect('/404');
             }
-        } elseif (Yii::$app->request->get('title') == '404') {
-            return $it->render(Yii::$app->request->get('title'), [
+        } elseif (Yii::$app->request->get('slug') == '404') {
+            return $it->render(Yii::$app->request->get('slug'), [
                 'page_data' => $page_data
             ]);
         } else {
