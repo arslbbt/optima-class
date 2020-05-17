@@ -100,7 +100,7 @@ class Functions extends Model
             $object->redirect('/404');
         }
 
-        if ($page_data['view_path']) {
+        if (!empty($page_data['view_path'])) {
             try {
                 return $object->render($page_data['view_path'], [
                     'page_data' => $page_data
