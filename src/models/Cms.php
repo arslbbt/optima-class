@@ -216,6 +216,8 @@ class Cms extends Model
 
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $options = [])
     {
+        trigger_error(__METHOD__ . ' is going to be deprecated');
+
         if ($id == null) {
             $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
         } else {
@@ -877,7 +879,7 @@ class Cms extends Model
 
     public static function clean($string)
     {
-        trigger_error('Method CMS::' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        trigger_error(__METHOD__ . ' is deprecated', E_USER_DEPRECATED);
 
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
 
