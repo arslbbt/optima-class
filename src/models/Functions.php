@@ -105,9 +105,8 @@ class Functions extends Model
                 return $it->render($page_data['view_path'], [
                     'page_data' => $page_data
                 ]);
-            } catch (ViewNotFoundException $e) {
-                throw new ViewNotFoundException();
-                // $it->redirect('/404');
+            } catch (ViewNotFoundException $error) {
+                throw $error;
             }
         } elseif (Yii::$app->request->get('slug') == '404') {
             return $it->render(Yii::$app->request->get('slug'), [
