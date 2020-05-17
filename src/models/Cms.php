@@ -415,6 +415,8 @@ class Cms extends Model
 
     public static function Slugs($name)
     {
+        trigger_error('Method CMS::' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
         $file = Functions::directory() . 'slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
         $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
         $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . \Yii::$app->params['user'] . $site_id;
