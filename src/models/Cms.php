@@ -216,8 +216,6 @@ class Cms extends Model
 
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $options = [])
     {
-        trigger_error(__METHOD__ . ' is going to be deprecated');
-
         if ($id == null) {
             $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type . '.json';
         } else {
