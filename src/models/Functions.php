@@ -32,7 +32,7 @@ class Functions extends Model
         return $ret;
     }
 
-    public static function siteSendEmail($it)
+    public static function siteSendEmail($object)
     {
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
@@ -83,48 +83,48 @@ class Functions extends Model
             Yii::$app->session->setFlash('success', "Thank you for your message!");
         }
 
-        return $it->redirect(Yii::$app->request->referrer);
+        return $object->redirect(Yii::$app->request->referrer);
     }
 
-    public function loadPageDynamically($it)
+    public function loadPageDynamically($object)
     {
         $slug = Yii::$app->request->get('slug', '');
         if ($slug) {
-            $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => $slug, 'lang' => Yii::$app->language]);
+            $page_data = $object->view->params['page_data'] = Cms::getPage(['slug' => $slug, 'lang' => Yii::$app->language]);
         // } else {
-        //     $page_data = $it->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
+        //     $page_data = $object->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
         }
 
         // redirect if there is no page_data is available
         if (!isset($page_data) || empty(array_filter($page_data))) {
-            $it->redirect('/404');
+            $object->redirect('/404');
         }
 
         if ($page_data['view_path']) {
             try {
-                return $it->render($page_data['view_path'], [
+                return $object->render($page_data['view_path'], [
                     'page_data' => $page_data
                 ]);
             } catch (ViewNotFoundException $error) {
                 throw $error;
             }
         } elseif ($slug == '404') {
-            return $it->render($slug, [
+            return $object->render($slug, [
                 'page_data' => $page_data
             ]);
         } else {
-            return $it->render('page', [
+            return $object->render('page', [
                 'page_data' => $page_data
             ]);
         }
     }
 
-    public static function dynamicPage($it)
+    public static function dynamicPage($object)
     {
         $cmsModel = Cms::Slugs('page');
         $url = explode('/', Yii::$app->request->url);
         $this_page = urldecode(end($url));
-        $page_data = $it->view->params['page_data'] = Cms::pageBySlug(Yii::$app->request->get('title'));
+        $page_data = $object->view->params['page_data'] = Cms::pageBySlug(Yii::$app->request->get('title'));
         if (isset($cmsModel) and count($cmsModel) > 0)
             foreach ($cmsModel as $row) {
                 // $cms_page_exists = true;
@@ -142,7 +142,7 @@ class Functions extends Model
                 }
             }
         /*if(isset($page_template)){
-            $ret = $it->render($page_template, [
+            $ret = $object->render($page_template, [
                 'page_data' => $page_data
             ]);
             return $ret;
@@ -154,7 +154,7 @@ class Functions extends Model
                 else
                     $custom_post_id = '';
 
-                return $it->render($page_template, [
+                return $object->render($page_template, [
                     'page_data' => $page_data,
                     'custom_post_id' => $custom_post_id
                 ]);
@@ -162,11 +162,11 @@ class Functions extends Model
                 //die;
             }
         } elseif (isset($this_page) && is_file($this_page)) {
-            return $it->render($this_page, [
+            return $object->render($this_page, [
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);
             // }elseif(isset($cms_page_exists)){
-            //     return $it->render('page', [
+            //     return $object->render('page', [
             //         'page_data' => $page_data
             //     ]);
         } else {
@@ -177,13 +177,13 @@ class Functions extends Model
                 if (!isset($page_data_404) || !isset($page_data_404['slug_all']['EN'])) {
                     die('Please create 404 page with sluge "404" in CMS');
                 }
-                $page_data = $it->view->params['page_data'] = Cms::pageBySlug('404');
+                $page_data = $object->view->params['page_data'] = Cms::pageBySlug('404');
             }
-            return $it->render('page', [
+            return $object->render('page', [
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);
         }
-        // return $it->render('404', []);
+        // return $object->render('404', []);
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
