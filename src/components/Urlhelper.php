@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Component;
 use Cocur\Slugify\Slugify;
 use optima\models\Cms;
+use yii\helpers\Url;
 
 class Urlhelper extends Component
 {
@@ -17,7 +18,7 @@ class Urlhelper extends Component
 
     public static function propertiesListingUrl()
     {
-        return self::slug('propertyList');
+        return Url::to(self::slug('propertyList'));
     }
 
     public static function propertyDetailsSlug()
@@ -27,7 +28,7 @@ class Urlhelper extends Component
 
     public static function developmentsListingUrl()
     {
-        return self::slug('developmentsListing');
+        return Url::to(self::slug('developmentsListing'));
     }
 
     public static function developmentDetailsSlug()
@@ -37,7 +38,7 @@ class Urlhelper extends Component
 
     public static function blogListingUrl()
     {
-        return self::slug('blogListing');
+        return Url::to(self::slug('blogListing'));
     }
 
     public static function blogDetailsSlug()
@@ -71,7 +72,7 @@ class Urlhelper extends Component
      */
     public static function getPropertyUrl($property)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . self::propertyDetailsSlug() . '/' . self::getPropertyTitle($property);
+        return Url::to('/' . self::propertyDetailsSlug() . '/' . self::getPropertyTitle($property));
     }
 
     /**
@@ -100,7 +101,7 @@ class Urlhelper extends Component
      */
     public static function getDevelopmentUrl($development)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . self::developmentDetailsSlug() . '/' . self::getDevelopmentTitle($development);
+        return Url::to('/' . self::developmentDetailsSlug() . '/' . self::getDevelopmentTitle($development));
     }
 
     /**
@@ -130,6 +131,6 @@ class Urlhelper extends Component
      */
     public static function getBlogUrl($post)
     {
-        return '/' . strtolower(Yii::$app->language) . '/' . self::blogDetailsSlug() . '/' . self::getPostTitle($post);
+        return Url::to('/' . self::blogDetailsSlug() . '/' . self::getPostTitle($post));
     }
 }
