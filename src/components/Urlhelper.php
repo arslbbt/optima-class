@@ -10,7 +10,6 @@ use yii\helpers\Url;
 
 class Urlhelper extends Component
 {
-
     public static function slug($tag)
     {
         return Cms::getSlugByTagName($tag);
