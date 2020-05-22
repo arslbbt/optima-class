@@ -368,14 +368,15 @@ class Dropdowns extends Model
             ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
 
         $return_data = json_decode($response, TRUE);
-        if (!isset($params['allData'])) {
-            foreach ($return_data as $mooring_type) {
-                $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : $mooring_type['value']['en'];
-                $mooring_types[$mooring_type['key']] = $value;
-            }
-            return $mooring_types;
+
+        if (isset($params['allData']))
+            return $return_data;
+
+        foreach ($return_data as $mooring_type) {
+            $value = isset($mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)]) ? $mooring_type['value'][strtolower(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language)] : $mooring_type['value']['en'];
+            $mooring_types[$mooring_type['key']] = $value;
         }
-        return $return_data;
+        return $mooring_types;
     }
 
     public static function types()
@@ -665,7 +666,7 @@ class Dropdowns extends Model
             ['key' => "not_furnished", 'value' => \Yii::t('app', 'not_furnished')],
         ];
         $propertyFurnitures = [
-            'optional'=>Yii::t('app', strtolower('optional')),
+            'optional' => Yii::t('app', strtolower('optional')),
         ];
     }
 
