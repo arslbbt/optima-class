@@ -1328,6 +1328,7 @@ class Properties extends Model
 
                 if (isset($property->bookings) && count($property->bookings) > 0) {
                     $group_booked = [];
+                    $booking_group_with_enquiry = [];
                     $booking_status = [];
                     $booked_dates_costa = [];
                     foreach ($property->bookings as $key => $booking) {
@@ -1356,6 +1357,12 @@ class Properties extends Model
                             foreach ($period as $date) {
                                 $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                             }
+                            if(isset($booking->status) && $booking->status == 'enquiry'){
+                                $booking_group_with_enquiry[$key] = [];
+                                foreach ($dates as $date) {
+                                    $booking_group_with_enquiry[$key][] = $date;
+                                }
+                            }
                             $booking_status[] = isset($booking->status) && !empty($booking->status) ? $booking->status : '';
                             $group_booked[$key] = [];
                             foreach ($dates as $date) {
@@ -1367,6 +1374,7 @@ class Properties extends Model
                     $return_data['booking_status'] = $booking_status;
                     $return_data['group_booked'] = $group_booked;
                     $return_data['booked_dates'] = $booked_dates;
+                    $return_data['booking_group_with_enquiry'] = $booking_group_with_enquiry;
                     $return_data['booked_dates_costa'] = $booked_dates_costa;
                 }
 
