@@ -212,6 +212,15 @@ class CommercialProperties extends Model
         if (isset($property['description'][$lang])) {
             $f_property['description'] = $property['description'][$lang];
         }
+        if (isset($property['seo_title'])) {
+            $f_property['meta_title'] = $property['seo_title'][$lang];
+        }
+        if (isset($property['seo_description'])) {
+            $f_property['meta_desc'] = $property['seo_description'][$lang];
+        }
+        if (isset($property['keywords'])) {
+            $f_property['meta_keywords'] = $property['keywords'][$lang];
+        }
         if (isset($property['type_one'])) {
             $f_property['type'] = \Yii::t('app', $property['type_one']);
         }
