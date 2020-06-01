@@ -212,13 +212,13 @@ class CommercialProperties extends Model
         if (isset($property['description'][$lang])) {
             $f_property['description'] = $property['description'][$lang];
         }
-        if (isset($property['seo_title'])) {
+        if (isset($property['seo_title'][$lang]) && $property['seo_title'][$lang] != '') {
             $f_property['meta_title'] = $property['seo_title'][$lang];
         }
-        if (isset($property['seo_description'])) {
+        if (isset($property['seo_description'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_desc'] = $property['seo_description'][$lang];
         }
-        if (isset($property['keywords'])) {
+        if (isset($property['keywords'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
         if (isset($property['type_one'])) {
