@@ -327,6 +327,7 @@ class Cms extends Model
                     $query .= '&slug=' . $slug;
                     $query .= '&type=' . $type;
                     $query .= $imagesSeo ? '&seoimage=yes' : '';
+                    $query .= '&condition=and';
 
                     $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug' . $query;
 
@@ -633,13 +634,13 @@ class Cms extends Model
         die;
     }
 
-    public function get_files($type = null, $depth = 0, $search_parent = false)
+    public static function get_files($type = null, $depth = 0, $search_parent = false)
     {
         $files = (array) self::scandir(self::getViewPath(), $type, $depth);
         return $files;
     }
 
-    public function getViewPath()
+    public static function getViewPath()
     {
         return Yii::getAlias('../web/themes/optima_theme/views');
     }
