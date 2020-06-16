@@ -291,7 +291,7 @@ class Cms extends Model
         $page_id = isset($params['page_id']) ? $params['page_id'] : null;
 
         if ($slug !== null || $id !== null || $page_id !== null) {
-            $slug_lang = isset($params['lang']) ? $params['lang'] : 'EN';
+            $slug_lang = isset($params['lang']) ? strtoupper($params['lang']) : 'en';
             $type = isset($params['type']) ? $params['type'] : 'page';
             $imagesSeo = isset($params['seoimage']) ? true : false;
             $template = isset($params['without_template']) ? false : true;
@@ -301,7 +301,7 @@ class Cms extends Model
             } elseif ($page_id) {
                 $file = Functions::directory() . $page_id;
             } else {
-                $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type;
+                $file = Functions::directory() . str_replace('/', '_', $slug) . $slug_lang . '-' . $type;
             }
             $file .= $template ? '_with_template' : '';
             $file .= '.json';
@@ -323,7 +323,7 @@ class Cms extends Model
                     $file_data = Functions::getCRMData($url);
                 } else {
                     $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                    $query .= '&lang=' . strtoupper($slug_lang);
+                    $query .= '&lang=' . $slug_lang;
                     $query .= '&slug=' . $slug;
                     $query .= '&type=' . $type;
                     $query .= $imagesSeo ? '&seoimage=yes' : '';
