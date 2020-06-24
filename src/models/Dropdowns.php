@@ -746,7 +746,11 @@ class Dropdowns extends Model
         $finalFormatedSelectArray = array();
         foreach ($dataArray as $key => $value) {
             $finalFormatedSelectArray[$key]['option_key'] = $value[$option_key_index];
-            $finalFormatedSelectArray[$key]['option_value'] = (is_array($value[$option_value_index]) ? $value[$option_value_index]['en'] : $value[$option_value_index]);
+            if (isset($value[$option_value_index])) {
+                $finalFormatedSelectArray[$key]['option_value'] = (is_array($value[$option_value_index]) ? $value[$option_value_index]['en'] : $value[$option_value_index]);
+            } else {
+                $finalFormatedSelectArray[$key]['option_value'] = isset($value['en']) ? $value['en'] : '';
+            }
         }
         return $finalFormatedSelectArray;
     }

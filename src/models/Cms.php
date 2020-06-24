@@ -475,8 +475,10 @@ class Cms extends Model
 
             $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
 
-            $file_data = file_get_contents($url);
-            file_put_contents($file, $file_data);
+            $file_data = Functions::getCRMData($url);
+            if ($file_data) {
+                file_put_contents($file, $file_data);
+            }
         } else
             $file_data = file_get_contents($file);
         $data = json_decode($file_data, true);
