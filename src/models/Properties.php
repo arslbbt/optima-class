@@ -2669,6 +2669,10 @@ class Properties extends Model
                     $rental_prices[$booking_cleaning['description']['en']] = ($booking_cleaning['price'] * $number_sleeps);
                     if (isset($booking_cleaning['charge_to']) && $booking_cleaning['charge_to'] == 'client')
                         $total_price += ($booking_cleaning['price'] * $number_sleeps);
+                } else if (isset($booking_cleaning['type']) && $booking_cleaning['type'] == 'per_week') {
+                    $rental_prices[$booking_cleaning['description']['en']] = $booking_cleaning['price'];
+                    if (isset($booking_cleaning['charge_to']) && $booking_cleaning['charge_to'] == 'client')
+                        $total_price += $booking_cleaning['price'];
                 }
             }
         }
