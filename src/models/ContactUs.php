@@ -134,16 +134,21 @@ class ContactUs extends Model
             ['email', 'email'],
             [['resume', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, pdf, txt'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
+            // [
+            //     ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
+            //     'when' => function ($model) {
+            //         if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
+            //             $return = false;
+            //         } else {
+            //             $return = true;
+            //         }
+            //         return $return;
+            //     }
+            // ],
             [
-                ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
-                'when' => function ($model) {
-                    if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
-                        $return = false;
-                    } else {
-                        $return = true;
-                    }
-                    return $return;
-                }
+                ['reCaptcha'], \himiklab\yii2\recaptcha\ReCaptchaValidator3::className(),
+                'threshold' => 0.5,
+                'action' => 'capchaloaded',
             ],
 
             [['verifyCode'], 'captcha', 'when' => function ($model) {

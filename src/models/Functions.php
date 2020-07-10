@@ -32,6 +32,17 @@ class Functions extends Model
         return $ret;
     }
 
+    public static function reCaptcha3($id = '', $class = 'col-sm-offset-3', $name = 'reCaptcha')
+    {
+        $ret = "";
+        $ret .= \himiklab\yii2\recaptcha\ReCaptcha3::widget([
+            'name' => $name,
+            'action' => 'capchaloaded',
+            // 'widgetOptions' => ['class' => $class, 'id' => $id],
+        ]);
+        return $ret;
+    }
+
     public static function siteSendEmail($object)
     {
         $model = new ContactUs();
