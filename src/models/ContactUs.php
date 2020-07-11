@@ -71,6 +71,7 @@ class ContactUs extends Model
     public $mobile_phone;
     public $lgroups;
     public $reCaptcha;
+    public $reCaptcha3;
     public $resume;
     public $application;
     public $feet_setting;
@@ -134,20 +135,21 @@ class ContactUs extends Model
             ['email', 'email'],
             [['resume', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, pdf, txt'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
-            // [
-            //     ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
-            //     'when' => function ($model) {
-            //         if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
-            //             $return = false;
-            //         } else {
-            //             $return = true;
-            //         }
-            //         return $return;
-            //     }
-            // ],
+        
             [
-                ['reCaptcha'], \himiklab\yii2\recaptcha\ReCaptchaValidator3::className(),
-                'threshold' => 0.5,
+                ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
+                'when' => function ($model) {
+                    if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
+                        $return = false;
+                    } else {
+                        $return = true;
+                    }
+                    return $return;
+                }
+            ],
+            [
+                ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
+                'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
                 'action' => 'capchaloaded',
             ],
 
