@@ -32,12 +32,25 @@ class Functions extends Model
         return $ret;
     }
 
+    public static function reCaptcha3($id = '', $class = 'col-sm-offset-3', $name = 'reCaptcha3')
+    {
+        $ret = "";
+        $ret .= \himiklab\yii2\recaptcha\ReCaptcha3::widget([
+            'name' => $name,
+            'action' => 'capchaloaded',
+            // 'widgetOptions' => ['class' => $class, 'id' => $id],
+        ]);
+        return $ret;
+    }
+
     public static function siteSendEmail($object)
     {
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
         $model->verifyCode = true;
         $model->reCaptcha = Yii::$app->request->get('reCaptcha');
+        $model->reCaptcha3 = Yii::$app->request->get('reCaptcha3');
+
         if (isset($_GET['owner'])) {
             $model->owner = 1;
         }
