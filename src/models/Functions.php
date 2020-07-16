@@ -37,7 +37,7 @@ class Functions extends Model
         $ret = "";
         $ret .= \himiklab\yii2\recaptcha\ReCaptcha3::widget([
             'name' => $name,
-            'action' => 'capchaloaded',
+            'action' => 'captchaloaded',
             // 'widgetOptions' => ['class' => $class, 'id' => $id],
         ]);
         return $ret;

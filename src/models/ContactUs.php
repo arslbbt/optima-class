@@ -147,10 +147,15 @@ class ContactUs extends Model
                     return $return;
                 }
             ],
+
             [
                 ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
-                'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
-                'action' => 'capchaloaded',
+                'when' => function ($model) {
+                    if (isset(Yii::$app->params['recaptcha_v3_secret_key'])) {
+                        return ['threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
+                        'action' => 'captchaloaded'];
+                    }
+                }
             ],
 
             [['verifyCode'], 'captcha', 'when' => function ($model) {
