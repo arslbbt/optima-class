@@ -119,6 +119,9 @@ class CommercialProperties extends Model
         if (isset($get['price_from']) && $get['price_from']) {
             $query['current_price'] = ['$gte' => (int) $get['price_from']];
         }
+        if (isset($get['price_to']) && $get['price_to']) {
+            $query['current_price'] = ['$lte' => (int) $get['price_to']];
+        }
         if (isset($get['reference']) && $get['reference']) {
             $query['$or'] = [
                 ["reference" => (int) $get['reference']],
@@ -163,6 +166,10 @@ class CommercialProperties extends Model
         }
         if (isset($get['price_from'])) {
             $query['current_price']['$gt'] = (int) $get['price_from'];
+        }
+        if (isset($get['price_to'])) {
+            $query['current_price']['$lt'] = (int) $get['price_to'];
+        } else{
             $query['current_price']['$lt'] = (int) 100000000000000000;
         }
 
