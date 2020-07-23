@@ -65,7 +65,6 @@ class CommercialProperties extends Model
         $post_data = ["options" => $options];
         if(!empty($query_array))
             $post_data["query"] =  $query_array;
-        
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
@@ -104,6 +103,7 @@ class CommercialProperties extends Model
                 'Content-Length' => strlen(json_encode($post_data))
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+;
         
         $response = json_decode($response, TRUE);
 
@@ -243,6 +243,21 @@ class CommercialProperties extends Model
         }
         if (isset($property['sale']) && $property['sale']) {
             $f_property['sale'] = TRUE;
+        }
+        if (isset($property['transfer']) && $property['transfer']) {
+            $f_property['transfer'] = TRUE;
+        }
+        if (isset($property['leasehold']) && $property['leasehold']) {
+            $f_property['leasehold'] = $property['leasehold'];
+        }
+        if (isset($property['leasehold_rental_price']) && $property['leasehold_rental_price']) {
+            $f_property['leasehold_rental_price'] = $property['leasehold_rental_price'];
+        }  
+        if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
+            $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
+        }
+        if (isset($property['leasehold_unit']) && $property['leasehold_unit']) {
+            $f_property['leasehold_unit'] = $property['leasehold_unit'];
         }
         if (isset($property['rent']) && $property['rent']) {
             $f_property['rent'] = TRUE;
