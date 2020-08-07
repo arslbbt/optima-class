@@ -703,7 +703,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200')
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $exporter='')
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -714,7 +714,7 @@ class Properties extends Model
             }
         }
         if (isset($reference) && !empty($reference)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference .$exporter. '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
             // echo $url;die;
             if (isset($with_booking) && $with_booking == true) {
                 $url .= '&with_booking=true';
@@ -1357,7 +1357,7 @@ class Properties extends Model
                             foreach ($period as $date) {
                                 $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                             }
-                            if(isset($booking->status) && $booking->status == 'enquiry'){
+                            if (isset($booking->status) && $booking->status == 'enquiry') {
                                 $booking_group_with_enquiry[$key] = [];
                                 foreach ($dates as $date) {
                                     $booking_group_with_enquiry[$key][] = $date;
