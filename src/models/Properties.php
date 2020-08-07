@@ -703,7 +703,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200')
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options=[])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -733,6 +733,9 @@ class Properties extends Model
             }
             if (isset($with_count) && $with_count == true) {
                 $url .= '&view_count=true';
+            }
+            if (isset($options['exporter']) && $options['exporter'] == true) {
+                $url .= '&exporter=true';
             }
             // echo $url;die;
 
@@ -1357,7 +1360,7 @@ class Properties extends Model
                             foreach ($period as $date) {
                                 $dates[] = $date->format(isset(Yii::$app->params['date_fromate']) ? Yii::$app->params['date_fromate'] : "m-d-Y");
                             }
-                            if(isset($booking->status) && $booking->status == 'enquiry'){
+                            if (isset($booking->status) && $booking->status == 'enquiry') {
                                 $booking_group_with_enquiry[$key] = [];
                                 foreach ($dates as $date) {
                                     $booking_group_with_enquiry[$key][] = $date;
