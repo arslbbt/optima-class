@@ -703,7 +703,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $exporter='')
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -714,7 +714,7 @@ class Properties extends Model
             }
         }
         if (isset($reference) && !empty($reference)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference .$exporter. '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference . '&exporter=true&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
             // echo $url;die;
             if (isset($with_booking) && $with_booking == true) {
                 $url .= '&with_booking=true';
@@ -733,6 +733,9 @@ class Properties extends Model
             }
             if (isset($with_count) && $with_count == true) {
                 $url .= '&view_count=true';
+            }
+            if (isset($options['exporter']) && $options['exporter'] == true) {
+                $url .= '&exporter=true';
             }
             // echo $url;die;
 
