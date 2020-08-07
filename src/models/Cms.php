@@ -423,7 +423,8 @@ class Cms extends Model
         $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . \Yii::$app->params['user'] . $site_id;
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
+            if ($file_data)
+                file_put_contents($file, $file_data);
         } else
             $file_data = file_get_contents($file);
 
@@ -476,9 +477,8 @@ class Cms extends Model
             $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
 
             $file_data = Functions::getCRMData($url);
-            if ($file_data) {
+            if ($file_data)
                 file_put_contents($file, $file_data);
-            }
         } else
             $file_data = file_get_contents($file);
         $data = json_decode($file_data, true);

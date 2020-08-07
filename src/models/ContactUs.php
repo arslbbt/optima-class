@@ -135,7 +135,7 @@ class ContactUs extends Model
             ['email', 'email'],
             [['resume', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, pdf, txt'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
-        
+
             [
                 ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
                 'when' => function ($model) {
@@ -150,13 +150,27 @@ class ContactUs extends Model
 
             [
                 ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
+                'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
+                'action' => 'captchaloaded',
                 'when' => function ($model) {
-                    if (isset(Yii::$app->params['recaptcha_v3_secret_key'])) {
-                        return ['threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
-                        'action' => 'captchaloaded'];
-                    }
+                    if (!isset(Yii::$app->params['recaptcha_v3_secret_key']))
+                        return false;
+
+                    return true;
                 }
             ],
+
+            // [
+            //     ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
+            //     'when' => function ($model) {
+            //         if (isset(Yii::$app->params['recaptcha_v3_secret_key'])) {
+            //             return [
+            //                 'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
+            //                 'action' => 'captchaloaded'
+            //             ];
+            //         }
+            //     }
+            // ],
 
             [['verifyCode'], 'captcha', 'when' => function ($model) {
                 if ($model->verifyCode == 'null') {
@@ -388,7 +402,7 @@ class ContactUs extends Model
             } else {
                 $subscribe_subject = '';
                 $lngn = 0; //isset(\Yii::$app->language)&& strtoupper(\Yii::$app->language)=='ES'?1:0;
-                if(isset($settings['custom_settings'])){
+                if (isset($settings['custom_settings'])) {
                     foreach ($settings['custom_settings'] as $setting) {
                         if (isset($setting['key']) && $setting['key'] == 'enquiry_subject') {
                             $subscribe_subject = \Yii::t('app', $setting['value']);
@@ -451,7 +465,7 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
-            'country '=> isset($this->country) ? $this->country : null,
+            'country ' => isset($this->country) ? $this->country : null,
             'mobile_phone' => isset($this->mobile_phone) ? $this->mobile_phone : null,
             'id_number' => isset($this->id_number) ? $this->id_number : null,
             'min_sleeps' => isset($this->min_sleeps) ? $this->min_sleeps : null,
