@@ -37,6 +37,7 @@ class Functions extends Model
         $ret = "";
         $ret .= \himiklab\yii2\recaptcha\ReCaptcha3::widget([
             'name' => $name,
+            'siteKey' => isset(Yii::$app->params['recaptcha_v3_site_key']) ? Yii::$app->params['recaptcha_v3_site_key'] : "6LfdYakZAAAAACxIv5KExmk7CsTGx7J_-KJdGvUX",
             'action' => 'captchaloaded',
             // 'widgetOptions' => ['class' => $class, 'id' => $id],
         ]);
@@ -49,7 +50,9 @@ class Functions extends Model
         $model->load(Yii::$app->request->get());
         $model->verifyCode = true;
         $model->reCaptcha = Yii::$app->request->get('reCaptcha');
-        $model->reCaptcha3 = Yii::$app->request->get('reCaptcha3');
+        if ($model->reCaptcha3 = Yii::$app->request->get('reCaptcha3')) {
+            $model->scenario = ContactUs::SCENARIO_V3;
+        }
 
         if (isset($_GET['owner'])) {
             $model->owner = 1;
@@ -104,8 +107,8 @@ class Functions extends Model
         $slug = Yii::$app->request->get('slug', '');
         if ($slug) {
             $page_data = $object->view->params['page_data'] = Cms::getPage(['slug' => $slug, 'lang' => Yii::$app->language]);
-        // } else {
-        //     $page_data = $object->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
+            // } else {
+            //     $page_data = $object->view->params['page_data'] = Cms::getPage(['slug' => Yii::$app->request->get('title'), 'lang' => strtoupper(Yii::$app->language)]);
         }
 
         // redirect if there is no page_data is available

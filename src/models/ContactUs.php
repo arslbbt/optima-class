@@ -122,6 +122,15 @@ class ContactUs extends Model
     public $postal_code;
     public $infants;
 
+    const SCENARIO_V3 = 'v3validation';
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_V3] = ['reCaptcha3'];
+        return $scenarios;
+    }
+
     public function rules()
     {
         return [
@@ -149,28 +158,12 @@ class ContactUs extends Model
             ],
 
             [
-                ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
-                'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
+                ['reCaptcha3'], \himiklab\yii2\recaptcha\ReCaptchaValidator3::className(),
+                'secret' => isset(Yii::$app->params['recaptcha_v3_secret_key']) ? Yii::$app->params['recaptcha_v3_secret_key'] : "6LfdYakZAAAAAFHMsVwjMmZaNCCJo-jqdVDx2uxl",
+                'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.8,
                 'action' => 'captchaloaded',
-                'when' => function ($model) {
-                    if (!isset(Yii::$app->params['recaptcha_v3_secret_key']))
-                        return false;
-
-                    return true;
-                }
+                'on' => self::SCENARIO_V3
             ],
-
-            // [
-            //     ['reCaptcha3'], isset(Yii::$app->params['recaptcha_v3_secret_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator3::className() : 'safe',
-            //     'when' => function ($model) {
-            //         if (isset(Yii::$app->params['recaptcha_v3_secret_key'])) {
-            //             return [
-            //                 'threshold' => isset(Yii::$app->params['threshold']) ? Yii::$app->params['threshold'] : 0.5,
-            //                 'action' => 'captchaloaded'
-            //             ];
-            //         }
-            //     }
-            // ],
 
             [['verifyCode'], 'captcha', 'when' => function ($model) {
                 if ($model->verifyCode == 'null') {
