@@ -104,7 +104,7 @@ class CommercialProperties extends Model
             ])
             ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
 ;
-        
+       
         $response = json_decode($response, TRUE);
 
         $property = self::formateProperty($response);
@@ -192,6 +192,10 @@ class CommercialProperties extends Model
     {      
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
+        $contentLang = strtolower(\Yii::$app->language);
+        if(strtolower(\Yii::$app->language) == 'es'){
+            $contentLang = 'es_AR';
+        }
         $f_property = [];
         if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference') {
             $ref = $settings['general_settings']['reference'];
@@ -271,8 +275,17 @@ class CommercialProperties extends Model
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
         }
+        if (isset($property['city_value'][$contentLang])) {
+            $f_property['city'] = $property['city_value'][$contentLang];
+        }
+        if (isset($property['province_value'][$contentLang])) {
+            $f_property['province'] = $property['province_value'][$contentLang];
+        }
         if (isset($property['location'])) {
             $f_property['location_key'] = $property['location'];
+        }
+        if (isset($property['location_value'][$contentLang])) {
+            $f_property['location'] = $property['location_value'][$contentLang];
         }
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
