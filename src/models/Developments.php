@@ -28,7 +28,7 @@ class Developments extends Model
         }
         $query .= self::setQuery();
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
-
+        // echo "<pre>";print_r($url);die;
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -36,13 +36,18 @@ class Developments extends Model
         }
         $apiData = json_decode($JsonData);
         $return_data = [];
-
+        if (strpos($query, "&latlng=true")) {
+            return $apiData;
+        }
         foreach ($apiData as $property) {
             $data = [];
             $features = [];
             $slugs = [];
             if (isset($property->total_properties)) {
                 $data['total_properties'] = $property->total_properties;
+            }
+            if (isset($property->property->_id) && $property->property->_id != ''){
+                $data['_id'] = $property->property->_id;
             }
             if (isset($property->property->reference) && $property->property->reference != '')
                 $data['id'] = $property->property->reference;
