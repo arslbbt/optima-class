@@ -37,7 +37,7 @@ class Developments extends Model
         $apiData = json_decode($JsonData);
         $return_data = [];
         if (strpos($query, "&latlng=true")) {
-            return json_decode($JsonData, true);
+            return $apiData;
         }
         foreach ($apiData as $property) {
             $data = [];
