@@ -496,6 +496,12 @@ class Properties extends Model
                     if (isset($property->bookings_extras) && count($property->bookings_extras) > 0) {
                         $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
                     }
+                    if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                        $data['agency_logo'] = 'https://images.optima-crm.com/agencies/'.(isset($property->agency_logo->_id) ? $property->agency_logo->_id : '').'/'.(isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                    }
+                    elseif((!isset($property->property->own) || !$property->property->own )&& isset($property->agency_logo) && !empty($property->agency_logo)){
+                        $data['agency_logo'] = 'https://images.optima-crm.com/companies/'.(isset($property->agency_logo->_id) ? $property->agency_logo->_id : '').'/'.(isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                    }
                     if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0) {
                         $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
                     }
