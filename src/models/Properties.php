@@ -51,6 +51,9 @@ class Properties extends Model
         if (strpos($query, "&latlng=true")) {
             return json_decode($JsonData, true);
         }
+        if (strpos($query, "&just_external_reference=true") || strpos($query, "&just_agency_reference=true") || strpos($query, "&just_reference=true")) {
+            return json_decode($JsonData, true);
+        }
         $apiData = json_decode($JsonData);
 
         $settings = Cms::settings();
