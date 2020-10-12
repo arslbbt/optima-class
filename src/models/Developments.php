@@ -57,9 +57,15 @@ class Developments extends Model
 
             if (isset($property->property->description->$lang) && $property->property->description->$lang != '')
                 $data['content'] = $property->property->description->$lang;
-
+                
+            if (isset($property->property->phase) && $property->property->phase != '')
+                $data['phase_name'] = isset($property->property->phase['0']->phase_name) ? $property->property->phase['0']->phase_name : '';
+            
             if (isset($property->property->type) && $property->property->type != '')
                 $data['type'] = implode(', ', $property->property->type);
+            
+            if (isset($property->property->city_name) && $property->property->city_name != '')
+                $data['city_name'] = $property->property->city_name;
 
             if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
                 $data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
