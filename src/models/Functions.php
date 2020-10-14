@@ -121,14 +121,16 @@ class Functions extends Model
         $message .= 'Name : ' . $model->first_name . ' ' . $model->last_name . '<br>';
         $message .= 'Email : ' . $model->email . '<br>';
         $message .= 'Phone : ' . $model->phone . '<br>';
-        $message .= 'Message : ' . $model->message . '<br>';
+        $message .= 'Message : ' . $model->message . '<br><br>';
+        $message .= 'Site : ' . Url::home(true) . '<br>';
+        $message .= 'Url : ' . Yii::$app->request->referrer . '<br>';
         $message .= 'Errors : ' . $errors . '<br>';
 
 
         Yii::$app->mailer->compose()
             ->setFrom($model->email)
             ->setTo($to)
-            ->setSubject('Ibiza Estates failed Leads')
+            ->setSubject('Leads Error')
             ->setHtmlBody($message)
             ->send();
     }
