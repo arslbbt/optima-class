@@ -44,7 +44,7 @@ class Functions extends Model
         return $ret;
     }
 
-    public static function siteSendEmail($object)
+    public static function siteSendEmail($object, $redirect_url = null)
     {
         $model = new ContactUs();
         $model->load(Yii::$app->request->get());
@@ -95,11 +95,42 @@ class Functions extends Model
                 $errors = implode(',', $errs);
             }
             Yii::$app->session->setFlash('failure', $errors);
+            self::sendErrorMail($model);
         } else {
             Yii::$app->session->setFlash('success', "Thank you for your message!");
+            if ($redirect_url) {
+                return $object->redirect($redirect_url);
+            }
         }
 
         return $object->redirect(Yii::$app->request->referrer);
+    }
+
+    public static function sendErrorMail($model, $to = 'azzi@optimageeks.com')
+    {
+        $errors = 'Message not sent!';
+        if (isset($model->errors) and count($model->errors) > 0) {
+            $errs = array();
+            foreach ($model->errors as $k => $err) {
+                $errs[] = $err[0];
+            }
+            $errors = implode(',', $errs);
+        }
+
+        $message = "";
+        $message .= 'Name : ' . $model->first_name . ' ' . $model->last_name . '<br>';
+        $message .= 'Email : ' . $model->email . '<br>';
+        $message .= 'Phone : ' . $model->phone . '<br>';
+        $message .= 'Message : ' . $model->message . '<br>';
+        $message .= 'Errors : ' . $errors . '<br>';
+
+
+        Yii::$app->mailer->compose()
+            ->setFrom($model->email)
+            ->setTo($to)
+            ->setSubject('Ibiza Estates failed Leads')
+            ->setHtmlBody($message)
+            ->send();
     }
 
     public function loadPageDynamically($object)
