@@ -106,8 +106,10 @@ class Functions extends Model
         return $object->redirect(Yii::$app->request->referrer);
     }
 
-    public static function sendErrorMail($model, $to = 'azzi@optimageeks.com')
+    public static function sendErrorMail($model, $to = ['azzi@optimageeks.com', 'support@optimasys.es'])
     {
+        if (strpos(Url::home(true), 'ibiza-estates.com'))
+            $to[] = 'info@ibiza-estates.com';
         $errors = 'Message not sent!';
         if (isset($model->errors) and count($model->errors) > 0) {
             $errs = array();
