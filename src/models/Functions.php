@@ -94,8 +94,13 @@ class Functions extends Model
                 }
                 $errors = implode(',', $errs);
             }
+            
             Yii::$app->session->setFlash('failure', $errors);
-            self::sendErrorMail($model);
+            if(YII_ENV == 'prod' && isset(Yii::$app->params['send_error_mails_to']) && !empty(Yii::$app->params['send_error_mails_to'])){
+                self::sendErrorMail($model, Yii::$app->params['send_error_mails_to']);
+            }else{
+                self::sendErrorMail($model);
+            }
         } else {
             Yii::$app->session->setFlash('success', "Thank you for your message!");
             if ($redirect_url) {
@@ -106,10 +111,8 @@ class Functions extends Model
         return $object->redirect(Yii::$app->request->referrer);
     }
 
-    public static function sendErrorMail($model, $to = ['azzi@optimageeks.com', 'support@optimasys.es'])
+    public static function sendErrorMail($model, $bcc = ['support@optimasys.es'])
     {
-        if (strpos(Url::home(true), 'ibiza-estates.com'))
-            $to[] = 'info@ibiza-estates.com';
         $errors = 'Message not sent!';
         if (isset($model->errors) and count($model->errors) > 0) {
             $errs = array();
@@ -131,7 +134,8 @@ class Functions extends Model
 
         Yii::$app->mailer->compose()
             ->setFrom($model->email)
-            ->setTo($to)
+            ->setTo('azzi@optimageeks.com')
+            ->setBcc($bcc)
             ->setSubject('Leads Error')
             ->setHtmlBody($message)
             ->send();
