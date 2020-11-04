@@ -58,7 +58,11 @@ class Properties extends Model
 
         $settings = Cms::settings();
 
-        $get = Yii::$app->request->get();
+        try {
+            $get = Yii::$app->request->get();
+        } catch (\Throwable $th) {
+            $get = [];
+        }
         /* to set the display price
          * transaction 1 = Rental
          * transaction 4 = Resale
@@ -500,10 +504,9 @@ class Properties extends Model
                         $data['booking_extras'] = ArrayHelper::toArray($property->bookings_extras);
                     }
                     if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
-                        $data['agency_logo'] = 'https://images.optima-crm.com/agencies/'.(isset($property->agency_logo->_id) ? $property->agency_logo->_id : '').'/'.(isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
-                    }
-                    elseif((!isset($property->property->own) || !$property->property->own )&& isset($property->agency_logo) && !empty($property->agency_logo)){
-                        $data['agency_logo'] = 'https://images.optima-crm.com/companies/'.(isset($property->agency_logo->_id) ? $property->agency_logo->_id : '').'/'.(isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                        $data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                    } elseif ((!isset($property->property->own) || !$property->property->own) && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                        $data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
                     }
                     if (isset($property->bookings_cleaning) && count($property->bookings_cleaning) > 0) {
                         $data['booking_cleaning'] = ArrayHelper::toArray($property->bookings_cleaning);
@@ -712,7 +715,7 @@ class Properties extends Model
         return $return_data;
     }
 
-    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options=[])
+    public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options = [])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);

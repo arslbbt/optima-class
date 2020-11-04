@@ -408,7 +408,7 @@ class Cms extends Model
         $root =  realpath(dirname(__FILE__) . '/../../../../../');
         Yii::setAlias('@webroot', $root . '/web');
         $params = require $root . '/config/params.php';
-        $url_array = explode('/', $_SERVER['REQUEST_URI']);
+        $url_array = isset($_SERVER['REQUEST_URI']) ? explode('/', $_SERVER['REQUEST_URI']) : '';
         \Yii::$app->params['user'] =    $params['user'];
         \Yii::$app->params['site_id'] = $params['site_id'];
         \Yii::$app->params['apiUrl'] =  $params['apiUrl'];
