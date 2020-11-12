@@ -746,7 +746,8 @@ class Cms extends Model
         if ($type == 'user') {
             return str_replace($name, $size . '/' . $name, $url);
         } else if ($type == 'property') {
-            return str_replace(prev($url_array), $size, $url);
+            $needle = prev($url_array);
+            return str_replace("/{$needle}/", "/{$size}/" , $url);
         }
 
         return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
