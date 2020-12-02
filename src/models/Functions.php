@@ -208,7 +208,7 @@ class Functions extends Model
                     $custom_post_id = Cms::postTypes($custom_post_id);
                 else
                     $custom_post_id = '';
-
+                $object->view->params['page_data'] = $page_data;
                 return $object->render($page_template, [
                     'page_data' => $page_data,
                     'custom_post_id' => $custom_post_id
