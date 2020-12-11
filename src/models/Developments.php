@@ -154,6 +154,9 @@ class Developments extends Model
             $return_data['title'] = $property->property->title->$lang;
         else
             $return_data['title'] = 'N/A';
+            
+        if (isset($property->property->city) && $property->property->city != '')
+            $return_data['city'] = $property->property->city;
         if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
             $return_data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
 
