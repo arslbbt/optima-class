@@ -533,7 +533,6 @@ class Cms extends Model
 
             $cmsData = self::getSlugs();
             $rules = [];
-
             foreach ($cmsData as $row) {
                 if (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
                     if (isset($row['template']['template_action']) && !empty($row['template']['template_action'])) {
@@ -551,7 +550,7 @@ class Cms extends Model
                         /* Need to remove after ['template_pattern'] added */
                         if (
                             strpos($row['template']['template_action'], '/view')
-                            || strpos($row['template']['template_action'], '/blog-post')
+                            || strpos($row['template']['template_action'], '/blog-post') || strpos($row['template']['template_action'], '/recruitment-details')
                         ) {
                             foreach ($row['slug'] as $key => $val) {
                                 if ($val) {
