@@ -749,8 +749,12 @@ class Properties extends Model
             if (isset($options['exporter']) && $options['exporter'] == true) {
                 $url .= '&exporter=true';
             }
+            if(isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])){
+                foreach(Yii::$app->params['status'] as $status){
+                    $url .='&status[]='.$status;
+                }
+            }
             // echo $url;die;
-
             $JsonData = Functions::getCRMData($url, false);
             $property = json_decode($JsonData);
             if (isset($property->property->reference)) {
@@ -1954,6 +1958,11 @@ class Properties extends Model
         $cms_settings = Cms::settings();
         $get = Yii::$app->request->get();
         $query = '';
+        if(isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])){
+            foreach(Yii::$app->params['status'] as $status){
+                $query .='&status[]='.$status;
+            }
+        }
         /*
          * transaction 1 = Rental
          * transaction 2 = Bank repossessions
