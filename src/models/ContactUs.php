@@ -509,7 +509,7 @@ class ContactUs extends Model
             'orientation' => isset($this->orientation) ? (is_array($this->orientation) ? implode(",", $this->orientation) : $this->orientation) : null,
             'views' => isset($this->views) ? (is_array($this->views) ? implode(",", $this->views) : $this->views) : null,
             'garden' => isset($this->garden) ? (is_array($this->garden) ? implode(",", $this->garden) : $this->garden) : null,
-            'garden' => isset($this->furniture) ? (is_array($this->furniture) ? implode(",", $this->furniture) : $this->furniture) : null,
+            'furniture' => isset($this->furniture) ? (is_array($this->furniture) ? implode(",", $this->furniture) : $this->furniture) : null,
             'condition' => isset($this->condition) ? (is_array($this->condition) ? implode(",", $this->condition) : $this->condition) : null,
             'only_golf_properties' => isset($this->only_golf_properties) ? $this->only_golf_properties : null,
             'only_off_plan' => isset($this->only_off_plan) ? $this->only_off_plan : null,
