@@ -550,6 +550,11 @@ class Properties extends Model
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             }
+                        } elseif (!$wm && isset(Yii::$app->params['img_url__without_watermark'])) {
+                            foreach ($property->attachments as $pic) {
+                                $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
+                            }
                         } else {
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
@@ -887,7 +892,29 @@ class Properties extends Model
                 if (isset($property->property->status)) {
                     $return_data['status'] = $property->property->status;
                 }
+                if (isset($property->property->facade_width)) {
+                    $return_data['facade_width'] = $property->property->facade_width;
+                }
+                if (isset($property->property->facade_width)) {
+                    $return_data['facade_width'] = $property->property->facade_width;
+                }
+                if (isset($property->property->electricity_certificate)) {
+                    $return_data['electricity_certificate'] = $property->property->electricity_certificate;
+                }
+                if (isset($property->property->allotment_permit)) {
+                    $return_data['allotment_permit'] = $property->property->allotment_permit;
+                }if (isset($property->property->soil_certificate)) {
+                    $return_data['soil_certificate'] = $property->property->soil_certificate;
+                }if (isset($property->property->summons)) {
+                    $return_data['summons'] = $property->property->summons;
+                }if (isset($property->property->right_to_sell)) {
+                    $return_data['right_to_sell'] = $property->property->right_to_sell;
+                }if (isset($property->property->protected_heritage)) {
+                    $return_data['protected_heritage'] = $property->property->protected_heritage;
+                }
+                
 
+                
                 // Code for all terrace sizes
 
                 // if (isset($property->property->terrace)) {
