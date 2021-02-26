@@ -125,9 +125,6 @@ class Properties extends Model
                     }
                     $data = [];
                     $features = [];
-                    if (isset($property->occupancy_status)) {
-                        $data['occupancy_status'] = $property->occupancy_status;
-                    }
                     if (isset($property->total_properties)) {
                         $data['total_properties'] = $property->total_properties;
                     }
@@ -174,6 +171,9 @@ class Properties extends Model
 
                     if (isset($property->property->status)) {
                         $data['status'] = $property->property->status;
+                    }
+                    if (isset($property->occupancy_status)) {
+                        $data['occupancy_status'] = $property->occupancy_status;
                     }
                     if (isset($property->property->type_one)) {
                         $data['type'] = $property->property->type_one;
@@ -245,9 +245,6 @@ class Properties extends Model
                     }
                     if (isset($property->property->bathrooms) && $property->property->bathrooms > 0) {
                         $data['bathrooms'] = $property->property->bathrooms;
-                    }
-                    if (isset($property->property->occupancy_status)) {
-                        $data['occupancy_status'] = $property->property->occupancy_status;
                     }
                     if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                         $data['sleeps'] = $property->property->sleeps;
