@@ -113,7 +113,6 @@ class Properties extends Model
                 $seo_description = 'rental_seo_description';
                 $keywords = 'rental_keywords';
                 $perma_link = 'rental_perma_link';
-                $occupancy_status = 'occupancy_status';
                 if (isset($property->property)) {
                     if (((isset($property->property->sale) && $property->property->sale == true) || (isset($property->property->transfer) && $property->property->transfer == true)) && !$rent_check) {
                         $title = 'title';
@@ -123,7 +122,6 @@ class Properties extends Model
                         $seo_description = 'seo_description';
                         $keywords = 'keywords';
                         $perma_link = 'perma_link';
-                        $occupancy_status = 'occupancy_status';
                     }
                     $data = [];
                     $features = [];
