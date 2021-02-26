@@ -1319,7 +1319,11 @@ class Properties extends Model
 
                 if (isset($property->attachments) && count($property->attachments) > 0) {
                     foreach ($property->attachments as $pic) {
-                        $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        if (isset(Yii::$app->params['img_url__without_watermark'])) {
+                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        }else{
+                            $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        }
                         $attachments[] = $url;
                         $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
                         $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
