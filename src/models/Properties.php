@@ -172,9 +172,6 @@ class Properties extends Model
                     if (isset($property->property->status)) {
                         $data['status'] = $property->property->status;
                     }
-                    if (isset($property->occupancy_status)) {
-                        $data['occupancy_status'] = $property->occupancy_status;
-                    }
                     if (isset($property->property->type_one)) {
                         $data['type'] = $property->property->type_one;
                     }
@@ -245,6 +242,9 @@ class Properties extends Model
                     }
                     if (isset($property->property->bathrooms) && $property->property->bathrooms > 0) {
                         $data['bathrooms'] = $property->property->bathrooms;
+                    }
+                    if (isset($property->property->occupancy_status)) {
+                        $data['occupancy_status'] = $property->property->occupancy_status;
                     }
                     if (isset($property->property->sleeps) && $property->property->sleeps > 0) {
                         $data['sleeps'] = $property->property->sleeps;
@@ -1319,7 +1319,11 @@ class Properties extends Model
 
                 if (isset($property->attachments) && count($property->attachments) > 0) {
                     foreach ($property->attachments as $pic) {
-                        $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        if (isset(Yii::$app->params['img_url__without_watermark'])) {
+                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        }else{
+                            $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        }
                         $attachments[] = $url;
                         $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
                         $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
