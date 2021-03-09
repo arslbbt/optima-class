@@ -1320,7 +1320,7 @@ class Properties extends Model
                 if (isset($property->attachments) && count($property->attachments) > 0) {
                     foreach ($property->attachments as $pic) {
                         if (isset(Yii::$app->params['img_url__without_watermark'])) {
-                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
                         }else{
                             $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
                         }
