@@ -13,6 +13,20 @@ use yii\helpers\ArrayHelper;
  */
 class Properties extends Model
 {
+
+    public $type_one;
+    public $type_two;
+    public $bedrooms;
+    public $bathrooms;
+    public $oldprice;
+    public $description;
+
+    public function rules()
+    {
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'oldprice','description'], 'safe']];
+
+    }
+
     /**
      * LoginForm is the model behind the login form.
      *
@@ -2770,5 +2784,21 @@ class Properties extends Model
         $url = Yii::$app->params['apiUrl'] . 'properties/calculate-rental-price&user_apikey=' . Yii::$app->params['api_key'] . '&property=' . $property . '&from=' . $arrival . '&to=' . $departure;
         $json = file_get_contents($url);
         return json_decode($json);
+    }
+
+    public function saveProperty(){
+        $settings = Cms::settings();
+        $url = Yii::$app->params['apiUrl'] . 'properties/create&user_apikey=' . Yii::$app->params['api_key'];
+        
+        $fields = array(
+            'type_one' => (isset($this->type_one) ? $this->type_one : null),
+            'type_two' => (isset($this->type_two) ? $this->type_two : null),
+            'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
+            'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
+            'oldprice' => (isset($this->oldprice) ? $this->oldprice : null),
+            'description' => (isset($this->description) ? $this->description : null),
+        );
+        $curl = new \linslin\yii2\curl\Curl();
+        $response = $curl->setPostParams($fields)->post($url);
     }
 }
