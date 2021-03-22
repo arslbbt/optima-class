@@ -18,12 +18,12 @@ class Properties extends Model
     public $type_two;
     public $bedrooms;
     public $bathrooms;
-    public $oldprice;
+    public $currentprice;
     public $description;
 
     public function rules()
     {
-        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'oldprice','description'], 'safe']];
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','description'], 'safe']];
 
     }
 
@@ -2828,7 +2828,7 @@ class Properties extends Model
             'type_two' => (isset($this->type_two) ? $this->type_two : null),
             'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
             'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
-            'oldprice' => (isset($this->oldprice) ? $this->oldprice : null),
+            'currentprice' => (isset($this->currentprice) ? $this->currentprice : null),
             'description' => (isset($this->description) ? $this->description : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
