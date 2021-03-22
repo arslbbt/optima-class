@@ -20,10 +20,11 @@ class Properties extends Model
     public $bathrooms;
     public $currentprice;
     public $description;
+    public $own;
 
     public function rules()
     {
-        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','description'], 'safe']];
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','description', 'own'], 'safe']];
 
     }
 
@@ -2829,9 +2830,11 @@ class Properties extends Model
             'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
             'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
             'currentprice' => (isset($this->currentprice) ? $this->currentprice : null),
+            'own' => (isset($this->own) ? $this->own : null),
             'description' => (isset($this->description) ? $this->description : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
+        // echo '<pre>'; print_r($response); die;
     }
 }
