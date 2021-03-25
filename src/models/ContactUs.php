@@ -537,7 +537,6 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
         $res = json_decode($response);
-        $owner_id = $res->_id;
         return $res->_id;
     }
 
