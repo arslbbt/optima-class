@@ -19,12 +19,17 @@ class Properties extends Model
     public $bedrooms;
     public $bathrooms;
     public $currentprice;
-    public $description;
+    public $address_comments;
     public $own;
+    public $sale;
+    public $owner_id;
+    public $address;
+    public $latitude;
+    public $longitude;
 
     public function rules()
     {
-        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','description', 'own'], 'safe']];
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','address','latitude', 'longitude' , 'address_comments','sale', 'owner_id', 'own'], 'safe']];
 
     }
 
@@ -2823,18 +2828,21 @@ class Properties extends Model
     public function saveProperty(){
         $settings = Cms::settings();
         $url = Yii::$app->params['apiUrl'] . 'properties/create&user_apikey=' . Yii::$app->params['api_key'];
-        
         $fields = array(
             'type_one' => (isset($this->type_one) ? $this->type_one : null),
             'type_two' => (isset($this->type_two) ? $this->type_two : null),
             'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
             'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
-            'currentprice' => (isset($this->currentprice) ? $this->currentprice : null),
-            'own' => (isset($this->own) ? $this->own : null),
-            'description' => (isset($this->description) ? $this->description : null),
+            'currentprice' =>  (isset($this->currentprice) ? $this->currentprice : null),
+            'own' =>  (isset($this->own) ? $this->own : null),
+            'lat' =>  (isset($this->latitude) ? $this->latitude: null),
+            'long' =>  (isset($this->longitude) ? $this->longitude: null),
+            'formatted_address' => (isset($this->address) ? $this->address : null),
+            'sale' =>  (isset($this->sale) ? $this->sale : null),
+            'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
+            'owner_id' => (isset($this->owner_id) ? $this->owner_id : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
-        // echo '<pre>'; print_r($response); die;
     }
 }

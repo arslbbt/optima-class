@@ -534,9 +534,10 @@ class ContactUs extends Model
             'only_bank_repossessions' => isset($this->only_bank_repossessions) ? $this->only_bank_repossessions : null,
             'mooring_type' => isset($this->mooring_type) ? (is_array($this->mooring_type) ? implode(",", $this->mooring_type) : $this->mooring_type) : null,
         );
-        // echo "<pre>";print_r($fields);die;
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
+        $res = json_decode($response);
+        return $res->_id;
     }
 
     public function saveSenderAccount()
