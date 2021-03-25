@@ -2829,16 +2829,16 @@ class Properties extends Model
         $settings = Cms::settings();
         $url = Yii::$app->params['apiUrl'] . 'properties/create&user_apikey=' . Yii::$app->params['api_key'];
         $fields = array(
-            'type_one' => (isset($this->type_one) ? (int) $this->type_one : null),
-            'type_two' => (isset($this->type_two) ? (int) $this->type_two : null),
-            'bedrooms' => (isset($this->bedrooms) ? (int) $this->bedrooms : null),
-            'bathrooms' => (isset($this->bathrooms) ? (int) $this->bathrooms : null),
-            'currentprice' =>  (isset($this->currentprice) ? (int) $this->currentprice : null),
-            'own' =>  (isset($this->own) ? (int) $this->own : null),
-            'lat' =>  (isset($this->latitude) ? (float) $this->latitude: null),
-            'long' =>  (isset($this->longitude) ? (float) $this->longitude: null),
+            'type_one' => (isset($this->type_one) ? $this->type_one : null),
+            'type_two' => (isset($this->type_two) ? $this->type_two : null),
+            'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
+            'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
+            'currentprice' =>  (isset($this->currentprice) ? $this->currentprice : null),
+            'own' =>  (isset($this->own) ? $this->own : null),
+            'lat' =>  (isset($this->latitude) ? $this->latitude: null),
+            'long' =>  (isset($this->longitude) ? $this->longitude: null),
             'formatted_address' => (isset($this->address) ? $this->address : null),
-            'sale' =>  (isset($this->sale) ? (int) $this->sale : null),
+            'sale' =>  (isset($this->sale) ? $this->sale : null),
             'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
             'owner_id' => (isset($this->owner_id) ? $this->owner_id : null),
         );
