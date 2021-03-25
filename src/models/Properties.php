@@ -2837,7 +2837,7 @@ class Properties extends Model
             'own' => (int) (isset($this->own) ? $this->own : null),
             'lat' => (float) (isset($this->latitude) ? $this->latitude: 3.564),
             'long' => (float) (isset($this->longitude) ? $this->longitude: 3.564),
-            'address' => (isset($this->address) ? $this->address : null),
+            'formatted_address' => (isset($this->address) ? $this->address : null),
             'sale' => (int) (isset($this->sale) ? $this->sale : null),
             'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
             'private_info_object'  => (isset($this->private_info) ? ($this->private_info) : null),
