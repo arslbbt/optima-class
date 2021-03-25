@@ -2829,14 +2829,14 @@ class Properties extends Model
         $settings = Cms::settings();
         $url = Yii::$app->params['apiUrl'] . 'properties/create&user_apikey=' . Yii::$app->params['api_key'];
         $fields = array(
-            'type_one' => (isset($this->type_one) ? (int) $this->type_one : 0),
-            'type_two' => (isset($this->type_two) ? (int) $this->type_two : 0),
-            'bedrooms' => (isset($this->bedrooms) ? (int) $this->bedrooms : 0),
-            'bathrooms' => (isset($this->bathrooms) ? (int) $this->bathrooms : 0),
-            'currentprice' => (int) (isset($this->currentprice) ? $this->currentprice : 0),
+            'type_one' => (isset($this->type_one) ? (int) $this->type_one : null),
+            'type_two' => (isset($this->type_two) ? (int) $this->type_two : null),
+            'bedrooms' => (isset($this->bedrooms) ? (int) $this->bedrooms : null),
+            'bathrooms' => (isset($this->bathrooms) ? (int) $this->bathrooms : null),
+            'currentprice' => (int) (isset($this->currentprice) ? $this->currentprice : null),
             'own' => (int) (isset($this->own) ? $this->own : null),
-            'lat' => (float) (isset($this->latitude) ? $this->latitude: 3.564),
-            'long' => (float) (isset($this->longitude) ? $this->longitude: 3.564),
+            'lat' => (float) (isset($this->latitude) ? $this->latitude: null),
+            'long' => (float) (isset($this->longitude) ? $this->longitude: null),
             'formatted_address' => (isset($this->address) ? $this->address : null),
             'sale' => (int) (isset($this->sale) ? $this->sale : null),
             'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
@@ -2845,6 +2845,5 @@ class Properties extends Model
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
-        // echo '<pre>'; print_r($response); die;
     }
 }
