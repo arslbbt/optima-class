@@ -2840,7 +2840,6 @@ class Properties extends Model
             'formatted_address' => (isset($this->address) ? $this->address : null),
             'sale' => (int) (isset($this->sale) ? $this->sale : null),
             'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
-            'private_info_object'  => (isset($this->private_info) ? ($this->private_info) : null),
             'owner_id' => (isset($this->owner_id) ? $this->owner_id : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
