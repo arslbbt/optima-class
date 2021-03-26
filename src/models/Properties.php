@@ -26,10 +26,11 @@ class Properties extends Model
     public $address;
     public $latitude;
     public $longitude;
+    public $status;
 
     public function rules()
     {
-        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'currentprice','address','latitude', 'longitude' , 'address_comments','sale', 'owner_id', 'own'], 'safe']];
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'status', 'currentprice','address','latitude', 'longitude' , 'address_comments','sale', 'owner_id', 'own'], 'safe']];
 
     }
 
@@ -2832,6 +2833,7 @@ class Properties extends Model
             'type_one' => (isset($this->type_one) ? $this->type_one : null),
             'type_two' => (isset($this->type_two) ? $this->type_two : null),
             'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
+            'status' => (isset($this->status) ? $this->status : null),
             'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
             'currentprice' =>  (isset($this->currentprice) ? $this->currentprice : null),
             'own' =>  (isset($this->own) ? $this->own : null),
@@ -2844,5 +2846,6 @@ class Properties extends Model
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
+        // echo '<pre>'; print_r($response); die;
     }
 }
