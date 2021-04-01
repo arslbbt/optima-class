@@ -9,7 +9,7 @@ use yii\helpers\Url;
 
 
 /**
- * Cms Functions to get CMS data
+                                                 * Cms Functions to get CMS data
  *
  */
 class Cms extends Model
@@ -539,7 +539,7 @@ class Cms extends Model
                             }
                         }
                         /**
-                         * Need to remove after ['template_pattern'] added
+                         * TODO:Remove this code starting here after all template using sites migrate
                          */
                         elseif (
                             strpos($row['template']['template_action'], '/view')
@@ -554,7 +554,11 @@ class Cms extends Model
                                     ];
                                 }
                             }
-                        } else {
+                        }
+                        /**
+                         * TODO:Remove this code ending here after all template using sites migrate
+                         */
+                        else {
                             foreach ($row['slug'] as $key => $val) {
                                 if ($val) {
                                     $rules[] = [
