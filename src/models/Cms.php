@@ -516,16 +516,6 @@ class Cms extends Model
      */
     public static function cmsRules()
     {
-        /* Code for http to https redirect */
-        // $redirects = require __DIR__ . '/redirects.php';
-        // $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        // foreach ($redirects as $key => $val) {
-        //     if ($key == $_SERVER['REQUEST_URI']) {
-        //         header('Location:' . $val);
-        //         die;
-        //     }
-        // }
-
         /* to set some config because config not loaded yet in from web */
         self::setParams();
         $file = Functions::directory() . 'rules.json';
@@ -548,8 +538,10 @@ class Cms extends Model
                                 }
                             }
                         }
-                        /* Need to remove after ['template_pattern'] added */
-                        if (
+                        /**
+                         * Need to remove after ['template_pattern'] added
+                         */
+                        elseif (
                             strpos($row['template']['template_action'], '/view')
                             || strpos($row['template']['template_action'], '/blog-post') || strpos($row['template']['template_action'], '/recruitment-details')
                         ) {
@@ -594,7 +586,6 @@ class Cms extends Model
             $rules = json_decode($file_data, true);
         }
 
-        // print_r($rules); die;
         return $rules;
     }
 
@@ -747,7 +738,7 @@ class Cms extends Model
             return str_replace($name, $size . '/' . $name, $url);
         } else if ($type == 'property') {
             $needle = prev($url_array);
-            return str_replace("/{$needle}/", "/{$size}/" , $url);
+            return str_replace("/{$needle}/", "/{$size}/", $url);
         }
 
         return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;

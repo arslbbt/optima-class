@@ -194,12 +194,6 @@ class Functions extends Model
                         }
                 }
             }
-        /*if(isset($page_template)){
-            $ret = $object->render($page_template, [
-                'page_data' => $page_data
-            ]);
-            return $ret;
-        }*/
         if (isset($page_template)) {
             try {
                 if (isset($custom_post_id))
@@ -218,10 +212,6 @@ class Functions extends Model
             return $object->render($this_page, [
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);
-            // }elseif(isset($cms_page_exists)){
-            //     return $object->render('page', [
-            //         'page_data' => $page_data
-            //     ]);
         } else {
 
             if (!array_filter($page_data)) {
@@ -236,16 +226,6 @@ class Functions extends Model
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);
         }
-        // return $object->render('404', []);
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
     }
 
     public static function getCRMData($url, $cache = true, $fields = array(), $auth = false)
