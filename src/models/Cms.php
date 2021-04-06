@@ -161,7 +161,6 @@ class Cms extends Model
 
     public static function languages()
     {
-        self::setParams();
         $file = Functions::directory() . 'languages.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
