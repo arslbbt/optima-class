@@ -546,9 +546,6 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
         $res = json_decode($response);
-        echo '<pre>';
-        print_r($res);
-        die;
         return $res->_id;
     }
 
