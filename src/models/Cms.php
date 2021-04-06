@@ -185,6 +185,7 @@ class Cms extends Model
             }, $languages);
         }
 
+        /* Creating translation Components from languages  */
         foreach ($languages as $language) {
             if (!is_dir(Yii::getAlias('@root') . './messages/' . $language) && is_dir(Yii::getAlias('@root') . './messages/en')) {
                 mkdir(Yii::getAlias('@root') . './messages/' . $language);
