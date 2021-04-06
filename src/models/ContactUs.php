@@ -454,9 +454,9 @@ class ContactUs extends Model
             $call_rememeber = $this->call_remember;
         }
         if ($this->owner)
-            $url = Yii::$app->params['apiUrl'] . "owners/index&user=" . Yii::$app->params['user'];
+            $url = Yii::$app->params['apiUrl'] . "owners/index&user_apikey=" . Yii::$app->params['api_key'];
         else
-            $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
+            $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
         $fields = array(
             'f_title' => $this->title,
             'forename' => $this->first_name,
@@ -546,7 +546,9 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
         $res = json_decode($response);
-        echo '<pre>'; print_r($res); die;
+        echo '<pre>';
+        print_r($res);
+        die;
         return $res->_id;
     }
 
@@ -554,7 +556,7 @@ class ContactUs extends Model
     {
         $settings = Cms::settings();
 
-        $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
+        $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
         $fields = array(
             '
             ' => isset($this->sender_first_name) ? $this->sender_first_name : null,
