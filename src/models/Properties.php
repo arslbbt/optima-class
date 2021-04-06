@@ -2189,7 +2189,12 @@ class Properties extends Model
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
 
-        if (isset($get['built_from']) && !empty($get['built_from'])) {
+        if (isset($get["built_range"]) && $get["built_range"] != "") {
+            $from = substr($get["built_range"], 0, strrpos($get["built_range"], '-'));
+            $to = substr($get["built_range"], strrpos($get["built_range"], '-') + 1);
+            $query .= '&built[]=' . $from;
+            $query .= '&built[]=' . $to;
+        }elseif (isset($get['built_from']) && !empty($get['built_from'])) {
             $query .= '&built[]=' . $get['built_from'];
             if (isset($get['built_to']) && !empty($get['built_to'])) {
                 $query .= '&built[]=' . $get['built_to'];
@@ -2303,6 +2308,13 @@ class Properties extends Model
         }
         if (isset($get["min_plot"]) && $get["min_plot"] != "") {
             $query .= '&min_plot=' . $get['min_plot'];
+        }
+        if (isset($get["plot_range"]) && $get["plot_range"] != "") {
+            $from = substr($get["plot_range"], 0, strrpos($get["plot_range"], '-'));
+            $to = substr($get["plot_range"], strrpos($get["plot_range"], '-') + 1);
+
+            $query .= '&plot[]=' . $from;
+            $query .= '&plot[]=' . $to;
         }
         if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"]) {
             $query .= '&pool[]=pool_communal';
