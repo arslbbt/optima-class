@@ -126,6 +126,10 @@ class ContactUs extends Model
     public $infants;
     public $appt;
     public $visit_date;
+    public $title;
+    public $work_phone;
+    public $only_investments;
+    public $only_urgent_sales;
 
     const SCENARIO_V3 = 'v3validation';
 
@@ -139,7 +143,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name', 'mobile_phone', 'phone', 'home_phone' , 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories'], 'safe'],
+            [['name', 'mobile_phone', 'phone', 'home_phone', 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories', 'title', 'work_phone', 'only_investments', 'only_urgent_sales'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -454,6 +458,7 @@ class ContactUs extends Model
         else
             $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
         $fields = array(
+            'f_title' => $this->title,
             'forename' => $this->first_name,
             'surname' => $this->last_name,
             'email' => $this->email,
@@ -463,7 +468,8 @@ class ContactUs extends Model
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,
-            'home_phone' => isset($this->home_phone) ? $this->home_phone : null ,
+            'work_phone' => isset($this->work_phone) ? $this->work_phone : null,
+            'home_phone' => isset($this->home_phone) ? $this->home_phone : null,
             'country ' => isset($this->country) ? $this->country : null,
             'appt'  => isset($this->appt) ? $this->appt : null,
             'date'  => isset($this->visit_date) ? $this->visit_date : null,
@@ -481,6 +487,7 @@ class ContactUs extends Model
             'p_type' => isset($this->p_type) ? $this->p_type : null,
             'min_bedrooms' => isset($this->bedrooms) ? $this->bedrooms : null,
             'min_bathrooms' => isset($this->bathrooms) ? $this->bathrooms : null,
+            'only_urgent_sales' => isset($this->only_urgent_sales) ? $this->only_urgent_sales : null,
             'budget_min' => isset($this->buy_price_from) && $this->buy_price_from != '' ? $this->buy_price_from : null,
             'budget_max' => isset($this->buy_price_to) && $this->buy_price_to != '' ? $this->buy_price_to : null,
             'long_term_Rent_price_low' => isset($this->ltrent_price_from) ? $this->ltrent_price_from : null,
@@ -488,6 +495,7 @@ class ContactUs extends Model
             'st_budget_min' => isset($this->strent_price_from) ? $this->strent_price_from : null,
             'st_budget_max' => isset($this->strent_price_to) ? $this->strent_price_to : null,
             'transaction_types' => isset($this->transaction_types) ? (is_array($this->transaction_types) ? implode(",", $this->transaction_types) : $this->transaction_types) : null,
+            'legal_status' => isset($this->legal_status) ? (is_array($this->legal_status) ? implode(",", $this->legal_status) : $this->legal_status) : null,
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? (is_array($this->lgroups) ? implode(",", $this->lgroups) : $this->lgroups) : null,
@@ -502,7 +510,7 @@ class ContactUs extends Model
             'pool' => isset($this->pool) ? (is_array($this->pool) ? implode(",", $this->pool) : $this->pool) : null,
             'year_built_from' => isset($this->year_built_from) ? $this->year_built_from : null,
             'year_built_to' => isset($this->year_built_to) ? $this->year_built_to : null,
-            'min_plot_size' => isset($this->plot_size_from) ? $this->plot_size_from : null,
+            'plot_size_from' => isset($this->plot_size_from) ? $this->plot_size_from : null,
             'plot_size_to' => isset($this->plot_size_to) ? $this->plot_size_to : null,
             'built_size_to' => isset($this->built_size_to) ? $this->built_size_to : null,
             'built_size_from' => isset($this->built_size_from) ? $this->built_size_from : null,
@@ -510,6 +518,7 @@ class ContactUs extends Model
             'usefull_area_to' => isset($this->usefull_area_to) ? $this->usefull_area_to : null,
             'building_style' => isset($this->building_style) ? (is_array($this->building_style) ? implode(",", $this->building_style) : $this->building_style) : null,
             'gated_comunity' => isset($this->gated_comunity) ? $this->gated_comunity : null,
+            'only_investments' => isset($this->only_investments) ? $this->only_investments : null,
             'elevator' => isset($this->elevator) ? $this->elevator : null,
             'settings' => isset($this->settings) ? (is_array($this->settings) ? implode(",", $this->settings) : $this->settings) : null,
             'orientation' => isset($this->orientation) ? (is_array($this->orientation) ? implode(",", $this->orientation) : $this->orientation) : null,
@@ -518,6 +527,7 @@ class ContactUs extends Model
             'furniture' => isset($this->furniture) ? (is_array($this->furniture) ? implode(",", $this->furniture) : $this->furniture) : null,
             'condition' => isset($this->condition) ? (is_array($this->condition) ? implode(",", $this->condition) : $this->condition) : null,
             'only_golf_properties' => isset($this->only_golf_properties) ? $this->only_golf_properties : null,
+            'own' => isset($this->own) ? $this->own : null,
             'only_off_plan' => isset($this->only_off_plan) ? $this->only_off_plan : null,
             'buy_from_date' => isset($this->buy_from_date) ? $this->buy_from_date : null,
             'countries' => isset($this->countries) ? (is_array($this->countries) ? implode(",", $this->countries) : $this->countries) : null,
@@ -526,8 +536,7 @@ class ContactUs extends Model
             'cities' => isset($this->cities) ? (is_array($this->cities) ? implode(",", $this->cities) : $this->cities) : null,
             'locations' => isset($this->locations) ? (is_array($this->locations) ? implode(",", $this->locations) : $this->locations) : null,
             'urbanization' => isset($this->urbanization) ? (is_array($this->urbanization) ? implode(",", $this->urbanization) : $this->urbanization) : null,
-            'occupancy_status' => isset($this->occupancy_status) ? $this->occupancy_status : null,
-            'legal_status' => isset($this->legal_status) ? $this->legal_status : null,
+            'occupancy_status' => isset($this->occupancy_status) ? (is_array($this->occupancy_status) ? implode(",", $this->occupancy_status) : $this->occupancy_status) : null,
             'total_floors' => isset($this->total_floors) ? $this->total_floors : null,
             'only_projects' => isset($this->only_projects) ? $this->only_projects : null,
             'only_holiday_homes' => isset($this->only_holiday_homes) ? $this->only_holiday_homes : null,
@@ -537,6 +546,7 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
         $res = json_decode($response);
+        echo '<pre>'; print_r($res); die;
         return $res->_id;
     }
 
