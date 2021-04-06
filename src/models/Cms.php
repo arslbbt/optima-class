@@ -173,6 +173,29 @@ class Cms extends Model
         return json_decode($file_data, TRUE);
     }
 
+    /**
+     * siteLanguages() is for Sites Configration and creating related translate components
+     */
+    public static function siteLanguages()
+    {
+        $languages = self::languages();
+        if (!empty($languages) && count($languages)) {
+            $languages = array_map(function ($language) {
+                return strtolower($language['key']);
+            }, $languages);
+        }
+
+        foreach ($languages as $language) {
+            if (!is_dir(Yii::getAlias('@root') . './messages/' . $language) && is_dir(Yii::getAlias('@root') . './messages/en')) {
+                mkdir(Yii::getAlias('@root') . './messages/' . $language);
+                file_put_contents(Yii::getAlias('@root') . './messages/' . $language . '/app.php', '');
+                copy(Yii::getAlias('@root') . './messages/en/app.php', Yii::getAlias('@root') . './messages/' . $language . '/app.php');
+            }
+        }
+
+        return $languages;
+    }
+
     public static function SystemLanguages()
     {
         $file = Functions::directory() . 'SystemLanguages.json';
@@ -407,6 +430,7 @@ class Cms extends Model
     public static function setParams()
     {
         $root =  realpath(dirname(__FILE__) . '/../../../../../');
+        Yii::setAlias('@root', $root);
         Yii::setAlias('@webroot', $root . '/web');
         $params = require $root . '/config/params.php';
         if (isset($_SERVER['PATH_INFO'])) {
