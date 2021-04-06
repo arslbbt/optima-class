@@ -2189,7 +2189,11 @@ class Properties extends Model
             $query .= '&bedrooms[]=' . $get["bedrooms"] . '&bedrooms[]=50';
         }
 
-        if (isset($get['built_from']) && !empty($get['built_from'])) {
+        if (isset($get["built_range"]) && $get["built_range"] != "") {
+            $divide= explode("-", $get["built_range"]);
+            $query .= '&built[]=' . $divide[0];
+            $query .= '&built[]=' . $divide[1];
+        }elseif (isset($get['built_from']) && !empty($get['built_from'])) {
             $query .= '&built[]=' . $get['built_from'];
             if (isset($get['built_to']) && !empty($get['built_to'])) {
                 $query .= '&built[]=' . $get['built_to'];
@@ -2303,6 +2307,11 @@ class Properties extends Model
         }
         if (isset($get["min_plot"]) && $get["min_plot"] != "") {
             $query .= '&min_plot=' . $get['min_plot'];
+        }
+        if (isset($get["plot_range"]) && $get["plot_range"] != "") {
+            $divide= explode("-", $get["plot_range"]);
+            $query .= '&plot[]=' . $divide[0];
+            $query .= '&plot[]=' . $divide[1];
         }
         if (isset($get["communal_pool"]) && $get["communal_pool"] != "" && $get["communal_pool"]) {
             $query .= '&pool[]=pool_communal';
