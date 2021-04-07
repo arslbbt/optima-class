@@ -26,7 +26,7 @@ class Functions extends Model
             $dir_handle = opendir($dirname);
         }
 
-        if (!$dir_handle) {
+        if (isset($dir_handle) && !$dir_handle) {
             return false;
         }
 
@@ -40,10 +40,9 @@ class Functions extends Model
             }
         }
         closedir($dir_handle);
+
         rmdir($dirname);
 
-        /* Make Empty Directory again */
-        mkdir($dirname);
         return true;
     }
 

@@ -586,7 +586,7 @@ class ContactUs extends Model
             $res = json_decode($response);
             return $res;
         } else {
-            return 'Please provide an Email';
+            return 'Please provide Account Email';
         }
     }
 }
