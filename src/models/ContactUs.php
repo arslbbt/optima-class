@@ -573,4 +573,20 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
     }
+
+    public static function loadAccount()
+    {
+        if (Yii::$app->request->post('email')) {
+            $url = Yii::$app->params['apiUrl'] . "accounts/view&user_apikey=" . Yii::$app->params['api_key'];
+            $fields = array(
+                'email' => Yii::$app->request->post('email'),
+            );
+            $curl = new \linslin\yii2\curl\Curl();
+            $response = $curl->setPostParams($fields)->post($url);
+            $res = json_decode($response);
+            return $res;
+        } else {
+            return 'Please provide an Email';
+        }
+    }
 }

@@ -626,6 +626,7 @@ class Cms extends Model
 
     public function updateAgencyPageTemplates()
     {
+        $post_templates = [];
         $files = (array) self::get_files('php', 1, true);
 
         foreach ($files as $file => $full_path) {

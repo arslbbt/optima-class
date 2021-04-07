@@ -20,6 +20,33 @@ class Functions extends Model
         return $webroot . '/uploads/temp/';
     }
 
+    public static function deleteDirectory($dirname)
+    {
+        if (is_dir($dirname)) {
+            $dir_handle = opendir($dirname);
+        }
+
+        if (!$dir_handle) {
+            return false;
+        }
+
+        while ($file = readdir($dir_handle)) {
+            if ($file != "." && $file != "..") {
+                if (!is_dir($dirname . "/" . $file)) {
+                    unlink($dirname . "/" . $file);
+                } else {
+                    self::deleteDirectory($dirname . '/' . $file);
+                }
+            }
+        }
+        closedir($dir_handle);
+        rmdir($dirname);
+
+        /* Make Empty Directory again */
+        mkdir($dirname);
+        return true;
+    }
+
     public static function recaptcha($name = 'reCaptcha', $id = '')
     {
         $recaptcha_site_key = isset(Yii::$app->params['recaptcha_site_key']) ? Yii::$app->params['recaptcha_site_key'] : "6Le9fqsUAAAAAN2KL4FQEogpmHZ_GpdJ9TGmYMrT";
