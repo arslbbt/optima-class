@@ -26,7 +26,7 @@ class Functions extends Model
             $dir_handle = opendir($dirname);
         }
 
-        if (isset($dir_handle) && !$dir_handle) {
+        if (!isset($dir_handle) || !$dir_handle) {
             return false;
         }
 
