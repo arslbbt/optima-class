@@ -244,6 +244,7 @@ class ContactUs extends Model
         }
 
         if ($this->validate() && isset($ae_array)) {
+
             if (isset($this->attach) && $this->attach == 1) {
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf')) {
@@ -457,6 +458,7 @@ class ContactUs extends Model
             $url = Yii::$app->params['apiUrl'] . "owners/index&user_apikey=" . Yii::$app->params['api_key'];
         else
             $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
+
         $fields = array(
             'f_title' => $this->title,
             'forename' => $this->first_name,
@@ -574,12 +576,13 @@ class ContactUs extends Model
         $response = $curl->setPostParams($fields)->post($url);
     }
 
-    public static function loadAccount()
+    public static function loadAccount($email)
     {
-        if (Yii::$app->request->post('email')) {
+        if (!empty($email)) {
             $url = Yii::$app->params['apiUrl'] . "accounts/view&user_apikey=" . Yii::$app->params['api_key'];
+
             $fields = array(
-                'email' => Yii::$app->request->post('email'),
+                'email' => $email,
             );
             $curl = new \linslin\yii2\curl\Curl();
             $response = $curl->setPostParams($fields)->post($url);
