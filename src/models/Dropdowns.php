@@ -638,7 +638,7 @@ class Dropdowns extends Model
             ['key' => "almond_grove", 'value' => \Yii::t('app', 'almond_grove')],
             ['key' => "garden_communal", 'value' => \Yii::t('app', 'garden_communal')],
             ['key' => "easy_maintenance", 'value' => \Yii::t('app', 'easy_maintenance')],
-            ['key' => "fenced", 'value' => \Yii::t('app', 'fenced')],
+            ['key' => "fenced", 'value' => \Yii::t('app', 'fenced_garden')],
             ['key' => "fruit_trees_citrus", 'value' => \Yii::t('app', 'fruit_trees_citrus')],
             ['key' => "fruit_trees_tropical", 'value' => \Yii::t('app', 'fruit_trees_tropical')],
             ['key' => "irrigation_rights", 'value' => \Yii::t('app', 'irrigation_rights')],
