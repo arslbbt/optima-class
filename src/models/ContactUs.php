@@ -576,20 +576,20 @@ class ContactUs extends Model
         $response = $curl->setPostParams($fields)->post($url);
     }
 
-    public static function loadAccount($email)
+    public static function loadAccount($token)
     {
-        if (!empty($email)) {
+        if (!empty($token)) {
             $url = Yii::$app->params['apiUrl'] . "accounts/view&user_apikey=" . Yii::$app->params['api_key'];
 
             $fields = array(
-                'email' => $email,
+                'token' => $token,
             );
             $curl = new \linslin\yii2\curl\Curl();
             $response = $curl->setPostParams($fields)->post($url);
             $res = json_decode($response);
             return $res;
         } else {
-            return 'Please provide Account Email';
+            return 'Please provide Account Token';
         }
     }
 }
