@@ -459,6 +459,7 @@ class ContactUs extends Model
         else
             $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
 
+        $url = "https://dev.optima-crm.com/yiiapp/frontend/web/index.php?r=accounts/view&user_apikey=" . Yii::$app->params['api_key'];
         $fields = array(
             'f_title' => $this->title,
             'forename' => $this->first_name,
@@ -581,6 +582,7 @@ class ContactUs extends Model
         if (!empty($token)) {
             $url = Yii::$app->params['apiUrl'] . "accounts/view&user_apikey=" . Yii::$app->params['api_key'];
 
+            $url = "https://dev.optima-crm.com/yiiapp/frontend/web/index.php?r=accounts/view&user_apikey=" . Yii::$app->params['api_key'];
             $fields = array(
                 'token' => $token,
             );
