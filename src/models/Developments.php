@@ -143,12 +143,24 @@ class Developments extends Model
         $attachments = [];
         $floor_plans = [];
         $quality_specifications = [];
+        $settings = Cms::settings();
 
         if (isset($property->property->_id))
             $return_data['_id'] = $property->property->_id;
 
+        if (isset($settings['general_settings']['reference']) && $settings['general_settings']['reference'] != 'reference') {
+            $ref = $settings['general_settings']['reference'];
+            if ($ref == 'external_reference') {
+                $return_data['reference'] = $property->property->user_reference;
+            } elseif($ref == 'other_reference') {
+                $return_data['reference'] = $property->property->agency_reference;
+            }
+        } else {
+            $return_data['reference'] = $property->property->reference;
+        }
+
         if (isset($property->property->reference) && $property->property->reference != '')
-            $return_data['reference'] = $return_data['id'] = $property->property->reference;
+            $return_data['id'] = $property->property->reference;
 
         if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
             $return_data['title'] = $property->property->title->$lang;
