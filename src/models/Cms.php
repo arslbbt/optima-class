@@ -16,7 +16,7 @@ class Cms extends Model
 {
     private static $image_url = 'https://images.optima-crm.com/resize/cms_medias/'; // For resize image URLs
     private static $image_url_users = ' https://images.optima-crm.com/resize/users/'; // For getUsers image URLs
-    private static $image_url_posttype = 'https://images.optima-crm.com/cms_medias/'; // For svg images URLs
+    private static $image_url_svg = 'https://images.optima-crm.com/cms_medias/'; // For svg images URLs
 
     public static function settings()
     {
@@ -753,7 +753,7 @@ class Cms extends Model
             $needle = prev($url_array);
             return str_replace("/{$needle}/", "/{$size}/" , $url);
         }
-        if(isset($img_type) && $img_type == 'svg'){
+        if($img_type == 'svg'){
             return self::$image_url_posttype .$settings['site_id'] . '/' . $name;
         }
 
