@@ -14,9 +14,9 @@ use yii\helpers\Url;
  */
 class Cms extends Model
 {
-    private static $image_url = 'https://images.optima-crm.com/resize/cms_medias/'; // For resize image URLs
-    private static $image_url_users = ' https://images.optima-crm.com/resize/users/'; // For getUsers image URLs
-    private static $image_url_without_resize = 'https://images.optima-crm.com/cms_medias/'; // For svg images URLs
+    private $image_url = 'https://images.optima-crm.com/resize/cms_medias/'; // For resize image URLs
+    private $image_url_users = ' https://images.optima-crm.com/resize/users/'; // For getUsers image URLs
+    private $image_url_without_resize = 'https://images.optima-crm.com/cms_medias/'; // For svg images URLs
 
     public static function settings()
     {
@@ -42,7 +42,7 @@ class Cms extends Model
      * 
      * @return false|array
      */
-    public static function custom_settings($custom_settings = "")
+    public static function custom_settings($custom_settings = [])
     {
         if (!$custom_settings) {
             $settings = self::settings();
