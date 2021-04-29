@@ -30,8 +30,7 @@ class Properties extends Model
 
     public function rules()
     {
-        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'status', 'currentprice','address','latitude', 'longitude' , 'address_comments','sale', 'owner_id', 'own'], 'safe']];
-
+        return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'status', 'currentprice', 'address', 'latitude', 'longitude', 'address_comments', 'sale', 'owner_id', 'own'], 'safe']];
     }
 
     /**
@@ -777,9 +776,9 @@ class Properties extends Model
             if (isset($options['exporter']) && $options['exporter'] == true) {
                 $url .= '&exporter=true';
             }
-            if(isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])){
-                foreach(Yii::$app->params['status'] as $status){
-                    $url .='&status[]='.$status;
+            if (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])) {
+                foreach (Yii::$app->params['status'] as $status) {
+                    $url .= '&status[]=' . $status;
                 }
             }
             // echo $url;die;
@@ -926,18 +925,22 @@ class Properties extends Model
                 }
                 if (isset($property->property->allotment_permit)) {
                     $return_data['allotment_permit'] = $property->property->allotment_permit;
-                }if (isset($property->property->soil_certificate)) {
+                }
+                if (isset($property->property->soil_certificate)) {
                     $return_data['soil_certificate'] = $property->property->soil_certificate;
-                }if (isset($property->property->summons)) {
+                }
+                if (isset($property->property->summons)) {
                     $return_data['summons'] = $property->property->summons;
-                }if (isset($property->property->right_to_sell)) {
+                }
+                if (isset($property->property->right_to_sell)) {
                     $return_data['right_to_sell'] = $property->property->right_to_sell;
-                }if (isset($property->property->protected_heritage)) {
+                }
+                if (isset($property->property->protected_heritage)) {
                     $return_data['protected_heritage'] = $property->property->protected_heritage;
                 }
-                
 
-                
+
+
                 // Code for all terrace sizes
 
                 // if (isset($property->property->terrace)) {
@@ -1342,7 +1345,7 @@ class Properties extends Model
                     foreach ($property->attachments as $pic) {
                         if (isset(Yii::$app->params['img_url__without_watermark'])) {
                             $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
-                        }else{
+                        } else {
                             $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
                         }
                         $attachments[] = $url;
@@ -2012,9 +2015,9 @@ class Properties extends Model
         $cms_settings = Cms::settings();
         $get = Yii::$app->request->get();
         $query = '';
-        if(isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])){
-            foreach(Yii::$app->params['status'] as $status){
-                $query .='&status[]='.$status;
+        if (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])) {
+            foreach (Yii::$app->params['status'] as $status) {
+                $query .= '&status[]=' . $status;
             }
         }
         /*
@@ -2190,10 +2193,10 @@ class Properties extends Model
         }
 
         if (isset($get["built_range"]) && $get["built_range"] != "") {
-            $divide= explode("-", $get["built_range"]);
+            $divide = explode("-", $get["built_range"]);
             $query .= '&built[]=' . $divide[0];
             $query .= '&built[]=' . $divide[1];
-        }elseif (isset($get['built_from']) && !empty($get['built_from'])) {
+        } elseif (isset($get['built_from']) && !empty($get['built_from'])) {
             $query .= '&built[]=' . $get['built_from'];
             if (isset($get['built_to']) && !empty($get['built_to'])) {
                 $query .= '&built[]=' . $get['built_to'];
@@ -2309,7 +2312,7 @@ class Properties extends Model
             $query .= '&min_plot=' . $get['min_plot'];
         }
         if (isset($get["plot_range"]) && $get["plot_range"] != "") {
-            $divide= explode("-", $get["plot_range"]);
+            $divide = explode("-", $get["plot_range"]);
             $query .= '&plot[]=' . $divide[0];
             $query .= '&plot[]=' . $divide[1];
         }
@@ -2507,7 +2510,7 @@ class Properties extends Model
     public static function findWithLatLang($query, $wm = false, $cache = false, $options = ['images_size' => 1200])
     {
         $webroot = Yii::getAlias('@webroot');
-        $file = $webroot . '/uploads/temp/'.(isset($options['transaction_type']) ? $options['transaction_type'].'_' : '').'properties-all-latlang.json';
+        $file = $webroot . '/uploads/temp/' . (isset($options['transaction_type']) ? $options['transaction_type'] . '_' : '') . 'properties-all-latlang.json';
         $query .= '&latlng=true';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $data_array = self::findAll($query, $wm, $cache, $options);
@@ -2547,19 +2550,13 @@ class Properties extends Model
 
     public static function getAgency()
     {
-        $lang = strtoupper(\Yii::$app->language);
-        $webroot = Yii::getAlias('@webroot');
-        if (!is_dir($webroot . '/uploads/'))
-            mkdir($webroot . '/uploads/');
-        if (!is_dir($webroot . '/uploads/temp/'))
-            mkdir($webroot . '/uploads/temp/');
-        $file = $webroot . '/uploads/temp/agency.json';
+        $file = Functions::directory() . 'agency' . '.json';
         $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
+            $file_data = Functions::getCRMData($url);
+            if ($file_data) {
+                file_put_contents($file, $file_data);
+            }
         } else {
             $file_data = file_get_contents($file);
         }
@@ -2835,7 +2832,8 @@ class Properties extends Model
         return json_decode($json);
     }
 
-    public function saveProperty(){
+    public function saveProperty()
+    {
         $settings = Cms::settings();
         $url = Yii::$app->params['apiUrl'] . 'properties/create&user_apikey=' . Yii::$app->params['api_key'];
         $fields = array(
@@ -2844,12 +2842,12 @@ class Properties extends Model
             'bedrooms' => (isset($this->bedrooms) ? $this->bedrooms : null),
             'status' => (isset($this->status) ? $this->status : null),
             'bathrooms' => (isset($this->bathrooms) ? $this->bathrooms : null),
-            'currentprice' =>  (isset($this->currentprice) ? $this->currentprice : null),
-            'own' =>  (isset($this->own) ? $this->own : null),
-            'lat' =>  (isset($this->latitude) ? $this->latitude: null),
-            'long' =>  (isset($this->longitude) ? $this->longitude: null),
+            'currentprice' => (isset($this->currentprice) ? $this->currentprice : null),
+            'own' => (isset($this->own) ? $this->own : null),
+            'lat' => (isset($this->latitude) ? $this->latitude : null),
+            'long' => (isset($this->longitude) ? $this->longitude : null),
             'formatted_address' => (isset($this->address) ? $this->address : null),
-            'sale' =>  (isset($this->sale) ? $this->sale : null),
+            'sale' => (isset($this->sale) ? $this->sale : null),
             'address_comments' => (isset($this->address_comments) ? $this->address_comments : null),
             'owner_id' => (isset($this->owner_id) ? $this->owner_id : null),
         );
@@ -2857,12 +2855,12 @@ class Properties extends Model
         $response = $curl->setPostParams($fields)->post($url);
         // echo '<pre>'; print_r($response); die;
     }
-    
+
     public static function getAgencyData()
     {
         $file = Functions::directory() . 'agency_data' . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey='.Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
