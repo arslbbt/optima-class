@@ -24,7 +24,11 @@ class Cms extends Model
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template'];
-
+if (YII_DEBUG) {
+                echo '<pre>';
+                print_r($url);
+                die;
+}
             $file_data = Functions::getCRMData($url);
 
             file_put_contents($file, $file_data);
