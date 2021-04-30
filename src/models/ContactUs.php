@@ -130,6 +130,7 @@ class ContactUs extends Model
     public $work_phone;
     public $only_investments;
     public $only_urgent_sales;
+    public $from_source;
 
     const SCENARIO_V3 = 'v3validation';
 
@@ -467,6 +468,7 @@ class ContactUs extends Model
             'office' => $this->office,
             'gdpr_status' => $this->gdpr_status,
             'source' => isset($this->source) ? $this->source : urlencode('web-client'),
+            'from_source' => isset($this->from_source) ? $this->from_source : '',
             'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
             'message' => $this->message,
             'phone' => $this->phone,

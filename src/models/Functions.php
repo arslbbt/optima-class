@@ -165,7 +165,7 @@ class Functions extends Model
             ->send();
     }
 
-    public function loadPageDynamically($object)
+    public static function loadPageDynamically($object)
     {
         $slug = Yii::$app->request->get('slug', '');
         if ($slug) {
