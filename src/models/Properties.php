@@ -2855,17 +2855,4 @@ class Properties extends Model
         $response = $curl->setPostParams($fields)->post($url);
         // echo '<pre>'; print_r($response); die;
     }
-
-    public static function getAgencyData()
-    {
-        $file = Functions::directory() . 'agency_data' . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
-    }
 }
