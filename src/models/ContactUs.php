@@ -545,8 +545,7 @@ class ContactUs extends Model
 
         $url = Yii::$app->params['apiUrl'] . "accounts/index&user=" . Yii::$app->params['user'];
         $fields = array(
-            '
-            ' => isset($this->sender_first_name) ? $this->sender_first_name : null,
+            'forename' => isset($this->sender_first_name) ? $this->sender_first_name : null,
             'surname' => isset($this->sender_last_name) ? $this->sender_last_name : null,
             'email' => isset($this->sender_email) ? $this->sender_email : null,
             'gdpr_status' => $this->gdpr_status,
