@@ -729,6 +729,7 @@ class Dropdowns extends Model
                 $loc[] = $value;
             }
         }
+        $loc = array_unique($loc, SORT_REGULAR);
         usort($loc, "self::sortedLocation");
         return self::html_select($loc, $options);
     }
