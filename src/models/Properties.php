@@ -1575,7 +1575,8 @@ class Properties extends Model
                             $type = isset($value) && isset($value->type) && isset($value->type->$contentLang) ? $value->type->$contentLang : (isset($value) && isset($value->type) && isset($value->type->EN) ? $value->type->EN : '');
                             $name = isset($value) && isset($value->name) && isset($value->name->$contentLang) ? $value->name->$contentLang : (isset($value) && isset($value->name) && isset($value->name->EN) ? $value->name->EN : '');
                             $description = isset($value) && isset($value->description) && isset($value->description->$contentLang) ? $value->description->$contentLang : (isset($value) && isset($value->description) && isset($value->description->EN) ? $value->description->EN : '');
-                            $rooms[] = ['type' => $type, 'name' => $name, 'description' => $description];
+                            $size = isset($value) && isset($value->size) ? $value->size : '';
+                            $rooms[] = ['type' => $type, 'name' => $name, 'description' => $description, 'size' => $size];
                         }
                         $rental_features['rooms'] = $rooms;
                     }
