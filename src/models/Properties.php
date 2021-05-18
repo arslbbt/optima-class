@@ -1556,7 +1556,7 @@ class Properties extends Model
                     }
                 }
                 $return_data['rental_investment_info'] = $rental_investment_info;
-                if (isset($property->property->rent) && $property->property->rent == true) {
+                if (isset($property->property->rent) && $property->property->rent == true || isset($property->property->sale) && $property->property->sale == true ) {
                     $rental_features = [];
                     $rental_features['beds'] = [];
                     $rental_features['baths'] = [];
@@ -2471,6 +2471,8 @@ class Properties extends Model
             } elseif ($get['orderby'] == 'own') {
                 $query .= '&orderby[]=own&orderby[]=DESC&orderby[]=exclusive&orderby[]=DESC';
             }
+        }else{
+            $query .= '&orderby[]=updateDESC';
         }
         /**New Rental Query */
         if (isset($get["st_date_from_submit"]) && $get["st_date_from_submit"] != "") {
