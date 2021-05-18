@@ -1556,7 +1556,7 @@ class Properties extends Model
                     }
                 }
                 $return_data['rental_investment_info'] = $rental_investment_info;
-                if (isset($property->property->rent) && $property->property->rent == true) {
+                if ((isset($property->property->rent) && $property->property->rent == true) || (isset($property->property->sale) && $property->property->sale == true)) {
                     $rental_features = [];
                     $rental_features['beds'] = [];
                     $rental_features['baths'] = [];
