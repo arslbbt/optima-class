@@ -52,6 +52,9 @@ class Developments extends Model
             if (isset($property->property->reference) && $property->property->reference != '')
                 $data['id'] = $property->property->reference;
 
+            if (isset($property->property->user_reference) && $property->property->user_reference != '')
+                $data['reference'] = $property->property->user_reference;
+
             if (isset($property->property->title->$lang) && $property->property->title->$lang != '')
                 $data['title'] = $property->property->title->$lang;
 
