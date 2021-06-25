@@ -3,6 +3,7 @@
 namespace optima\models;
 
 use optima\models\Functions;
+use stdClass;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -440,9 +441,10 @@ class Cms extends Model
         } elseif (isset($_SERVER['REQUEST_URI'])) {
             $url_array = explode('/', $_SERVER['REQUEST_URI']);
         }
-        \Yii::$app->params['user'] =    $params['user'];
+        \Yii::$app = new stdClass;
+        \Yii::$app->params['user'] = $params['user'];
         \Yii::$app->params['site_id'] = $params['site_id'];
-        \Yii::$app->params['apiUrl'] =  $params['apiUrl'];
+        \Yii::$app->params['apiUrl'] = $params['apiUrl'];
         \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
     }
 
@@ -769,17 +771,17 @@ class Cms extends Model
         $url_array = explode('/', $url);
         $name = end($url_array);
 
-        $img_type = explode('.',$name);
+        $img_type = explode('.', $name);
         $img_type = end($img_type);
-        
+
         if ($type == 'user') {
             return str_replace($name, $size . '/' . $name, $url);
         } else if ($type == 'property') {
             $needle = prev($url_array);
             return str_replace("/{$needle}/", "/{$size}/", $url);
         }
-        if($img_type == 'svg'){
-            return self::$image_url_without_resize .$settings['site_id'] . '/' . $name;
+        if ($img_type == 'svg') {
+            return self::$image_url_without_resize . $settings['site_id'] . '/' . $name;
         }
 
         return self::$image_url . $settings['site_id'] . '/' . $size . '/' . $name;
