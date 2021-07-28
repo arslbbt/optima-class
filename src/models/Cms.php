@@ -181,10 +181,15 @@ class Cms extends Model
     public static function siteLanguages()
     {
         $languages = self::languages();
+
         if (!empty($languages) && count($languages)) {
-            $languages = array_map(function ($language) {
-                return strtolower($language['key']);
-            }, $languages);
+            $exclude_langs = isset(\Yii::$app->params['excluded_langs']) ? \Yii::$app->params['excluded_langs'] : [];
+            $languages = array_reduce($languages, function ($langs, $lang) use ($exclude_langs) {
+                if (!in_array($lang['key'], $exclude_langs))
+                    $langs[] = strtolower($lang['key']);
+
+                return $langs;
+            }, []);
         }
 
         /* Creating translation Components from languages  */
@@ -442,9 +447,7 @@ class Cms extends Model
             $url_array = explode('/', $_SERVER['REQUEST_URI']);
         }
         \Yii::$app = new stdClass;
-        \Yii::$app->params['user'] = $params['user'];
-        \Yii::$app->params['site_id'] = $params['site_id'];
-        \Yii::$app->params['apiUrl'] = $params['apiUrl'];
+        \Yii::$app->params = $params;
         \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
     }
 
