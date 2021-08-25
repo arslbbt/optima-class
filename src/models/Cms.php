@@ -27,8 +27,9 @@ class Cms extends Model
             $url = Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template'];
 
             $file_data = Functions::getCRMData($url);
-
-            file_put_contents($file, $file_data);
+            if($file_data != 'null' && $file_data != '[]'){
+                file_put_contents($file, $file_data);
+            }
         } else {
             $file_data = file_get_contents($file);
         }
@@ -365,7 +366,7 @@ class Cms extends Model
 
                     $file_data = Functions::getCRMData($url);
                 }
-                if ($file_data) {
+                if ($file_data != '[]' && $file_data != 'null') {
                     file_put_contents($file, $file_data);
                 }
             } else {
@@ -495,30 +496,27 @@ class Cms extends Model
      */
     public static function getSlugs($params = [])
     {
-        $file = '';
         $name = isset($params['name']) ? $params['name'] : 'all';
         $with_templates = isset($params['without_templates']) ? false : true;
         $with_tags = isset($params['without_tags']) ? false : true;
-        
-        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $query .= $with_templates ? '&expand=template' : '';
-        $query .= $with_tags ? '&tags=true' : '';
-        
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
-        $file_data = Functions::getCRMData($url);
+        $file = Functions::directory() . 'slugs_for_';
+        $file .= str_replace(' ', '_', strtolower($name));
+        $file .= $with_templates ? '_with_templates' : '';
+        $file .= $with_tags ? '_with_tags' : '';
+        $file .= '.json';
 
-        if ($file_data != '[]') {
-            $file = Functions::directory() . 'slugs_for_';
-            $file .= str_replace(' ', '_', strtolower($name));
-            $file .= $with_templates ? '_with_templates' : '';
-            $file .= $with_tags ? '_with_tags' : '';
-            $file .= '.json';
-        }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            
-            if ($file_data !='[]')
+            $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+            $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+            $query .= $with_templates ? '&expand=template' : '';
+            $query .= $with_tags ? '&tags=true' : '';
+
+            $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
+
+            $file_data = Functions::getCRMData($url);
+            if ($file_data != 'null' && $file_data != '[]') {
                 file_put_contents($file, $file_data);
+            }
         } else
             $file_data = file_get_contents($file);
         $data = json_decode($file_data, true);
