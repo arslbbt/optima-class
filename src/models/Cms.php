@@ -27,7 +27,7 @@ class Cms extends Model
             $url = Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template'];
 
             $file_data = Functions::getCRMData($url);
-            if($file_data != 'null' && $file_data != '[]'){
+            if($file_data && $file_data != 'null' && $file_data != '[]'){
                 file_put_contents($file, $file_data);
             }
         } else {
@@ -514,7 +514,7 @@ class Cms extends Model
             $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
 
             $file_data = Functions::getCRMData($url);
-            if ($file_data != 'null' && $file_data != '[]') {
+            if ($file_data && $file_data != 'null' && $file_data != '[]') {
                 file_put_contents($file, $file_data);
             }
         } else
