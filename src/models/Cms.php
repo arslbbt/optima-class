@@ -366,7 +366,7 @@ class Cms extends Model
 
                     $file_data = Functions::getCRMData($url);
                 }
-                if ($file_data != '[]' && $file_data != 'null') {
+                if (json_decode($file_data, true)) {
                     file_put_contents($file, $file_data);
                 }
             } else {
