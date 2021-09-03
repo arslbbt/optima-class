@@ -171,15 +171,17 @@ class Properties extends Model
                         $data['sale_rent_title'] = $property->property->title->$contentLang;
                     } elseif (isset($property->property->rent) && $property->property->rent == true && isset($property->property->rental_title->$contentLang) && $property->property->rental_title->$contentLang != '') {
                         $data['sale_rent_title'] = $property->property->rental_title->$contentLang;
-                    } elseif (isset($property->property->location) && isset($property->property->type_one)) {
-                        $data['sale_rent_title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-                    }
+                    } 
+                    // elseif (isset($property->property->location) && isset($property->property->type_one)) {
+                    //     $data['sale_rent_title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                    // }
 
                     if (isset($property->property->$title->$contentLang) && $property->property->$title->$contentLang != '') {
                         $data['title'] = $property->property->$title->$contentLang;
-                    } elseif (isset($property->property->location) && isset($property->property->type_one)) {
-                        $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
-                    }
+                    } 
+                    // elseif (isset($property->property->location) && isset($property->property->type_one)) {
+                    //     $data['title'] = (isset($property->property->type_one) ? \Yii::t('app', strtolower($property->property->type_one)) : \Yii::t('app', 'N/A')) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $property->property->location);
+                    // }
                     if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
                         $data['meta_title'] = $property->property->$seo_title->$contentLang;
                     }
@@ -412,12 +414,12 @@ class Properties extends Model
                     }
                     if (isset($property->property->rent) && $property->property->rent == 1) {
                         if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
-                            $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                            $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                            $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . 'per_month' : '';
+                            $data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . 'per_month' : '';
                         }
                         if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_object($property->property->period_seasons) && $property->property->period_seasons->{0}->new_price) {
-                            $data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                            $data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                            $data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . 'per_month' : '';
+                            $data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . 'per_month' : '';
                         }
                         if (isset($property->property->st_rental) && $property->property->st_rental == true && isset($property->property->rental_seasons)) {
                             $st_price = [];
@@ -496,7 +498,7 @@ class Properties extends Model
                         $catsArr = [];
                         foreach ($property->property->custom_categories as $catdata) {
                             if (isset($cats[$catdata])) {
-                                $catsArr[$catdata] = $cats[$catdata];
+                                $catsArr[$catdata] = Yii::$app->translate->t($cats[$catdata]);
                             }
                         }
                         $data['categories'] = $catsArr;
@@ -1168,12 +1170,12 @@ class Properties extends Model
                     }
                 }
                 if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
-                    $return_data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                    $return_data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                    $return_data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . 'per_month' : '';
+                    $return_data['lt_price'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' € ' . 'per_month' : '';
                 }
                 if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_object($property->property->period_seasons) && $property->property->period_seasons->{0}->new_price) {
-                    $return_data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
-                    $return_data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . Yii::t('app', 'per_month') : '';
+                    $return_data['ltprice'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' ' . 'per_month' : '';
+                    $return_data['lt_price'] = ($property->property->period_seasons->{0}->new_price != 0) ? number_format((int) $property->property->period_seasons->{0}->new_price, 0, '', '.') . ' € ' . 'per_month' : '';
                 }
                 if (isset($property->property->type_two)) {
                     $return_data['type_two'] = $property->property->type_two;
