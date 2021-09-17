@@ -306,22 +306,10 @@ class Developments extends Model
         if (isset($property->property->general_features)) {
             foreach ($property->property->general_features as $key => $value) {
                 if (is_array($value)) {
-                    if ($key == 'kitchens') {
+                    if ($key == 'kitchens' || $key == 'floors' || $key == 'furniture') {
                         foreach ($value as $val) {
-                            $kitchens[] = \Yii::t('app', $val);
-                            $value = implode(', ', $kitchens);
-                        }
-                    }
-                    if ($key == 'floors') {
-                        foreach ($value as $val) {
-                            $floor[] = \Yii::t('app', $val);
-                            $value = implode(', ', $floor);
-                        }
-                    }
-                    if ($key == 'furniture') {
-                        foreach ($value as $val) {
-                            $furniture[] = \Yii::t('app', $val);
-                            $value = implode(', ', $furniture);
+                            $gen_feature[] = \Yii::t('app', $val);
+                            $value = implode(', ', $gen_feature);
                         }
                     }
                 }
