@@ -306,16 +306,21 @@ class Developments extends Model
         if (isset($property->property->general_features)) {
             foreach ($property->property->general_features as $key => $value) {
                 if (is_array($value)) {
-                    $value = implode(', ', $value);
+                    if ($key == 'kitchens' || $key == 'floors' || $key == 'furniture') {
+                        foreach ($value as $val) {
+                            $gen_feature[] = \Yii::t('app', $val);
+                            $value = implode(', ', $gen_feature);
+                        }
+                    }
                 }
                 if ($key == 'kitchens' && $value != '') {
-                    $features[] = \Yii::t('app', 'kitchens') . ': ' . \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'kitchens') . ': ' . $value;
                 }
                 if ($key == 'floors' && $value != '') {
-                    $features[] = \Yii::t('app', 'floors') . ': ' . \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'floors') . ': ' . $value;
                 }
                 if ($key == 'furniture' && $value != 'No') {
-                    $features[] = \Yii::t('app', 'furniture') . ': ' . \Yii::t('app', strtolower($value));
+                    $features[] = \Yii::t('app', 'furniture') . ': ' . $value;
                 } else {
                     if ($value == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
