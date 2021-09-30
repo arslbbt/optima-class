@@ -61,7 +61,11 @@ class Properties extends Model
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
         if (Yii::$app->request->post('pids') !== null ) {
-            $url = self::httpPost($url, $_POST['pids']);
+            $fields = [
+                'favourite_ids' => Yii::$app->request->post('pids'),
+            ];
+            $curl = new \linslin\yii2\curl\Curl();
+            $url = $curl->setPostParams($fields)->post($url);
         }
         //  echo $url;
         //  die;
@@ -2858,15 +2862,5 @@ class Properties extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
         // echo '<pre>'; print_r($response); die;
-    }
-    public static function httpPost($url, $data){
-        $curl = new \linslin\yii2\curl\Curl();
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, '&favourite_ids=' . $data);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        return $response;
     }
 }
