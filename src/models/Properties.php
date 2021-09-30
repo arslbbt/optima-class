@@ -65,7 +65,8 @@ class Properties extends Model
                 'favourite_ids' => Yii::$app->request->post('pids'),
             ];
             $curl = new \linslin\yii2\curl\Curl();
-            $url = $curl->setPostParams($fields)->post($url);
+            $response = $curl->setPostParams($fields)->post($url);
+            return json_decode($response, true);
         }
         //  echo $url;
         //  die;
