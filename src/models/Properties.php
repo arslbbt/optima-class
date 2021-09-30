@@ -60,6 +60,14 @@ class Properties extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
+        if (Yii::$app->request->post('pids') !== null ) {
+            $fields = [
+                'favourite_ids' => Yii::$app->request->post('pids'),
+            ];
+            $curl = new \linslin\yii2\curl\Curl();
+            $response = $curl->setPostParams($fields)->post($url);
+            return json_decode($response, true);
+        }
         //  echo $url;
         //  die;
 
