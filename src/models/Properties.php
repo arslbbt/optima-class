@@ -420,6 +420,19 @@ class Properties extends Model
                             $data['saleprice'] = str_replace(',', '.', (number_format((int) ($property->property->currentprice))));
                         }
                     }
+                    if ((isset($property->property->rent) && $property->property->rent == true) || (isset($property->property->sale) && $property->property->sale == true)) {
+                        $rental_features = [];
+                        $rental_features['living_rooms'] = [];
+                        if (isset($property->property->feet_living_room) && count((array) $property->property->feet_living_room) > 0) {
+                            foreach ($property->property->feet_living_room as $key => $value) {
+                                if (isset($value) && $value == true) {
+                                    $living_rooms[] = Yii::t('app', $key);
+                                }
+                            }
+                            $rental_features['living_rooms'] = isset($living_rooms) ? $living_rooms : [];
+                        }
+                        $data['rental_features'] = $rental_features;
+                    }
                     if (isset($property->property->rent) && $property->property->rent == 1) {
                         if (isset($property->property->lt_rental) && $property->property->lt_rental == true && isset($property->property->period_seasons) && is_array($property->property->period_seasons) && isset($property->property->period_seasons[0]->new_price)) {
                             $data['ltprice'] = ($property->property->period_seasons[0]->new_price != 0) ? number_format((int) $property->property->period_seasons[0]->new_price, 0, '', '.') . ' ' . Yii::t('app', 'per_month') : '';
