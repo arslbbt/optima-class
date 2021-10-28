@@ -1365,11 +1365,12 @@ class Properties extends Model
                 }
 
                 if (isset($property->attachments) && count($property->attachments) > 0) {
+                    $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                     foreach ($property->attachments as $pic) {
                         if (isset(Yii::$app->params['img_url__without_watermark'])) {
                             $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
                         } else {
-                            $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                            $url = Yii::$app->params['img_url'] . '/'.$watermark_size. $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
                         }
                         $attachments[] = $url;
                         $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
