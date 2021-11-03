@@ -607,7 +607,6 @@ class Properties extends Model
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
                         }
-                        
                         $data['attachments'] = $attachments;
                         $data['attachment_alt_desc'] = $attachment_alt_descriptions;
                     }
