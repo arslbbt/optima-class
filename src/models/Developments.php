@@ -323,7 +323,7 @@ class Developments extends Model
                 if ($key == 'furniture' && $value != '') {
                     $features[] = \Yii::t('app', 'furniture') . ': ' . $value;
                 } else {
-                    if ($value != '' && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
+                    if ($value == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
                         $features[] = ucfirst(str_replace('_', ' ', $key));
                 }
             }
