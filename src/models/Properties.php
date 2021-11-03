@@ -592,11 +592,11 @@ class Properties extends Model
                         $attachment_alt_descriptions = [];
                         $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                         $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
-                        if ($wm == true && isset(Yii::$app->params['img_url_wm']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
+                        if (isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             }
-                        } elseif (!$wm && isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
+                        } elseif (isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
@@ -1370,11 +1370,11 @@ class Properties extends Model
                     $attachment_alt_descriptions = [];
                     $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                     $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
-                    if ($wm == true && isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
+                    if (isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
                         foreach ($property->attachments as $pic) {
                             $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                         }
-                    } elseif (!$wm && isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
+                    } elseif (isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
                         foreach ($property->attachments as $pic) {
                             $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
