@@ -320,7 +320,7 @@ class Developments extends Model
                 if ($key == 'floors' && $value != '') {
                     $features[] = \Yii::t('app', 'floors') . ': ' . $value;
                 }
-                if ($key == 'furniture' && $value != '') {
+                if ($key == 'furniture' && $value != 'No') {
                     $features[] = \Yii::t('app', 'furniture') . ': ' . $value;
                 } else {
                     if ($value == true && $key != 'furniture' && $key != 'kitchens' && $key != 'floors')
