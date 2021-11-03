@@ -27,7 +27,7 @@ class Properties extends Model
     public $latitude;
     public $longitude;
     public $status;
-
+    public $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
     public function rules()
     {
         return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'status', 'currentprice', 'address', 'latitude', 'longitude', 'address_comments', 'sale', 'owner_id', 'own'], 'safe']];
@@ -46,6 +46,7 @@ class Properties extends Model
      */
     public static function findAll($query, $wm = false, $cache = false, $options = [])
     {
+        $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
@@ -595,14 +596,14 @@ class Properties extends Model
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             }
-                        } elseif (!$wm && isset(Yii::$app->params['img_url__without_watermark'])) {
+                        } elseif (isset($agency_data['watermark_image']['show_onweb']) && $agency_data['watermark_image']['show_onweb'] == 1) {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
                         } else {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachments[] = $url_to_use_without_watermark . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
                         }
@@ -767,6 +768,7 @@ class Properties extends Model
 
     public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options = [])
     {
+        $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
@@ -1365,12 +1367,12 @@ class Properties extends Model
                 }
 
                 if (isset($property->attachments) && count($property->attachments) > 0) {
-                    $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                     foreach ($property->attachments as $pic) {
-                        if (isset(Yii::$app->params['img_url__without_watermark'])) {
-                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
-                        } else {
-                            $url = Yii::$app->params['img_url'] . '/'.$watermark_size. $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        if(isset($agency_data['watermark_image']['show_onweb']) && $agency_data['watermark_image']['show_onweb'] == 1) {
+                            $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
+                        }
+                        else {
+                            $url = $url_to_use_without_watermark . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
                         }
                         $attachments[] = $url;
                         $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
