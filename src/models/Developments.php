@@ -140,6 +140,7 @@ class Developments extends Model
         }
         $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
+        // echo '<pre>'; print_r($url); die;
         $JsonData = Functions::getCRMData($url, false);
         $property = json_decode($JsonData);
         $return_data = [];
@@ -305,7 +306,7 @@ class Developments extends Model
         }
         if (isset($property->property->general_features)) {
             foreach ($property->property->general_features as $key => $value) {
-                if (is_array($value)) {
+                if (is_array($value) && $value != []) {
                     if ($key == 'kitchens' || $key == 'floors' || $key == 'furniture') {
                         foreach ($value as $val) {
                             $gen_feature[] = \Yii::t('app', $val);
@@ -332,6 +333,16 @@ class Developments extends Model
             $data = [];
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
+            if (isset($value->property->price_from) && $value->property->price_from > 0)
+                $data['price_from'] = str_replace(',', '.', (number_format((int) ($value->property->price_from))));
+            if (isset($value->property->price_to) && $value->property->price_to > 0)
+                $data['price_to'] = str_replace(',', '.', (number_format((int) ($value->property->price_to))));
+            if (isset($value->property->plot) && $value->property->plot > 0)
+                $data['plot'] = str_replace(',', '.', (number_format((int) ($value->property->plot))));
+            if (isset($value->property->bedrooms) && $value->property->bedrooms > 0)
+                $data['bedrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bedrooms))));
+            if (isset($value->property->bathrooms) && $value->property->bathrooms > 0)
+                $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
             if (isset($value->property->type_one))
                 $data['type'] = $value->property->type_one;
             if (isset($value->property->block))
