@@ -606,6 +606,11 @@ class Properties extends Model
                                 $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
+                        } else {
+                            foreach ($property->attachments as $pic) {
+                                $attachments[] = 'https://images.optima-crm.com/resize/properties_images/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
+                            }
                         }
                         $data['attachments'] = $attachments;
                         $data['attachment_alt_desc'] = $attachment_alt_descriptions;
@@ -1372,6 +1377,9 @@ class Properties extends Model
                         }
                         elseif (isset(Yii::$app->params['img_url__without_watermark'])) {
                             $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
+                        }
+                        else {
+                            $url = 'https://images.optima-crm.com/resize/properties_images/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
                         }
                         $attachments[] = $url;
                         $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
