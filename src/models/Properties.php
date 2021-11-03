@@ -27,7 +27,6 @@ class Properties extends Model
     public $latitude;
     public $longitude;
     public $status;
-    public $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
     public function rules()
     {
         return [[['type_one', 'type_two', 'bedrooms', 'bathrooms', 'status', 'currentprice', 'address', 'latitude', 'longitude', 'address_comments', 'sale', 'owner_id', 'own'], 'safe']];
@@ -46,6 +45,7 @@ class Properties extends Model
      */
     public static function findAll($query, $wm = false, $cache = false, $options = [])
     {
+        $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
         $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -768,6 +768,7 @@ class Properties extends Model
 
     public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options = [])
     {
+        $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
         $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
