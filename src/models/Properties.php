@@ -768,6 +768,7 @@ class Properties extends Model
 
     public static function findOne($reference, $with_booking = false, $with_locationgroup = false, $rent = false, $with_construction = false, $with_listing_agency = false, $with_testimonials = false, $with_count = false, $image_size = '1200', $options = [])
     {
+        $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
