@@ -70,7 +70,7 @@ class Dropdowns extends Model
 
         $file = Functions::directory() . 'provinces.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'] . '&country=all';
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
