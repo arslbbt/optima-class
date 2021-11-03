@@ -1372,7 +1372,7 @@ class Properties extends Model
                     $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
                     if (isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
                         foreach ($property->attachments as $pic) {
-                            $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                            $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                         }
                     } elseif (isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
                         foreach ($property->attachments as $pic) {
