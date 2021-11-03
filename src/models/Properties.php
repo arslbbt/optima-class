@@ -592,21 +592,22 @@ class Properties extends Model
                         $attachment_alt_descriptions = [];
                         $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
                         $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
-                        if (isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
+                        if ($wm == true && isset(Yii::$app->params['img_url_wm'])) {
                             foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachments[] = Yii::$app->params['img_url_wm'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                             }
-                        } elseif (isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
-                            foreach ($property->attachments as $pic) {
-                                $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
-                                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
-                            }
-                        } else {
+                        } elseif (isset($agency_data['watermark_image']['show_onweb']) && $agency_data['watermark_image']['show_onweb'] == 1) {
                             foreach ($property->attachments as $pic) {
                                 $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
                                 $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                             }
+                        }elseif (isset(Yii::$app->params['img_url__without_watermark'])) {
+                            foreach ($property->attachments as $pic) {
+                                $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                                $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
+                            }
                         }
+                        
                         $data['attachments'] = $attachments;
                         $data['attachment_alt_desc'] = $attachment_alt_descriptions;
                     }
@@ -1366,26 +1367,19 @@ class Properties extends Model
                 }
 
                 if (isset($property->attachments) && count($property->attachments) > 0) {
-                    $attachments = [];
-                    $attachment_alt_descriptions = [];
-                    $watermark_size = isset($options['watermark_size']) && !empty($options['watermark_size']) ? $options['watermark_size'] . '/' : '';
-                    $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
-                    if (isset(Yii::$app->params['img_url']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == 1) {
-                        foreach ($property->attachments as $pic) {
-                            $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
+                    foreach ($property->attachments as $pic) {
+                        if(isset($agency_data['watermark_image']['show_onweb']) && $agency_data['watermark_image']['show_onweb'] == 1) {
+                            $url = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/' . $image_size . '/' . $pic->file_md5_name;
                         }
-                    } elseif (isset(Yii::$app->params['img_url__without_watermark']) && isset($agency_data['watermark_image']) && $agency_data['watermark_image']['show_onweb'] == NULL) {
-                        foreach ($property->attachments as $pic) {
-                            $attachments[] = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
-                            $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
+                        elseif (isset(Yii::$app->params['img_url__without_watermark'])) {
+                            $url = Yii::$app->params['img_url__without_watermark'] . '/' . $pic->model_id . '/' . 1800 . '/' . $pic->file_md5_name;
                         }
-                    } else {
-                        foreach ($property->attachments as $pic) {
-                            $attachments[] = Yii::$app->params['img_url'] . '/' . $watermark_size . $pic->model_id . '/' . $attachments_size . $pic->file_md5_name;
-                            $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
-                        }
+                        $attachments[] = $url;
+                        $attachment_descriptions[] = isset($pic->description->$contentLang) ? $pic->description->$contentLang : '';
+                        $attachment_alt_descriptions[] = isset($pic->alt_description->$contentLang) ? $pic->alt_description->$contentLang : '';
                     }
                     $return_data['attachments'] = $attachments;
+                    $return_data['attachment_desc'] = $attachment_descriptions;
                     $return_data['attachment_alt_desc'] = $attachment_alt_descriptions;
                 }
                 if (isset($property->documents) && count($property->documents) > 0) {
