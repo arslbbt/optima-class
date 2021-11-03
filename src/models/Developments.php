@@ -307,7 +307,7 @@ class Developments extends Model
         if (isset($property->property->general_features)) {
             foreach ($property->property->general_features as $key => $value) {
                 if (is_array($value) && $value != []) {
-                    if (($key == 'kitchens' || $key == 'floors' || $key == 'furniture')) {
+                    if ($key == 'kitchens' || $key == 'floors' || $key == 'furniture') {
                         foreach ($value as $val) {
                             $gen_feature[] = \Yii::t('app', $val);
                             $value = implode(', ', $gen_feature);
