@@ -363,7 +363,8 @@ class Developments extends Model
                 $data['year_built'] = $value->property->year_built;
             if (isset($value->property->new_construction) && $value->property->new_construction == true)
                 $data['new_construction'] = $value->property->new_construction;
-
+            if (isset($value->property->description->$lang))
+                $data['description'] = $property->property->description->$lang;
 
             if (isset($value->documents)) {
                 $fplans = [];
