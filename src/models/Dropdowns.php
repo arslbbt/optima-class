@@ -65,7 +65,7 @@ class Dropdowns extends Model
     }
 
     // use Dropdowns::getProvinces() as it will provide more options to handle data in controller and works with countries and regions search too
-    public static function provinces($country = [])
+    public static function provinces($country = '')
     {
         $file = Functions::directory() . 'provinces.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
