@@ -67,7 +67,7 @@ class Dropdowns extends Model
     // use Dropdowns::getProvinces() as it will provide more options to handle data in controller and works with countries and regions search too
     public static function provinces($country = '')
     {
-        $country_query = '&country=' . $country;
+        $country_query = $country == 'all' ? '&country=all' : '';
         $file = Functions::directory() . 'provinces.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'] . $country_query;
