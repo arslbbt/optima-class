@@ -120,7 +120,7 @@ class Dropdowns extends Model
     {
         $country_query = $country == 'all' ? '&country=all' : '';
         $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
-
+        
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
             foreach ($provinces as $province) {
@@ -137,7 +137,7 @@ class Dropdowns extends Model
             $file_data = json_encode($file_data);
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']. $country_query;
             $file_data =
                 //file_get_contents($url);
                 Functions::getCRMData($url);
@@ -237,7 +237,7 @@ class Dropdowns extends Model
                 $country_check = '&country=' . $country;
             }
             $url = Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
-
+            
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
