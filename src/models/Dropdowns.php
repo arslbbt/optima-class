@@ -116,9 +116,9 @@ class Dropdowns extends Model
     }
 
     // use Dropdowns::getCities() as it will provide more options to handle data in controller and works with countries search too
-    public static function cities($provinces = [], $to_json = false)
+    public static function cities($country = '', $provinces = [], $to_json = false)
     {
-
+        $country_query = $country == 'all' ? '&country=all' : '';
         $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
 
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
@@ -126,7 +126,7 @@ class Dropdowns extends Model
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key']. $country_query;
             $file_data =
                 //file_get_contents($url);
                 Functions::getCRMData($url);
