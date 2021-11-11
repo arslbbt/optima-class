@@ -952,14 +952,24 @@ class Properties extends Model
                 if (isset($property->property->allotment_permit)) {
                     $return_data['allotment_permit'] = $property->property->allotment_permit;
                 }
+                
+                if (isset($property->property->environmental_permit)) {
+                    $return_data['environmental_permit'] = $property->property->environmental_permit;
+                }
+                if (isset($property->property->right_to_sell)) {
+                    $return_data['right_to_sell'] = $property->property->right_to_sell;
+                }
                 if (isset($property->property->soil_certificate)) {
                     $return_data['soil_certificate'] = $property->property->soil_certificate;
                 }
                 if (isset($property->property->summons)) {
                     $return_data['summons'] = $property->property->summons;
                 }
-                if (isset($property->property->right_to_sell)) {
-                    $return_data['right_to_sell'] = $property->property->right_to_sell;
+                if (isset($property->property->destination)) {
+                    $return_data['destination'] = $property->property->destination;
+                }
+                if (isset($property->property->flood_risk)) {
+                    $return_data['flood_risk'] = $property->property->flood_risk;
                 }
                 if (isset($property->property->protected_heritage)) {
                     $return_data['protected_heritage'] = $property->property->protected_heritage;
