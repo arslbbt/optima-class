@@ -520,7 +520,7 @@ class Properties extends Model
                         $catsArr = [];
                         foreach ($property->property->custom_categories as $catdata) {
                             if (isset($cats[$catdata]) && !empty($cats[$catdata])) {
-                                $catsArr[$catdata] = Yii::$app->translate->t($cats[$catdata]);
+                                $catsArr[$catdata] = Yii::t($cats[$catdata]);
                             }
                         }
                         $data['categories'] = $catsArr;
