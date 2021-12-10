@@ -57,7 +57,7 @@ class Properties extends Model
         }
         if (isset($options['set_query']) && $options['set_query'] == false) {
             $query .= $query;
-        } else {
+        } elseif(!Yii::$app->request->isConsoleRequest) {
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
