@@ -61,7 +61,7 @@ class Properties extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-        if (Yii::$app->request->post('pids') !== null ) {
+        if (!Yii::$app->request->isConsoleRequest && Yii::$app->request->post('pids') !== null ) {
             $fields = [
                 'favourite_ids' => Yii::$app->request->post('pids'),
             ];
