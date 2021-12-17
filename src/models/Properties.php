@@ -241,6 +241,9 @@ class Properties extends Model
                     if (isset($property->property->p_style)) {
                         $data['p_style'] = $property->property->p_style;
                     }
+                    if (isset($property->property->price_per_built)){
+                        $data['price_per_built'] = $property->property->price_per_built;
+                    }
                     if (isset($property->property->region)) {
                         $data['region'] = $property->property->region;
                     }
