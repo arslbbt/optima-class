@@ -232,6 +232,25 @@ class CommercialProperties extends Model
         if (isset($property['keywords'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
+        if(isset($property['videos']) && !empty($property['videos'])){
+            $videos = [];
+            $virtual_tours = [];
+            foreach($property['videos'] as $video){
+                if(isset($video['type']) && $video['type'] == 'Video' && isset($video['status']) && $video['status'] == 1){
+                    $videos[] = $video['url'][strtoupper(Yii::$app->language)];
+                }
+            }
+            $f_property['videos'] = $videos;
+            foreach($property['videos'] as $vt){
+                if(isset($vt['type']) && $vt['type'] == '2' && isset($vt['status']) && $vt['status'] == 1){
+                    $virtual_tours[] = $vt['url'][strtoupper(Yii::$app->language)];
+                }
+            }
+            $f_property['vt'] = $virtual_tours;
+        }
+        if (isset($property['created_at']) && !empty($property['created_at'])) {
+            $f_property['created_at'] = strtotime($property['created_at']);
+        }
         if (isset($property['type_one'])) {
             $f_property['type'] = \Yii::t('app', $property['type_one']);
         }
