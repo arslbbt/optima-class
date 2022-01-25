@@ -194,8 +194,19 @@ class Properties extends Model
                     if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
                         $data['meta_title'] = $property->property->$seo_title->$contentLang;
                     }
-
-
+                    $urls = [];
+                    if (isset($property->property->urls) && $property->property->urls != '') {
+                        foreach ($langugesSystem as $lang_sys) {
+                            $lang_sys_key = strtolower($lang_sys['key']);
+                            if (isset($property->property->urls->sale->$lang_sys_key) && $property->property->urls->sale->$lang_sys_key != '' && isset($property->property->sale) && $property->property->sale == 1) {
+                                $urls['sale_urls'][$lang_sys_key] = $property->property->urls->sale->$lang_sys_key;
+                            } 
+                            if (isset($property->property->urls->rent->$lang_sys_key) && $property->property->urls->rent->$lang_sys_key != '' && isset($property->property->rent) && $property->property->rent == 1) {
+                                $urls['rent_urls'][$lang_sys_key] = $property->property->urls->rent->$lang_sys_key;
+                            }
+                        }
+                    }
+                    $data['urls'] = $urls;
                     if (isset($property->property->property_name)) {
                         $data['property_name'] = $property->property->property_name;
                     }
@@ -864,6 +875,19 @@ class Properties extends Model
                     $keywords = 'keywords';
                     $perma_link = 'perma_link';
                 }
+                $urls = [];
+                if (isset($property->property->urls) && $property->property->urls != '') {
+                    foreach ($langugesSystem as $lang_sys) {
+                        $lang_sys_key = strtolower($lang_sys['key']);
+                        if (isset($property->property->urls->sale->$lang_sys_key) && $property->property->urls->sale->$lang_sys_key != '' && isset($property->property->sale) && $property->property->sale == 1) {
+                            $urls['sale_urls'][$lang_sys_key] = $property->property->urls->sale->$lang_sys_key;
+                        } 
+                        if (isset($property->property->urls->rent->$lang_sys_key) && $property->property->urls->rent->$lang_sys_key != '' && isset($property->property->rent) && $property->property->rent == 1) {
+                            $urls['rent_urls'][$lang_sys_key] = $property->property->urls->rent->$lang_sys_key;
+                        }
+                    }
+                }
+                $return_data['urls'] = $urls;
                 //    start slug_all
                 $slugs = [];
                 foreach ($langugesSystem as $lang_sys) {
