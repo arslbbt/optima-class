@@ -1060,6 +1060,9 @@ class Properties extends Model
                 if (isset($property->featured) && !empty($property->featured)) {
                     $return_data['featured'] = $property->featured;
                 }
+                if (isset($property->property->price_per_built)){
+                    $return_data['price_per_built'] = $property->property->price_per_built;
+                }
                 if (isset($property->property->own) && $property->property->own == true) {
                     $return_data['own'] = true;
                 }
