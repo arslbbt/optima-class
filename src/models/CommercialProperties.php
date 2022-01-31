@@ -251,8 +251,18 @@ class CommercialProperties extends Model
         if (isset($property['created_at']) && !empty($property['created_at'])) {
             $f_property['created_at'] = strtotime($property['created_at']);
         }
+        
+        if (isset($property['featured'])) {
+            $f_property['featured'] = $property['featured'];
+        }
         if (isset($property['type_one'])) {
             $f_property['type'] = \Yii::t('app', $property['type_one']);
+        }
+        if (isset($property['type_one_value'][$contentLang])) {
+            $f_property['type_one'] = \Yii::t('app', $property['type_one_value'][$contentLang]);
+        }
+        if (isset($property['type_two_value'][$contentLang])) {
+            $f_property['type_two'] = \Yii::t('app', $property['type_two_value'][$contentLang]);
         }
         if (isset($property['latitude_alt']) && isset($property['longitude_alt']) && $property['latitude_alt'] != '' && $property['longitude_alt'] != '') {
             $f_property['lat'] = $property['latitude_alt'];
