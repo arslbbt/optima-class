@@ -1520,7 +1520,9 @@ class Properties extends Model
                     $return_data['booking_group_with_enquiry'] = $booking_group_with_enquiry;
                     $return_data['booked_dates_costa'] = $booked_dates_costa;
                 }
-
+                if (isset($property->bookings) && count($property->bookings) > 0) {
+                    $return_data['bookings'] = ArrayHelper::toArray($property->bookings);
+                }
                 if (isset($property->testimonials)) {
                     $testimonials = [];
                     foreach ($property->testimonials as $test) {
