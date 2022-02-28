@@ -29,7 +29,7 @@ class CommercialProperties extends Model
             ]
         ];
 
-        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby')) == 2 ) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
         }
         $options['sort'] = $sort;
@@ -41,8 +41,8 @@ class CommercialProperties extends Model
                 $k = explode('=', $var);
                 if(isset($k[0]) && isset($k[1])){
                     if($k[0] == 'favourite_ids'){
-                        $query_array['favourite_ids'] = explode(',', $k[1]);
-                        $query_array['archived']['$ne'] = true;
+                        $query_array['$and'][]['favourite_ids'] = explode(',', $k[1]);
+                        $query_array['$and'][]['archived']['$ne'] = true;
                     }else{
                         $post_data[$k[0]] = $k[1];
                         $post_data['archived']['$ne'] = true;
@@ -53,18 +53,19 @@ class CommercialProperties extends Model
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
-                $query['archived']['$ne'] = true;
+                $query['$and'][]['archived']['$ne'] = true;
             }
             if (count($query)){
                 $query_array = $query;
-                $query_array['archived']['$ne'] = true;
-                $query_array['status'] = ['$in' => ['Available', 'Under Offer']];
+                $query_array['$and'][]['archived']['$ne'] = true;
+                $query_array['$and'][]['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
             }
         }
         
         $post_data = ["options" => $options];
-        if(!empty($query_array))
+        if(!empty($query_array)){
             $post_data["query"] =  $query_array;
+        }
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
@@ -117,13 +118,13 @@ class CommercialProperties extends Model
         $get = Yii::$app->request->get();
         $query = [];
         if (isset($get['price_from']) && $get['price_from']) {
-            $query['current_price'] = ['$gte' => (int) $get['price_from']];
+            $query['$and'][]['current_price'] = ['$gte' => (int) $get['price_from']];
         }
         if (isset($get['price_to']) && $get['price_to']) {
-            $query['current_price'] = ['$lte' => (int) $get['price_to']];
+            $query['$and'][]['current_price'] = ['$lte' => (int) $get['price_to']];
         }
         if (isset($get['reference']) && $get['reference']) {
-            $query['$or'] = [
+            $query['$and'][]['$or'] = [
                 ["reference" => (int) $get['reference']],
                 ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
@@ -132,58 +133,82 @@ class CommercialProperties extends Model
 
         if (isset($get['type']) && $get['type'] && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
             $intArray = array();
-            $int_type = '';
-            foreach ($get['type'] as $int_type) {
-                $int_type = (int) $int_type;
+            foreach ($get['type'] as $int_val) {
+                $intArray[] = (int) $int_val;
             }
-            $intArray[] = $int_type;
-            $query['type_one'] = ['$in' => $intArray];
+            $query['$and'][]['type_one'] = ['$in' => $intArray];
         }
         if (isset($get['sub_type']) && $get['sub_type'] && is_array($get['sub_type']) && count($get['sub_type']) > 0 && $get['sub_type'][0] != 0 && $get['sub_type'][0] != '' && $get['sub_type'][0] != '0') {
             $intArray = array();
-            $int_type = '';
-            foreach ($get['sub_type'] as $int_type) {
-                $int_type = (int) $int_type;
+            foreach ($get['sub_type'] as $int_val) {
+                $intArray[] = (int) $int_val;
             }
-            $intArray[] = $int_type;
-            $query['type_two'] = ['$in' => $intArray];
+            $query['$and'][]['type_two'] = ['$in' => $intArray];
         }
 
         if (isset($get['country']) && $get['country']) {
-            $query['country'] = (int) $get['country'];
+            $query['$and'][]['country'] = (int) $get['country'];
         }
         if (isset($get['city']) && $get['city']) {
-            $query['city'] = (int) $get['city'];
+            $intArray = array();
+            foreach ($get['city'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['city'] = ['$in' => $intArray];
         }
         if (isset($get['location']) && $get['location']) {
-            $query['location'] = (int) $get['location'];
+            $intArray = array();
+            foreach ($get['location'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['location'] = ['$in' => $intArray];
         }
         if (isset($get['province']) && $get['province']) {
-            $query['province'] = (int) $get['province'];
+            $intArray = array();
+            foreach ($get['province'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['province'] = ['$in' => $intArray];
+        }
+        if (isset($get['cp_features']) && !empty($get['cp_features'])) {
+            foreach($get['cp_features'] as $features){
+                $search_features = [];
+                if(isset($features) && !empty($features)){
+                    foreach($features as $key => $feature){
+                        $search_features[$key] = $feature;
+                    }
+                }
+                $query['$and'][]['$or'] = $search_features;
+            }
+        }
+        if (isset($get['sale']) && $get['sale']) {
+            $query['$and'][]['sale'] = true;
+        }
+        if (isset($get['rent']) && $get['rent']) {
+            $query['$and'][]['rent'] = true;
+        }
+        if (isset($get['new_built']) && $get['new_built']) {
+            $query['$and'][]['project'] = true;
         }
         if (isset($get['region']) && $get['region']) {
-            $query['region'] = (int) $get['region'];
+            $query['$and'][]['region'] = (int) $get['region'];
         }
         if (isset($get['price_from'])) {
-            $query['current_price']['$gt'] = (int) $get['price_from'];
+            $query['$and'][]['current_price']['$gt'] = (int) $get['price_from'];
         }
         if (isset($get['price_to'])) {
-            $query['current_price']['$lt'] = (int) $get['price_to'];
+            $query['$and'][]['current_price']['$lt'] = (int) $get['price_to'];
         } else{
-            $query['current_price']['$lt'] = (int) 100000000000000000;
+            $query['$and'][]['current_price']['$lt'] = (int) 100000000000000000;
         }
 
-        $query['archived']['$ne'] = true;
+        $query['$and'][]['archived']['$ne'] = true;
 
-        if (isset($get['location']) && $get['location']) {
-
-            $query['location'] = (int) $get['location'];
-        }
         if (isset($get['featured']) && $get['featured']) {
-            $query['featured'] = true;
+            $query['$and'][]['featured'] = true;
         }
         if (isset($get['office']) && $get['office']) {
-            $query['offices'] =['$in' => $get['office']];
+            $query['$and'][]['offices'] =['$in' => $get['office']];
         }
         return $query;
     }
@@ -484,5 +509,83 @@ class CommercialProperties extends Model
         $f_property['offices'] = $offices;
 
         return $f_property;
+    }
+
+    public function findAllWithLatLang($qry = 'true', $cache = false)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
+        $query = [];
+        $sort = ['current_price' => '-1'];
+        $query_array=[];
+        $options = ["page" => 1, "limit" => 10];
+        $options['populate'] = [
+            [
+                'path' => 'property_attachments',
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]],
+            ]
+        ];
+
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby')) == 2 ) {
+            $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
+        }
+        $options['sort'] = $sort;
+
+        
+        if(isset($query) && $query != '' && !is_array($query)){
+            $vars = explode('&', $query);
+            foreach($vars as $var){
+                $k = explode('=', $var);
+                if(isset($k[0]) && isset($k[1])){
+                    if($k[0] == 'favourite_ids'){
+                        $query_array['favourite_ids'] = explode(',', $k[1]);
+                        $query_array['archived']['$ne'] = true;
+                    }else{
+                        $post_data[$k[0]] = $k[1];
+                        $post_data['archived']['$ne'] = true;
+                    }
+                }
+            }
+        }
+        if(isset($query) && $query != '' && is_array($query)){
+            if (!count($query)) {
+                $query = self::setQuery();
+                $query['archived']['$ne'] = true;
+            }
+            if (count($query)){
+                $query_array = $query;
+                $query_array['archived']['$ne'] = true;
+                $query_array['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
+            }
+        }
+        $post_data = ["options" => $options];
+        if(!empty($query_array))
+        {
+            $post_data["query"] =  $query_array;
+        }
+       
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        if (!is_dir($webroot . '/uploads/')) {
+            mkdir($webroot . '/uploads/');
+        }
+        if (!is_dir($webroot . '/uploads/temp/')) {
+            mkdir($webroot . '/uploads/temp/');
+        }
+        if($cache){
+            return json_decode($response, true);
+        }
+        $file = $webroot . '/uploads/temp/commercial_properties-latlang.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $file_data = file_put_contents($file, $response);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, true);
     }
 }
