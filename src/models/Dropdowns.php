@@ -119,7 +119,7 @@ class Dropdowns extends Model
     public static function cities($country = '', $provinces = [], $to_json = false, $prop_count = 1)
     {
         $country_query = $country == 'all' ? '&country=all' : '&country='.$country;
-        $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
+        $file = Functions::directory() . 'cities_' .(isset($provinces) && !empty($provinces) ? implode(',', $provinces) : '') . '.json';
         
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
