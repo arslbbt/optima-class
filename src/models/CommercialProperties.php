@@ -187,6 +187,34 @@ class CommercialProperties extends Model
         if (isset($get['rent']) && $get['rent']) {
             $query['$and'][]['rent'] = true;
         }
+        if (isset($get['bedrooms']) && $get['bedrooms']) {
+            $query['$and'][]['bedrooms'] = $get['bedrooms'];
+        }
+        if (isset($get['min_bed']) && !empty($get['min_bed'])) {
+            $query['$and'][]['bedrooms'] = ['$lte' => (int)$get['min_bed']];
+            if (isset($get['max_bed']) && !empty($get['max_bed'])) {
+                $query['$and'][]['bedrooms'] = ['$gte' => (int)$get['max_bed']];
+            } else {
+                $query['$and'][]['bedrooms'] = ['$gte' => (int)(50)];
+            }
+        } elseif (isset($get['max_bed']) && !empty($get['max_bed'])) {
+            $query['$and'][]['bedrooms'] = ['$lte' => (int)(1)];
+            $query['$and'][]['bedrooms'] = ['$gte' => (int)$get['max_bed']];
+        }
+        if (isset($get['bathrooms']) && $get['bathrooms']) {
+            $query['$and'][]['bathrooms'] = $get['bathrooms'];
+        }
+        if (isset($get['min_bath']) && !empty($get['min_bath'])) {
+            $query['$and'][]['bathrooms'] = ['$lte' => (int)$get['min_bath']];
+            if (isset($get['max_bath']) && !empty($get['max_bath'])) {
+                $query['$and'][]['bathrooms'] = ['$gte' => (int)$get['max_bath']];
+            } else {
+                $query['$and'][]['bathrooms'] = ['$gte' => (int)(50)];
+            }
+        } elseif (isset($get['max_bath']) && !empty($get['max_bath'])) {
+            $query['$and'][]['bathrooms'] = ['$lte' => (int)(1)];
+            $query['$and'][]['bathrooms'] = ['$gte' => (int)$get['max_bath']];
+        }
         if (isset($get['new_built']) && $get['new_built']) {
             $query['$and'][]['project'] = true;
         }
