@@ -19,14 +19,12 @@ class MooringProperties extends Model
 {
 
     public static function findAll($page =1, $page_size=10 , $query = '',$sort = ['current_price' => '-1'], $options = [] )
-    {
-        
+    {        
         $query_options = [
             "page" => (int)$page,
             "limit" => (int)$page_size,
             "sort" => ['current_price' => (int)'-1'],
-        ];
-        
+        ];     
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
         }
@@ -35,8 +33,10 @@ class MooringProperties extends Model
             $query = self::setQuery();
         }
         if(!empty($query)){
-            $query_array =  $query;
+            $query_array  =  $query;
         }
+        $query_array['query']['show_on'] =  ["All Websites" , "Our Website"];
+        
         $query_array['options'] = $query_options;
         $node_url = Yii::$app->params['node_url'] . '/api/mooring_properties/search?user_apikey=' . Yii::$app->params['api_key'];
         $curl = new curl\Curl();
@@ -46,6 +46,7 @@ class MooringProperties extends Model
                 'Content-Length' => strlen(json_encode($query_array))
             ])
             ->post($node_url);   
+ 
             $response = json_decode($response, TRUE);
 
         $properties = [];
@@ -61,8 +62,6 @@ class MooringProperties extends Model
     }
     public static function findOne($id)
     {
-
-    
         $curl = new curl\Curl();
         $node_url = Yii::$app->params['node_url'] . 'api/mooring_properties/view/' . $id . '?user_apikey=' . Yii::$app->params['api_key'];
         $JsonData = Functions::getCRMData($node_url, false);
@@ -73,7 +72,6 @@ class MooringProperties extends Model
 
     public static function formateProperty($property,$options)
 {
-        // $agency_data = self::getAgency();
         $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
         $agency_data = Properties::getAgency();
         $langugesSystem = Cms::SystemLanguages();
@@ -108,14 +106,14 @@ class MooringProperties extends Model
             if (isset($property['reference'])) {
                 $data['id'] = $property['reference'];
             }
-            if (isset($property['reference'])) {
-                $data['reference'] = $property['reference'];
+            if (isset($property['external_reference'])) {
+                $data['reference'] = $property['external_reference'];
             }
 
-            if (isset($property['sale']) && $property['sale'] == true && isset($property['seo_title'][$contentLang]) && $property['seo_title'][$contentLang] != '') {
-                $data['title'] = $property['seo_title'][$contentLang];
-            } elseif (isset($property['sale']) && $property['sale'] == true && isset($property['title'][$contentLang]) && $property['title'][$contentLang] != '') {
+            if (isset($property['sale']) && $property['sale'] == true && isset($property['title'][$contentLang]) && $property['title'][$contentLang] != '') {
                 $data['title'] = $property['title'][$contentLang];
+            } elseif (isset($property['sale']) && $property['sale'] == true && isset($property['seo_title'][$contentLang]) && $property['seo_title'][$contentLang] != '') {
+                $data['title'] = $property['seo_title'][$contentLang];
             }
             if (isset($property['rent']) && $property['rent'] == true && isset($property['rental_seo_title'][$contentLang]) && $property['rental_seo_title'][$contentLang] != '') {
                 $data['title'] = $property['rental_seo_title'][$contentLang];
@@ -159,14 +157,15 @@ class MooringProperties extends Model
             if (isset($property['description'][$contentLang]) && !empty($property['description'][$contentLang])) {
                 $data['description'] = $property['description'][$contentLang];
             }
-            if (isset($property['region']) && !empty($property['region'])) {
-                $data['region'] = $property['region'];
+            if (isset($property['property_region']) && !empty($property['property_region'])) {
+                $data['region'] = $property['property_region']['value'][strtolower(\Yii::$app->language)];
             }
-            if (isset($property['country']) && !empty($property['country'])) {
-                $data['country'] = $property['country'];
+            if (isset($property['property_country']) && !empty($property['property_country'])) {
+                $data['country'] = $property['country']['value'][strtolower(\Yii::$app->language)];
             }
-            if (isset($property['city']) && !empty($property['city'])) {
-                $data['city'] = $property['city'];
+   
+            if (isset($property['property_city']) && !empty($property['property_city'])) {
+                $data['city'] = $property['property_city']['value'][strtolower(\Yii::$app->language)];
             }
             if (isset($property['street_number']) && !empty($property['street_number'])) {
                 $data['street_number'] = $property['street_number'];
