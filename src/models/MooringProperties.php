@@ -39,6 +39,7 @@ class MooringProperties extends Model
         
         $query_array['options'] = $query_options;
         $node_url = Yii::$app->params['node_url'] . '/api/mooring_properties/search?user_apikey=' . Yii::$app->params['api_key'];
+
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($query_array))
                     ->setHeaders([
@@ -77,6 +78,12 @@ class MooringProperties extends Model
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = $lang;
+        foreach ($langugesSystem as $sysLang) {
+            if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
+                $contentLang = $sysLang['key'];
+            }
+        }
+
         $title = 'rental_title';
         $description = 'rental_description';
         $price = 'rent';
@@ -130,8 +137,8 @@ class MooringProperties extends Model
             if (isset($property['type'])) {
                 $data['type'] = $property['type'];
             }
-            if (isset($property['perma_link'][$contentLang])) {
-                $data['perma_link'] = $property['perma_link'][$contentLang];
+            if (isset($property['perma_link'][$lang])) {
+                $data['perma_link'] = $property['perma_link'][$lang];
             }
             $agency = Yii::$app->params['agency'];
             if (isset($property['latitude']) && $property['latitude'] != '') {
@@ -157,15 +164,14 @@ class MooringProperties extends Model
             if (isset($property['description'][$contentLang]) && !empty($property['description'][$contentLang])) {
                 $data['description'] = $property['description'][$contentLang];
             }
-            if (isset($property['property_region']) && !empty($property['property_region'])) {
-                $data['region'] = $property['property_region']['value'][strtolower(\Yii::$app->language)];
+            if (isset($property['property_region']['value']) && !empty($property['property_region']['value'])) {
+                $data['region'] = (isset(Yii::$app->language) && strtolower(Yii::$app->language) == 'es') ? $property['property_region']['value']['es_AR'] : $property['property_region']['value']['en'] ;
             }
-            if (isset($property['property_country']) && !empty($property['property_country'])) {
-                $data['country'] = $property['country']['value'][strtolower(\Yii::$app->language)];
+            if (isset($property['property_country']['value']) && !empty($property['property_country']['value'])) {
+                $data['country'] = (isset(Yii::$app->language) && strtolower(Yii::$app->language) == 'es') ? $property['property_country']['value']['es_AR'] : $property['property_country']['value']['en'] ;
             }
-   
-            if (isset($property['property_city']) && !empty($property['property_city'])) {
-                $data['city'] = $property['property_city']['value'][strtolower(\Yii::$app->language)];
+            if (isset($property['property_city']['value']) && !empty($property['property_city']['value'])) {
+                $data['city'] = (isset(Yii::$app->language) && strtolower(Yii::$app->language) == 'es') ? $property['property_city']['value']['es_AR'] : $property['property_city']['value']['en'] ;
             }
             if (isset($property['street_number']) && !empty($property['street_number'])) {
                 $data['street_number'] = $property['street_number'];
