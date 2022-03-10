@@ -251,6 +251,9 @@ class CommercialProperties extends Model
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
         }
+        if (isset($property['agency_data']['logo']['name']) && !empty($property['agency_data']['logo']['name']) ) {
+            $f_property['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property['agency_data']['_id']) ? $property['agency_data']['_id'] : '') . '/' . (isset($property['agency_data']['logo']['name']) ? $property['agency_data']['logo']['name'] : '');
+        }
         if (isset($property['description'][$lang])) {
             $f_property['description'] = $property['description'][$lang];
         }
@@ -319,6 +322,12 @@ class CommercialProperties extends Model
         }  
         if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
             $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
+        }
+        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0 && isset($_GET['rent']) && $_GET['rent'] == 1) {
+            $f_property['rental_season_data'] = [];
+            foreach($property['rental_seasons'] as $season){
+                $f_property['rental_season_data'][] = $season;
+            }
         }
         if (isset($property['leasehold_unit']) && $property['leasehold_unit']) {
             $f_property['leasehold_unit'] = $property['leasehold_unit'];
