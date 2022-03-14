@@ -33,12 +33,14 @@ class MooringProperties extends Model
             $query = self::setQuery();
         }
         if(!empty($query)){
-            $query_array  =  $query;
+            $query_array['query']  =  $query;
         }
         $query_array['query']['show_on'] =  ["All Websites" , "Our Website"];
         
         $query_array['options'] = $query_options;
+
         $node_url = Yii::$app->params['node_url'] . '/api/mooring_properties/search?user_apikey=' . Yii::$app->params['api_key'];
+        // echo '<pre>'; print_r($node_url); die;
 
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($query_array))
@@ -150,6 +152,9 @@ class MooringProperties extends Model
             }
             if (isset($property['offices']) && $property['offices'] != '') {
                 $data['offices'] = $property['offices'];
+            }
+            if (isset($property['property_references']) && $property['property_references'] != '') {
+                $data['property_references'] = $property['property_references'];
             }
             if (isset($property['sale']) && $property['sale'] == true && isset($property['description'][$contentLang]) && $property['description'][$contentLang] != '') {
                 $data['description'] = $property['description'][$contentLang];
@@ -327,23 +332,29 @@ class MooringProperties extends Model
         $query = [];
 
         if (isset($get['price_from']) && $get['price_from']) {
-            $query['query']['current_price_from'] = $get['price_from'];
+            $query['current_price_from'] = $get['price_from'];
         }
         if (isset($get['price_to']) && $get['price_to']) {
-            $query['query']['current_price_to'] = $get['price_to'];
+            $query['current_price_to'] = $get['price_to'];
         }
   
         if (isset($get['length']) && $get['length']) {
-            $query['query']['length_from'] = $get['length'];
+            $query['length_from'] = $get['length'];
         }
         if (isset($get['width']) && $get['width']) {
-            $query['query']['beam_from'] = $get['width'];
+            $query['beam_from'] = $get['width'];
         }
         if (isset($get['depth']) && $get['depth']) {
-            $query['query']['depth_from'] = $get['depth'];
+            $query['depth_from'] = $get['depth'];
         }
         if (isset($get['height']) && $get['height']) {
-            $query['query']['height_above_water_from'] = $get['height'];
+            $query['height_above_water_from'] = $get['height'];
+        }
+        if (isset($get['lg_by_key']) && $get['lg_by_key']) {
+            $query['lg_by_key'] = $get['lg_by_key'];
+        }
+        if (isset($get['location']) && $get['location']) {
+            $query['location'] = $get['location'];
         }
         return $query;
     }
