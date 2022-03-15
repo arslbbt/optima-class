@@ -40,7 +40,6 @@ class MooringProperties extends Model
         $query_array['options'] = $query_options;
 
         $node_url = Yii::$app->params['node_url'] . '/api/mooring_properties/search?user_apikey=' . Yii::$app->params['api_key'];
-        // echo '<pre>'; print_r($node_url); die;
 
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($query_array))
@@ -336,8 +335,7 @@ class MooringProperties extends Model
         }
         if (isset($get['price_to']) && $get['price_to']) {
             $query['current_price_to'] = $get['price_to'];
-        }
-  
+        } 
         if (isset($get['length']) && $get['length']) {
             $query['length_from'] = $get['length'];
         }
@@ -351,10 +349,10 @@ class MooringProperties extends Model
             $query['height_above_water_from'] = $get['height'];
         }
         if (isset($get['lg_by_key']) && $get['lg_by_key']) {
-            $query['lg_by_key'] = $get['lg_by_key'];
+            $query['lg_by_key'] = array_map('intval', $get['lg_by_key']);
         }
         if (isset($get['location']) && $get['location']) {
-            $query['location'] = $get['location'];
+            $query['location'] =  array_map('intval', $get['location']);
         }
         return $query;
     }
