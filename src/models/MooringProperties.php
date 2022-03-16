@@ -354,6 +354,9 @@ class MooringProperties extends Model
         if (isset($get['location']) && $get['location']) {
             $query['location'] =  array_map('intval', $get['location']);
         }
+        if (isset($get['p_types']) && $get['p_types']) {
+            $query['p_types'] = $get['p_types'];
+        }
         return $query;
     }
 }
