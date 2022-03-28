@@ -841,10 +841,10 @@ class Properties extends Model
                 if (isset($property->property->_id)) {
                     $return_data['_id'] = $property->property->_id;
                 }
-                if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
-                    $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
-                } elseif ((!isset($property->property->own) || !$property->property->own) && isset($property->agency_logo) && !empty($property->agency_logo)) {
-                    $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                if (isset($with_listing_agency) && $with_listing_agency == true) {
+                    if (isset($property->listing_agency_data && !empty($property->listing_agency_data)) {
+                    $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->listing_agency_data->_id) ? $property->listing_agency_data->_id : '') . '/' . (isset($property->listing_agency_data->logo->name) ? $property->listing_agency_data->logo->name : '');
+                    }
                 }
                 if (isset($property->property->reference)) {
                     $return_data['id'] = $property->property->reference;
