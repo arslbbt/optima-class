@@ -847,7 +847,7 @@ class Properties extends Model
                     $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
                 }
                 if (isset($with_listing_agency) && $with_listing_agency == true) {
-                    if (isset($property->listing_agency_data) && !empty($property->listing_agency_data)) {
+                    if (isset($property->listing_agency_data) &&  !empty($property->listing_agency_data)) {
                     $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->listing_agency_data->_id) ? $property->listing_agency_data->_id : '') . '/' . (isset($property->listing_agency_data->logo->name) ? $property->listing_agency_data->logo->name : '');
                     }
                 }
