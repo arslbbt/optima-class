@@ -526,7 +526,7 @@ class CommercialProperties extends Model
         return $f_property;
     }
 
-    public function findAllWithLatLang($qry = 'true', $cache = false)
+    public static function findAllWithLatLang($qry = 'true', $cache = false)
     {
         $webroot = Yii::getAlias('@webroot');
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
@@ -600,5 +600,89 @@ class CommercialProperties extends Model
             $file_data = file_get_contents($file);
         }
         return json_decode($file_data, true);
+    }
+    public static function getAgencyProperties($transaction_type = 'sale', $options = ['page' => 1, 'limit' => 10]){
+        $post_data['options'] = [
+            'page' => $options['page'],
+            'limit' => $options['limit']
+        ];
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($post_data))
+        ])
+        ->post($node_url);
+        
+        $response = json_decode($response, TRUE);
+        $properties = [];
+
+        if(isset($response) && isset($response['docs']))
+        foreach ($response['docs'] as $property) {
+            $properties[] = self::formateProperty($property);
+        }
+        $response['docs'] = $properties;
+
+        return $response;
+    }
+    public static function getAgencies($query = [], $options = [])
+    {
+        $post_data['option'] = [
+            'skipLimit' => (isset($options['skipLimit']) ? (int)$options['skipLimit'] : 0),
+            'endLimit' => (isset($options['endLimit']) ? (int)$options['endLimit'] : 10),
+        ];
+        $post_data['query']['type'] = 'Agency';
+        if (isset($query['country']) && !empty($query['country'])) {
+            $post_data['query']['country'] = (int)$query['country'];
+        }
+        if (isset($query['cities']) && !empty($query['cities'])) {
+            $intArray = array();
+            foreach ($query['cities'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $post_data['query']['city'] = ['$in' => $intArray];
+        }
+        if (isset($query['languages']) && !empty($query['languages'])) {
+            $intArray = array();
+            foreach ($query['languages'] as $int_val) {
+                $intArray[] = (string)$int_val;
+            }
+            $post_data['query']['$or'][]['communication_language'] = ['$in' => $intArray];
+            $post_data['query']['$or'][]['spoken_language'] = ['$in' => $intArray];
+        }
+        if (isset($query['transaction_type']) && !empty($query['transaction_type'])) {
+            foreach ($query['transaction_type'] as $int_val) {
+                $post_data['query'][$int_val] = (boolean)'true';
+            }
+        }
+        $node_url = Yii::$app->params['node_url'] . 'companies/search-company?user=' . Yii::$app->params['user'];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+
+    public static function findAnAgency($id){
+        $post_data['option'] = [
+            "skipLimit" => 0,
+            "endLimit" => 3
+        ];
+        $post_data['query'] = [
+            "type" => "Agency"
+        ];
+        $node_url = Yii::$app->params['node_url'] . 'companies/company-type-of-agency/' . $id;
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
     }
 }
