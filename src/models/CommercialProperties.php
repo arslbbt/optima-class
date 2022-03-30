@@ -601,10 +601,14 @@ class CommercialProperties extends Model
         }
         return json_decode($file_data, true);
     }
-    public static function getAgencyProperties($transaction_type = 'sale', $options = ['page' => 1, 'limit' => 10]){
+    public static function getAgencyProperties($transaction_type = 'sale', $id, $options = ['page' => 1, 'limit' => 10]){
         $post_data['options'] = [
             'page' => $options['page'],
-            'limit' => $options['limit']
+            'limit' => $options['limit'],
+            'populate' => 'property_attachments'
+        ];
+        $post_data['query'] = [
+            'id' => $id
         ];
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
@@ -681,6 +685,49 @@ class CommercialProperties extends Model
             ->setHeaders([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+
+    public static function cteateProperty($data){
+        $languages = Cms::siteLanguages();
+        $fields = [
+        'sale' => (isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ? (Boolean)'1' : (Boolean)'0'),
+        'rent' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
+        'type_one' => (isset($data['type_one']) && !empty($data['type_one']) ? (int)$data['type_one'] : ''),
+        'type_two' => (isset($data['type_two']) && !empty($data['type_two']) ? (int)$data['type_two'] : ''),
+        'bedrooms' => (isset($data['bedrooms']) && !empty($data['bedrooms']) ? (int)$data['bedrooms'] : ''),
+        'bathrooms' => (isset($data['bathrooms']) && !empty($data['bathrooms']) ? (int)$data['bathrooms'] : ''),
+        'built'  => (isset($data['built']) && !empty($data['built']) ? (int)$data['built'] : ''),
+        'plot'  => (isset($data['plot']) && !empty($data['plot']) ? (int)$data['plot'] : ''),
+        'energy_certificate_one' => (isset($data['energy_certificate_one']) && !empty($data['energy_certificate_one']) ? (string)$data['energy_certificate_one'] : ''),
+        'cadastral_numbers' => (isset($data['cadastral_numbers']) && !empty($data['cadastral_numbers']) ? (string)$data['cadastral_numbers'] : ''),
+        'address' => ['formatted_address' => (isset($data['formatted_address']) && !empty($data['formatted_address']) ? (string)$data['formatted_address'] : '')],
+        'country' => (isset($data['country']) && !empty($data['country']) ? (int)$data['country'] : ''),
+        'region'  => (isset($data['region']) && !empty($data['region']) ? (int)$data['region'] : ''),
+        'province'  => (isset($data['province']) && !empty($data['province']) ? (int)$data['province'] : ''),
+        'city'  => (isset($data['city']) && !empty($data['city']) ? (int)$data['city'] : ''),
+        'location' => (isset($data['location']) && !empty($data['location']) ? (int)$data['location'] : ''),
+        'street' => (isset($data['street']) && !empty($data['street']) ? (string)$data['street'] : ''),
+        'street_number' => (isset($data['street_number']) && !empty($data['street_number']) ? (string)$data['street_number'] : ''),
+        'postal_code'  => (isset($data['postal_code']) && !empty($data['postal_code']) ? (string)$data['postal_code'] : ''),
+        'currency' => (isset($data['currency']) && !empty($data['currency']) ? (string)$data['currency'] : ''),
+        'current_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''),
+        ];
+        if(isset($languages) && !empty($languages)){
+            foreach($languages as $lang){
+                $fields['title'][strtoupper($lang)] = (isset($data['title']) ? $data['title'] : '');
+                $fields['description'][strtoupper($lang)] =(isset($data['description']) ? $data['description'] : '');
+            }
+        }
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user_apikey=' . Yii::$app->params['api_key'];
+        
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields))
             ])
             ->post($node_url);
         return json_decode($response);
