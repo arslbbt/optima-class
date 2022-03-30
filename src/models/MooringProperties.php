@@ -23,7 +23,7 @@ class MooringProperties extends Model
         $query_options = [
             "page" => (int)$page,
             "limit" => (int)$page_size,
-            "sort" => ['current_price' => (int)'-1'],
+            "sort" => $sort,
         ];     
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
