@@ -64,6 +64,7 @@ class CommercialProperties extends Model
         if(!empty($query_array)){
             $post_data["query"] =  $query_array;
         }
+
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
@@ -714,15 +715,47 @@ class CommercialProperties extends Model
         'postal_code'  => (isset($data['postal_code']) && !empty($data['postal_code']) ? (string)$data['postal_code'] : ''),
         'currency' => (isset($data['currency']) && !empty($data['currency']) ? (string)$data['currency'] : ''),
         'current_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''),
+        'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? (int)$data['lat'] : ''),
+        'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? (int)$data['lng'] : ''),
         ];
+        if(isset($data['parking']) && !empty($data['parking'])){
+            foreach($data['parking'] as $parking){
+                $fields['parking'][$parking] = true;
+            }
+        }
+        if(isset($data['garden']) && !empty($data['garden'])){
+            foreach($data['garden'] as $garden){
+                $fields['garden'][$garden] = true;
+            }
+        }
+        if(isset($data['pool']) && !empty($data['pool'])){
+            foreach($data['pool'] as $pool){
+                $fields['pool'][$pool] = true;
+            }
+        }
+        if(isset($data['features']) && !empty($data['features'])){
+            foreach($data['features'] as $feature){
+                if($feature == 'project'){
+                    $fields[$feature] = true;
+                }
+                elseif($feature == 'lift_elevator'){
+                    $fields['features'] = [$feature => true];
+                }
+                elseif($feature == 'gated_complex'){
+                    $fields['security'] = [$feature => true];
+                }
+                else {
+                    $fields['categories'][$feature] = true;
+                }
+            }
+        }
         if(isset($languages) && !empty($languages)){
             foreach($languages as $lang){
                 $fields['title'][strtoupper($lang)] = (isset($data['title']) ? $data['title'] : '');
                 $fields['description'][strtoupper($lang)] =(isset($data['description']) ? $data['description'] : '');
             }
         }
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user_apikey=' . Yii::$app->params['api_key'];
-        
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($fields))
         ->setHeaders([
@@ -731,5 +764,72 @@ class CommercialProperties extends Model
             ])
             ->post($node_url);
         return json_decode($response);
+    }
+
+    public static function savePropertyAttachments($id, $images){
+
+        $node_url = Yii::$app->params['apiUrl'] . 'commercial-properties/uploader&user_apikey=' . Yii::$app->params['api_key'];
+
+        $fields = [
+            'id' => $id,
+            'modelName' => "commercial_images",   // model name should never be changed               // depend on you to send or send empty value
+            'files' => $images,
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
+    }
+
+    public static function savePropertyOfInterest($data){
+
+        $node_url = Yii::$app->params['node_url'] . 'accounts/update-with-email/?user_apikey=' . Yii::$app->params['api_key'];
+
+        $fields['query'] = [
+            'email' => $data['email'],
+            'data' => [
+                'commercials_interested' => [$data['id']],
+                'communication_language' => strtoupper(Yii::$app->language),
+                'language' => [strtoupper(Yii::$app->language)],
+                'title' => 'update account',
+            ],
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
+    }
+
+    public static function getAllUserProperties($query, $options = ['limit' => 10, 'page' => 1]){
+
+        $node_url = Yii::$app->params['node_url'] . '/commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
+        $post_data['options'] = [
+            'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
+            'page' => isset($options['page']) ? (int)$options['page'] : 10,
+            "populate" => ["property_attachments", "property_type_one", "property_type_two"]
+        ];
+        $post_data['query'] = [
+            "userId" => $query['_id'],
+            "type" => $query['property_type'],
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
     }
 }
