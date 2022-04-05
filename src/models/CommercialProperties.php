@@ -715,8 +715,8 @@ class CommercialProperties extends Model
         'postal_code'  => (isset($data['postal_code']) && !empty($data['postal_code']) ? (string)$data['postal_code'] : ''),
         'currency' => (isset($data['currency']) && !empty($data['currency']) ? (string)$data['currency'] : ''),
         'current_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''),
-        'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? (int)$data['lat'] : ''),
-        'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? (int)$data['lng'] : ''),
+        'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? $data['lat'] : ''),
+        'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? $data['lng'] : ''),
         ];
         if(isset($data['parking']) && !empty($data['parking'])){
             foreach($data['parking'] as $parking){
@@ -768,7 +768,7 @@ class CommercialProperties extends Model
 
     public static function savePropertyAttachments($id, $images){
 
-        $node_url = Yii::$app->params['apiUrl'] . 'commercial-properties/uploader&user_apikey=' . Yii::$app->params['api_key'];
+        $node_url = Yii::$app->params['apiUrl'] . 'commercial-properties/upload-images&user_apikey=' . Yii::$app->params['api_key'];
 
         $fields = [
             'id' => $id,
@@ -776,10 +776,10 @@ class CommercialProperties extends Model
             'files' => $images,
         ];
         $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode($fields))
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))
         ->setHeaders([
             'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($fields))
+            'Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))
             ])
             ->post($node_url);
         return json_decode($response);
@@ -815,7 +815,7 @@ class CommercialProperties extends Model
         $node_url = Yii::$app->params['node_url'] . '/commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
         $post_data['options'] = [
             'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
-            'page' => isset($options['page']) ? (int)$options['page'] : 10,
+            'page' => isset($options['page']) ? (int)$options['page'] : 1,
             "populate" => ["property_attachments", "property_type_one", "property_type_two"]
         ];
         $post_data['query'] = [
