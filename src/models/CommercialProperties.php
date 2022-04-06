@@ -221,7 +221,7 @@ class CommercialProperties extends Model
     }
 
     public static function formateProperty($property)
-    {      
+    {
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = strtolower(\Yii::$app->language);
@@ -296,8 +296,32 @@ class CommercialProperties extends Model
         if (isset($property['type_one_value'][$contentLang])) {
             $f_property['type_one'] = \Yii::t('app', $property['type_one_value'][$contentLang]);
         }
+        if (isset($property['type_two'])) {
+            $f_property['type_two_key'] = \Yii::t('app', $property['type_two']);
+        }
         if (isset($property['type_two_value'][$contentLang])) {
             $f_property['type_two'] = \Yii::t('app', $property['type_two_value'][$contentLang]);
+        }
+        if (isset($property['address']['formatted_address'])) {
+            $f_property['address'] = $property['address']['formatted_address'];
+        }
+        if (isset($property['street'])) {
+            $f_property['street'] = $property['street'];
+        }
+        if (isset($property['street_number'])) {
+            $f_property['street_number'] = $property['street_number'];
+        }
+        if (isset($property['postal_code'])) {
+            $f_property['postal_code'] = $property['postal_code'];
+        }
+        if (isset($property['cadastral_numbers'])) {
+            $f_property['cadastral_numbers'] = $property['cadastral_numbers'];
+        }
+        if (isset($property['project'])) {
+            $f_property['project'] = $property['project'];
+        }
+        if (isset($property['country'])) {
+            $f_property['country'] = $property['country'];
         }
         if (isset($property['latitude_alt']) && isset($property['longitude_alt']) && $property['latitude_alt'] != '' && $property['longitude_alt'] != '') {
             $f_property['lat'] = $property['latitude_alt'];
@@ -362,6 +386,9 @@ class CommercialProperties extends Model
         }
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
+        }
+        if (isset($property['currency'])) {
+            $f_property['currency'] = $property['currency'];
         }
         if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
@@ -755,14 +782,24 @@ class CommercialProperties extends Model
                 $fields['description'][strtoupper($lang)] =(isset($data['description']) ? $data['description'] : '');
             }
         }
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
         $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode($fields))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($fields))
-            ])
-            ->post($node_url);
+        if(isset($data['prop_id']) && !empty($data['prop_id'])){
+            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/update/'.$data['prop_id'].'?user=' . $data['user_id'];
+            $response = $curl->setRequestBody(json_encode($fields))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($fields))
+                ])
+                ->put($node_url);
+        }else{
+            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
+            $response = $curl->setRequestBody(json_encode($fields))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($fields))
+                ])
+                ->post($node_url);
+        }
         return json_decode($response);
     }
 
@@ -793,7 +830,7 @@ class CommercialProperties extends Model
         $fields['query'] = [
             'email' => $data['email'],
             'data' => [
-                'commercials_interested' => [$data['id']],
+                'commercials_interested' => [(int)$data['id']],
                 'communication_language' => strtoupper(Yii::$app->language),
                 'language' => [strtoupper(Yii::$app->language)],
                 'title' => 'update account',
@@ -812,7 +849,7 @@ class CommercialProperties extends Model
 
     public static function getAllUserProperties($query, $options = ['limit' => 10, 'page' => 1]){
 
-        $node_url = Yii::$app->params['node_url'] . '/commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
         $post_data['options'] = [
             'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
             'page' => isset($options['page']) ? (int)$options['page'] : 1,
