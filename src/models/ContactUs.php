@@ -465,6 +465,7 @@ class ContactUs extends Model
         else
             $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
 
+
         $fields = array(
             'f_title' => $this->title,
             'forename' => $this->first_name,
@@ -556,7 +557,7 @@ class ContactUs extends Model
             'collaborator' => $this->collaborator,
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
+        $response = $curl->setPostParams($fields)->post($url); 
         $res = json_decode($response);
         return $res->_id;
     }
@@ -584,6 +585,31 @@ class ContactUs extends Model
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
     }
+
+    public function collaboratorEmail()
+    {
+        $settings = Cms::settings();
+
+        $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
+        $fields = array(
+            'forename' => isset($this->first_name) ? $this->first_name : null,
+            'surname' => isset($this->last_name) ? $this->last_name : null,
+            'email' => isset($this->email) ? $this->email : null,
+            'gdpr_status' => $this->gdpr_status,
+            'source' => isset($this->source) ? $this->source : urlencode('web-client'),
+            'lead_status' => isset($this->lead_status) ? $this->lead_status : '1001',
+            'message' => $this->message,
+            'phone' => isset($this->phone) ? $this->phone : null,
+            'property' => isset($this->reference) ? $this->reference : null,
+            'transaction_types' => isset($this->transaction_types) ? (is_array($this->transaction_types) ? implode(",", $this->transaction_types) : $this->transaction_types) : null,
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
+            //For IC agency Only.
+            'collaborator' => 'true',
+        );
+        $curl = new \linslin\yii2\curl\Curl();
+        $response = $curl->setPostParams($fields)->post($url);
+    }
+
 
     public static function loadAccount($token)
     {
