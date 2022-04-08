@@ -134,6 +134,7 @@ class ContactUs extends Model
     public $only_investments;
     public $only_urgent_sales;
     public $from_source;
+    public $collaborator;
 
     const SCENARIO_V3 = 'v3validation';
 
@@ -552,6 +553,7 @@ class ContactUs extends Model
             'only_holiday_homes' => isset($this->only_holiday_homes) ? $this->only_holiday_homes : null,
             'only_bank_repossessions' => isset($this->only_bank_repossessions) ? $this->only_bank_repossessions : null,
             'mooring_type' => isset($this->mooring_type) ? (is_array($this->mooring_type) ? implode(",", $this->mooring_type) : $this->mooring_type) : null,
+            'collaborator' => $this->collaborator,
         );
         $curl = new \linslin\yii2\curl\Curl();
         $response = $curl->setPostParams($fields)->post($url);
