@@ -77,6 +77,7 @@ class ContactUs extends Model
     public $reCaptcha;
     public $reCaptcha3;
     public $resume;
+    public $imageFiles;
     public $application;
     public $feet_setting;
     public $feet_views;
@@ -156,6 +157,7 @@ class ContactUs extends Model
             ['accept_cookie', 'required', 'on' => 'toAcceptCookie'],
             ['email', 'email'],
             [['resume', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, pdf, txt'],
+            [['imageFiles', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, jpeg'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
 
             [
@@ -599,5 +601,23 @@ class ContactUs extends Model
         } else {
             return 'Please provide Account Token';
         }
+    }
+
+    public static function createUserAccount($data)
+    {
+        $url = Yii::$app->params['apiUrl'] .'users/create&user_apikey=' . Yii::$app->params['api_key'];
+        $fields = array(
+            'social_id' => isset($data['social_id']) ? $data['social_id'] : null,
+            'first_name' => isset($data['first_name']) ? $data['first_name'] : null,
+            'last_name' => isset($data['last_name']) ? $data['last_name'] : null,
+            'user_email' => isset($data['user_email']) ? $data['user_email'] : null,
+            "password_hash" =>  isset($data['password_hash']) ? $data['password_hash'] : null,
+            "password_repeat" =>  isset($data['password_repeat']) ? $data['password_repeat'] : null,
+            "type" => isset($data['type']) ? $data['type'] : null,
+            "phone" => isset($data['phone']) ? $data['phone'] : null,
+        );
+        $curl = new \linslin\yii2\curl\Curl();
+        $response = $curl->setPostParams($fields)->post($url);
+        return json_decode($response);
     }
 }
