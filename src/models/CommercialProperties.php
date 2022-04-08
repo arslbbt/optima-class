@@ -29,7 +29,7 @@ class CommercialProperties extends Model
             ]
         ];
 
-        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby')) == 2 ) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
         }
         $options['sort'] = $sort;
@@ -41,8 +41,8 @@ class CommercialProperties extends Model
                 $k = explode('=', $var);
                 if(isset($k[0]) && isset($k[1])){
                     if($k[0] == 'favourite_ids'){
-                        $query_array['favourite_ids'] = explode(',', $k[1]);
-                        $query_array['archived']['$ne'] = true;
+                        $query_array['$and'][]['favourite_ids'] = explode(',', $k[1]);
+                        $query_array['$and'][]['archived']['$ne'] = true;
                     }else{
                         $post_data[$k[0]] = $k[1];
                         $post_data['archived']['$ne'] = true;
@@ -53,18 +53,18 @@ class CommercialProperties extends Model
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
-                $query['archived']['$ne'] = true;
             }
             if (count($query)){
                 $query_array = $query;
-                $query_array['archived']['$ne'] = true;
-                $query_array['status'] = ['$in' => ['Available', 'Under Offer']];
+                $query_array['$and'][]['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
             }
         }
         
         $post_data = ["options" => $options];
-        if(!empty($query_array))
+        if(!empty($query_array)){
             $post_data["query"] =  $query_array;
+        }
+
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
@@ -116,80 +116,112 @@ class CommercialProperties extends Model
     {
         $get = Yii::$app->request->get();
         $query = [];
-        if (isset($get['price_from']) && $get['price_from']) {
-            $query['current_price'] = ['$gte' => (int) $get['price_from']];
+        if (isset($get['price_from']) && !empty($get['price_from'])) {
+            $query['$and'][]['current_price'] = ['$gte' => (int) $get['price_from']];
         }
-        if (isset($get['price_to']) && $get['price_to']) {
-            $query['current_price'] = ['$lte' => (int) $get['price_to']];
+        if (isset($get['price_to']) && !empty($get['price_to'])) {
+            $query['$and'][]['current_price'] = ['$lte' => (int) $get['price_to']];
         }
-        if (isset($get['reference']) && $get['reference']) {
-            $query['$or'] = [
+        if (isset($get['reference']) && !empty($get['reference'])) {
+            $query['$and'][]['$or'] = [
                 ["reference" => (int) $get['reference']],
                 ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
             ];
         }
 
-        if (isset($get['type']) && $get['type'] && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
+        if (isset($get['type']) && !empty($get['type']) && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
             $intArray = array();
-            $int_type = '';
-            foreach ($get['type'] as $int_type) {
-                $int_type = (int) $int_type;
+            foreach ($get['type'] as $int_val) {
+                $intArray[] = (int) $int_val;
             }
-            $intArray[] = $int_type;
-            $query['type_one'] = ['$in' => $intArray];
+            $query['$and'][]['type_one'] = ['$in' => $intArray];
         }
-        if (isset($get['sub_type']) && $get['sub_type'] && is_array($get['sub_type']) && count($get['sub_type']) > 0 && $get['sub_type'][0] != 0 && $get['sub_type'][0] != '' && $get['sub_type'][0] != '0') {
+        if (isset($get['sub_type']) && !empty($get['sub_type']) && is_array($get['sub_type']) && count($get['sub_type']) > 0 && $get['sub_type'][0] != 0 && $get['sub_type'][0] != '' && $get['sub_type'][0] != '0') {
             $intArray = array();
-            $int_type = '';
-            foreach ($get['sub_type'] as $int_type) {
-                $int_type = (int) $int_type;
+            foreach ($get['sub_type'] as $int_val) {
+                $intArray[] = (int) $int_val;
             }
-            $intArray[] = $int_type;
-            $query['type_two'] = ['$in' => $intArray];
+            $query['$and'][]['type_two'] = ['$in' => $intArray];
         }
 
-        if (isset($get['country']) && $get['country']) {
-            $query['country'] = (int) $get['country'];
+        if (isset($get['country']) && !empty($get['country'])) {
+            $query['$and'][]['country'] = (int) $get['country'];
         }
         if (isset($get['city']) && $get['city']) {
-            $query['city'] = (int) $get['city'];
+            $intArray = array();
+            foreach ($get['city'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['city'] = ['$in' => $intArray];
         }
-        if (isset($get['location']) && $get['location']) {
-            $query['location'] = (int) $get['location'];
+        if (isset($get['location']) && !empty($get['location'])) {
+            $intArray = array();
+            foreach ($get['location'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['location'] = ['$in' => $intArray];
         }
-        if (isset($get['province']) && $get['province']) {
-            $query['province'] = (int) $get['province'];
+        if (isset($get['province']) && !empty($get['province'])) {
+            $intArray = array();
+            foreach ($get['province'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['$and'][]['province'] = ['$in' => $intArray];
         }
-        if (isset($get['region']) && $get['region']) {
-            $query['region'] = (int) $get['region'];
+        if (isset($get['cp_features']) && !empty($get['cp_features'])) {
+            foreach($get['cp_features'] as $features){
+                $search_features = [];
+                if(isset($features) && !empty($features)){
+                    foreach($features as $key => $feature){
+                        $search_features[$key] = $feature;
+                    }
+                }
+                $query['$and'][]['$or'] = $search_features;
+            }
         }
-        if (isset($get['price_from'])) {
-            $query['current_price']['$gt'] = (int) $get['price_from'];
+        if (isset($get['sale']) && !empty($get['sale'])) {
+            $query['$and'][]['sale'] = true;
         }
-        if (isset($get['price_to'])) {
-            $query['current_price']['$lt'] = (int) $get['price_to'];
-        } else{
-            $query['current_price']['$lt'] = (int) 100000000000000000;
+        if (isset($get['rent']) && !empty($get['rent'])) {
+            $query['$and'][]['rent'] = true;
+        }
+        if (isset($get['bedrooms']) && !empty($get['bedrooms'])) {
+            $query['$and'][]['bedrooms'] = $get['bedrooms'];
+        }
+        if (isset($get['min_bed']) && !empty($get['min_bed'])) {
+            $query['$and'][]['bedrooms'] = ['$lte' => (int)$get['min_bed']];
+        } elseif (isset($get['max_bed']) && !empty($get['max_bed'])) {
+            $query['$and'][]['bedrooms'] = ['$gte' => (int)$get['max_bed']];
+        }
+        if (isset($get['bathrooms']) && $get['bathrooms']) {
+            $query['$and'][]['bathrooms'] = $get['bathrooms'];
+        }
+        if (isset($get['min_bath']) && !empty($get['min_bath'])) {
+            $query['$and'][]['bathrooms'] = ['$lte' => (int)$get['min_bath']];
+        } elseif (isset($get['max_bath']) && !empty($get['max_bath'])) {
+            $query['$and'][]['bathrooms'] = ['$gte' => (int)$get['max_bath']];
+        }
+        if (isset($get['new_built']) && !empty($get['new_built'])) {
+            $query['$and'][]['project'] = true;
+        }
+        if (isset($get['region']) && !empty($get['region'])) {
+            $query['$and'][]['region'] = (int) $get['region'];
         }
 
-        $query['archived']['$ne'] = true;
+        $query['$and'][]['archived']['$ne'] = true;
 
-        if (isset($get['location']) && $get['location']) {
-
-            $query['location'] = (int) $get['location'];
+        if (isset($get['featured']) && !empty($get['featured'])) {
+            $query['$and'][]['featured'] = true;
         }
-        if (isset($get['featured']) && $get['featured']) {
-            $query['featured'] = true;
-        }
-        if (isset($get['office']) && $get['office']) {
-            $query['offices'] =['$in' => $get['office']];
+        if (isset($get['office']) && !empty($get['office'])) {
+            $query['$and'][]['offices'] =['$in' => $get['office']];
         }
         return $query;
     }
 
     public static function formateProperty($property)
-    {      
+    {
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
         $contentLang = strtolower(\Yii::$app->language);
@@ -220,6 +252,9 @@ class CommercialProperties extends Model
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
         }
+        if (isset($property['agency_data']['logo']['name']) && !empty($property['agency_data']['logo']['name']) ) {
+            $f_property['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property['agency_data']['_id']) ? $property['agency_data']['_id'] : '') . '/' . (isset($property['agency_data']['logo']['name']) ? $property['agency_data']['logo']['name'] : '');
+        }
         if (isset($property['description'][$lang])) {
             $f_property['description'] = $property['description'][$lang];
         }
@@ -232,8 +267,61 @@ class CommercialProperties extends Model
         if (isset($property['keywords'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
+        if(isset($property['videos']) && !empty($property['videos'])){
+            $videos = [];
+            $virtual_tours = [];
+            foreach($property['videos'] as $video){
+                if(isset($video['type']) && $video['type'] == 'Video' && isset($video['status']) && $video['status'] == 1){
+                    $videos[] = $video['url'][strtoupper(Yii::$app->language)];
+                }
+            }
+            $f_property['videos'] = $videos;
+            foreach($property['videos'] as $vt){
+                if(isset($vt['type']) && $vt['type'] == '2' && isset($vt['status']) && $vt['status'] == 1){
+                    $virtual_tours[] = $vt['url'][strtoupper(Yii::$app->language)];
+                }
+            }
+            $f_property['vt'] = $virtual_tours;
+        }
+        if (isset($property['created_at']) && !empty($property['created_at'])) {
+            $f_property['created_at'] = strtotime($property['created_at']);
+        }
+        
+        if (isset($property['featured'])) {
+            $f_property['featured'] = $property['featured'];
+        }
         if (isset($property['type_one'])) {
             $f_property['type'] = \Yii::t('app', $property['type_one']);
+        }
+        if (isset($property['type_one_value'][$contentLang])) {
+            $f_property['type_one'] = \Yii::t('app', $property['type_one_value'][$contentLang]);
+        }
+        if (isset($property['type_two'])) {
+            $f_property['type_two_key'] = \Yii::t('app', $property['type_two']);
+        }
+        if (isset($property['type_two_value'][$contentLang])) {
+            $f_property['type_two'] = \Yii::t('app', $property['type_two_value'][$contentLang]);
+        }
+        if (isset($property['address']['formatted_address'])) {
+            $f_property['address'] = $property['address']['formatted_address'];
+        }
+        if (isset($property['street'])) {
+            $f_property['street'] = $property['street'];
+        }
+        if (isset($property['street_number'])) {
+            $f_property['street_number'] = $property['street_number'];
+        }
+        if (isset($property['postal_code'])) {
+            $f_property['postal_code'] = $property['postal_code'];
+        }
+        if (isset($property['cadastral_numbers'])) {
+            $f_property['cadastral_numbers'] = $property['cadastral_numbers'];
+        }
+        if (isset($property['project'])) {
+            $f_property['project'] = $property['project'];
+        }
+        if (isset($property['country'])) {
+            $f_property['country'] = $property['country'];
         }
         if (isset($property['latitude_alt']) && isset($property['longitude_alt']) && $property['latitude_alt'] != '' && $property['longitude_alt'] != '') {
             $f_property['lat'] = $property['latitude_alt'];
@@ -259,6 +347,12 @@ class CommercialProperties extends Model
         }  
         if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
             $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
+        }
+        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0 && isset($_GET['rent']) && $_GET['rent'] == 1) {
+            $f_property['rental_season_data'] = [];
+            foreach($property['rental_seasons'] as $season){
+                $f_property['rental_season_data'][] = $season;
+            }
         }
         if (isset($property['leasehold_unit']) && $property['leasehold_unit']) {
             $f_property['leasehold_unit'] = $property['leasehold_unit'];
@@ -292,6 +386,9 @@ class CommercialProperties extends Model
         }
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
+        }
+        if (isset($property['currency'])) {
+            $f_property['currency'] = $property['currency'];
         }
         if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
@@ -455,5 +552,321 @@ class CommercialProperties extends Model
         $f_property['offices'] = $offices;
 
         return $f_property;
+    }
+
+    public static function findAllWithLatLang($qry = 'true', $cache = false)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
+        $query = [];
+        $sort = ['current_price' => '-1'];
+        $query_array=[];
+        $options = ["page" => 1, "limit" => 10];
+        $options['populate'] = [
+            [
+                'path' => 'property_attachments',
+                'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]],
+            ]
+        ];
+
+        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby')) == 2 ) {
+            $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
+        }
+        $options['sort'] = $sort;
+
+        
+        if(isset($query) && $query != '' && !is_array($query)){
+            $vars = explode('&', $query);
+            foreach($vars as $var){
+                $k = explode('=', $var);
+                if(isset($k[0]) && isset($k[1])){
+                    if($k[0] == 'favourite_ids'){
+                        $query_array['favourite_ids'] = explode(',', $k[1]);
+                        $query_array['archived']['$ne'] = true;
+                    }else{
+                        $post_data[$k[0]] = $k[1];
+                        $post_data['archived']['$ne'] = true;
+                    }
+                }
+            }
+        }
+        if(isset($query) && $query != '' && is_array($query)){
+            if (!count($query)) {
+                $query = self::setQuery();
+            }
+            if (count($query)){
+                $query_array = $query;
+                $query_array['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
+            }
+        }
+        $post_data = ["options" => $options];
+        if(!empty($query_array))
+        {
+            $post_data["query"] =  $query_array;
+        }
+       
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        if (!is_dir($webroot . '/uploads/')) {
+            mkdir($webroot . '/uploads/');
+        }
+        if (!is_dir($webroot . '/uploads/temp/')) {
+            mkdir($webroot . '/uploads/temp/');
+        }
+        if($cache){
+            return json_decode($response, true);
+        }
+        $file = $webroot . '/uploads/temp/commercial_properties-latlang.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $file_data = file_put_contents($file, $response);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, true);
+    }
+    public static function getAgencyProperties($transaction_type = 'sale', $id, $options = ['page' => 1, 'limit' => 10]){
+        $post_data['options'] = [
+            'page' => $options['page'],
+            'limit' => $options['limit'],
+            'populate' => 'property_attachments'
+        ];
+        $post_data['query'] = [
+            'id' => $id
+        ];
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($post_data))
+        ])
+        ->post($node_url);
+        
+        $response = json_decode($response, TRUE);
+        $properties = [];
+
+        if(isset($response) && isset($response['docs']))
+        foreach ($response['docs'] as $property) {
+            $properties[] = self::formateProperty($property);
+        }
+        $response['docs'] = $properties;
+
+        return $response;
+    }
+    public static function getAgencies($query = [], $options = [])
+    {
+        $post_data['option'] = [
+            'skipLimit' => (isset($options['skipLimit']) ? (int)$options['skipLimit'] : 0),
+            'endLimit' => (isset($options['endLimit']) ? (int)$options['endLimit'] : 10),
+        ];
+        $post_data['query']['type'] = 'Agency';
+        if (isset($query['country']) && !empty($query['country'])) {
+            $post_data['query']['country'] = (int)$query['country'];
+        }
+        if (isset($query['cities']) && !empty($query['cities'])) {
+            $intArray = array();
+            foreach ($query['cities'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $post_data['query']['city'] = ['$in' => $intArray];
+        }
+        if (isset($query['languages']) && !empty($query['languages'])) {
+            $intArray = array();
+            foreach ($query['languages'] as $int_val) {
+                $intArray[] = (string)$int_val;
+            }
+            $post_data['query']['$or'][]['communication_language'] = ['$in' => $intArray];
+            $post_data['query']['$or'][]['spoken_language'] = ['$in' => $intArray];
+        }
+        if (isset($query['transaction_type']) && !empty($query['transaction_type'])) {
+            foreach ($query['transaction_type'] as $int_val) {
+                $post_data['query'][$int_val] = (boolean)'true';
+            }
+        }
+        $node_url = Yii::$app->params['node_url'] . 'companies/search-company?user=' . Yii::$app->params['user'];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+
+    public static function findAnAgency($id){
+        $post_data['option'] = [
+            "skipLimit" => 0,
+            "endLimit" => 3
+        ];
+        $post_data['query'] = [
+            "type" => "Agency"
+        ];
+        $node_url = Yii::$app->params['node_url'] . 'companies/company-type-of-agency/' . $id;
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+
+    public static function cteateProperty($data){
+        $languages = Cms::siteLanguages();
+        $fields = [
+        'sale' => (isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ? (Boolean)'1' : (Boolean)'0'),
+        'rent' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
+        'type_one' => (isset($data['type_one']) && !empty($data['type_one']) ? (int)$data['type_one'] : ''),
+        'type_two' => (isset($data['type_two']) && !empty($data['type_two']) ? (int)$data['type_two'] : ''),
+        'bedrooms' => (isset($data['bedrooms']) && !empty($data['bedrooms']) ? (int)$data['bedrooms'] : ''),
+        'bathrooms' => (isset($data['bathrooms']) && !empty($data['bathrooms']) ? (int)$data['bathrooms'] : ''),
+        'built'  => (isset($data['built']) && !empty($data['built']) ? (int)$data['built'] : ''),
+        'plot'  => (isset($data['plot']) && !empty($data['plot']) ? (int)$data['plot'] : ''),
+        'energy_certificate_one' => (isset($data['energy_certificate_one']) && !empty($data['energy_certificate_one']) ? (string)$data['energy_certificate_one'] : ''),
+        'cadastral_numbers' => (isset($data['cadastral_numbers']) && !empty($data['cadastral_numbers']) ? (string)$data['cadastral_numbers'] : ''),
+        'address' => ['formatted_address' => (isset($data['formatted_address']) && !empty($data['formatted_address']) ? (string)$data['formatted_address'] : '')],
+        'country' => (isset($data['country']) && !empty($data['country']) ? (int)$data['country'] : ''),
+        'region'  => (isset($data['region']) && !empty($data['region']) ? (int)$data['region'] : ''),
+        'province'  => (isset($data['province']) && !empty($data['province']) ? (int)$data['province'] : ''),
+        'city'  => (isset($data['city']) && !empty($data['city']) ? (int)$data['city'] : ''),
+        'location' => (isset($data['location']) && !empty($data['location']) ? (int)$data['location'] : ''),
+        'street' => (isset($data['street']) && !empty($data['street']) ? (string)$data['street'] : ''),
+        'street_number' => (isset($data['street_number']) && !empty($data['street_number']) ? (string)$data['street_number'] : ''),
+        'postal_code'  => (isset($data['postal_code']) && !empty($data['postal_code']) ? (string)$data['postal_code'] : ''),
+        'currency' => (isset($data['currency']) && !empty($data['currency']) ? (string)$data['currency'] : ''),
+        'current_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''),
+        'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? $data['lat'] : ''),
+        'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? $data['lng'] : ''),
+        ];
+        if(isset($data['parking']) && !empty($data['parking'])){
+            foreach($data['parking'] as $parking){
+                $fields['parking'][$parking] = true;
+            }
+        }
+        if(isset($data['garden']) && !empty($data['garden'])){
+            foreach($data['garden'] as $garden){
+                $fields['garden'][$garden] = true;
+            }
+        }
+        if(isset($data['pool']) && !empty($data['pool'])){
+            foreach($data['pool'] as $pool){
+                $fields['pool'][$pool] = true;
+            }
+        }
+        if(isset($data['features']) && !empty($data['features'])){
+            foreach($data['features'] as $feature){
+                if($feature == 'project'){
+                    $fields[$feature] = true;
+                }
+                elseif($feature == 'lift_elevator'){
+                    $fields['features'] = [$feature => true];
+                }
+                elseif($feature == 'gated_complex'){
+                    $fields['security'] = [$feature => true];
+                }
+                else {
+                    $fields['categories'][$feature] = true;
+                }
+            }
+        }
+        if(isset($languages) && !empty($languages)){
+            foreach($languages as $lang){
+                $fields['title'][strtoupper($lang)] = (isset($data['title']) ? $data['title'] : '');
+                $fields['description'][strtoupper($lang)] =(isset($data['description']) ? $data['description'] : '');
+            }
+        }
+        $curl = new curl\Curl();
+        if(isset($data['prop_id']) && !empty($data['prop_id'])){
+            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/update/'.$data['prop_id'].'?user=' . $data['user_id'];
+            $response = $curl->setRequestBody(json_encode($fields))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($fields))
+                ])
+                ->put($node_url);
+        }else{
+            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
+            $response = $curl->setRequestBody(json_encode($fields))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($fields))
+                ])
+                ->post($node_url);
+        }
+        return json_decode($response);
+    }
+
+    public static function savePropertyAttachments($id, $images){
+
+        $node_url = Yii::$app->params['apiUrl'] . 'commercial-properties/upload-images&user_apikey=' . Yii::$app->params['api_key'];
+
+        $fields = [
+            'id' => $id,
+            'modelName' => "commercial_images",   // model name should never be changed               // depend on you to send or send empty value
+            'files' => $images,
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
+    }
+
+    public static function savePropertyOfInterest($data){
+
+        $node_url = Yii::$app->params['node_url'] . 'accounts/update-with-email/?user_apikey=' . Yii::$app->params['api_key'];
+
+        $fields['query'] = [
+            'email' => $data['email'],
+            'data' => [
+                'commercials_interested' => [(int)$data['id']],
+                'communication_language' => strtoupper(Yii::$app->language),
+                'language' => [strtoupper(Yii::$app->language)],
+                'title' => 'update account',
+            ],
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
+    }
+
+    public static function getAllUserProperties($query, $options = ['limit' => 10, 'page' => 1]){
+
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
+        $post_data['options'] = [
+            'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
+            'page' => isset($options['page']) ? (int)$options['page'] : 1,
+            "populate" => ["property_attachments", "property_type_one", "property_type_two"]
+        ];
+        $post_data['query'] = [
+            "userId" => $query['_id'],
+            "type" => $query['property_type'],
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+
     }
 }
