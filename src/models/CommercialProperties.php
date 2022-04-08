@@ -847,13 +847,14 @@ class CommercialProperties extends Model
 
     }
 
-    public static function getAllUserProperties($query, $options = ['limit' => 10, 'page' => 1]){
+    public static function getAllUserProperties($query, $options = ['page' => 1, 'limit' => 10], $sort = ['current_price' => '-1']){
 
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
         $post_data['options'] = [
-            'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
             'page' => isset($options['page']) ? (int)$options['page'] : 1,
-            "populate" => ["property_attachments", "property_type_one", "property_type_two"]
+            'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
+            "populate" => ["property_attachments", "property_type_one", "property_type_two"],
+            'sort' => $sort,
         ];
         $post_data['query'] = [
             "userId" => $query['_id'],

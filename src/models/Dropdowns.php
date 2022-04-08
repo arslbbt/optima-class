@@ -213,12 +213,11 @@ class Dropdowns extends Model
     }
 
     // use Dropdowns::getLocations() as it will provide more options to handle data in controller
-    public static function locations($provinces = [], $to_json = false, $cities = [], $country = '')
+    public static function locations($provinces = [], $to_json = false, $cities = [], $country = '', $count = 'true')
     {
-
         $file = Functions::directory() . 'locations_' . implode(',', $provinces) . implode(',', $cities) . '.json';
-
-
+        
+        
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
             $c_q = '';
@@ -236,7 +235,7 @@ class Dropdowns extends Model
             if ($country) {
                 $country_check = '&country=' . $country;
             }
-            $url = Yii::$app->params['apiUrl'] . 'properties/locations&count=true' . $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
+            $url = Yii::$app->params['apiUrl'] . 'properties/locations'.($count == 'true' ? '&count=true' : ''). $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
             
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
