@@ -116,17 +116,17 @@ class Dropdowns extends Model
     }
 
     // use Dropdowns::getCities() as it will provide more options to handle data in controller and works with countries search too
-    public static function cities($country = '', $provinces = [], $to_json = false, $prop_count = 1)
+    public static function cities($country = '', $provinces = [], $to_json = false)
     {
-        $country_query = $country == 'all' ? '&country=all' : '&country='.$country;
-        $file = Functions::directory() . 'cities_' .(isset($provinces) && !empty($provinces) ? implode(',', $provinces) : '') . '.json';
+        $country_query = $country == 'all' ? '&country=all' : '';
+        $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
         
         if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $p_q = '';
             foreach ($provinces as $province) {
                 $p_q .= '&province[]=' . $province;
             }
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
+            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key']. $country_query;
             $file_data =
                 //file_get_contents($url);
                 Functions::getCRMData($url);
@@ -137,7 +137,7 @@ class Dropdowns extends Model
             $file_data = json_encode($file_data);
             file_put_contents($file, $file_data);
         } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
+            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']. $country_query;
             $file_data =
                 //file_get_contents($url);
                 Functions::getCRMData($url);

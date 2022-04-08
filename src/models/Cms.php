@@ -447,9 +447,7 @@ class Cms extends Model
         } elseif (isset($_SERVER['REQUEST_URI'])) {
             $url_array = explode('/', $_SERVER['REQUEST_URI']);
         }
-        if (!isset(\Yii::$app)) {
-            \Yii::$app = new stdClass;
-        }
+        \Yii::$app = new stdClass;
         \Yii::$app->params = $params;
         \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
     }
