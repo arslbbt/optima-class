@@ -247,7 +247,11 @@ class Functions extends Model
                     die('Please create 404 page with sluge "404" in CMS');
                 }
                 $page_data = $object->view->params['page_data'] = Cms::pageBySlug('404');
+                return $object->render('404', [
+                    'page_data' => isset($page_data) ? $page_data : ''
+                ]);
             }
+            $object->view->params['page_data'] = $page_data;
             return $object->render('page', [
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);

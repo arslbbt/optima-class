@@ -57,11 +57,11 @@ class Properties extends Model
         }
         if (isset($options['set_query']) && $options['set_query'] == false) {
             $query .= $query;
-        } else {
+        } elseif(!Yii::$app->request->isConsoleRequest) {
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'properties&user_apikey=' . Yii::$app->params['api_key'] . $query;
-        if (Yii::$app->request->post('pids') !== null ) {
+        if (!Yii::$app->request->isConsoleRequest && Yii::$app->request->post('pids') !== null ) {
             $fields = [
                 'favourite_ids' => Yii::$app->request->post('pids'),
             ];
@@ -194,8 +194,19 @@ class Properties extends Model
                     if (isset($property->property->$seo_title->$contentLang) && $property->property->$seo_title->$contentLang != '') {
                         $data['meta_title'] = $property->property->$seo_title->$contentLang;
                     }
-
-
+                    $urls = [];
+                    if (isset($property->property->urls) && $property->property->urls != '') {
+                        foreach ($langugesSystem as $lang_sys) {
+                            $lang_sys_key = strtolower($lang_sys['key']);
+                            if (isset($property->property->urls->sale->$lang_sys_key) && $property->property->urls->sale->$lang_sys_key != '' && isset($property->property->sale) && $property->property->sale == 1) {
+                                $urls['sale_urls'][$lang_sys_key] = $property->property->urls->sale->$lang_sys_key;
+                            } 
+                            if (isset($property->property->urls->rent->$lang_sys_key) && $property->property->urls->rent->$lang_sys_key != '' && isset($property->property->rent) && $property->property->rent == 1) {
+                                $urls['rent_urls'][$lang_sys_key] = $property->property->urls->rent->$lang_sys_key;
+                            }
+                        }
+                    }
+                    $data['urls'] = $urls;
                     if (isset($property->property->property_name)) {
                         $data['property_name'] = $property->property->property_name;
                     }
@@ -240,6 +251,9 @@ class Properties extends Model
                     }
                     if (isset($property->property->p_style)) {
                         $data['p_style'] = $property->property->p_style;
+                    }
+                    if (isset($property->property->price_per_built)){
+                        $data['price_per_built'] = $property->property->price_per_built;
                     }
                     if (isset($property->property->region)) {
                         $data['region'] = $property->property->region;
@@ -827,6 +841,16 @@ class Properties extends Model
                 if (isset($property->property->_id)) {
                     $return_data['_id'] = $property->property->_id;
                 }
+                if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                    $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                } elseif ((!isset($property->property->own) || !$property->property->own) && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                    $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+                }
+                if (isset($with_listing_agency) && $with_listing_agency == true) {
+                    if (isset($property->listing_agency_data) &&  !empty($property->listing_agency_data)) {
+                    $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->listing_agency_data->_id) ? $property->listing_agency_data->_id : '') . '/' . (isset($property->listing_agency_data->logo->name) ? $property->listing_agency_data->logo->name : '');
+                    }
+                }
                 if (isset($property->property->reference)) {
                     $return_data['id'] = $property->property->reference;
                 }
@@ -861,6 +885,19 @@ class Properties extends Model
                     $keywords = 'keywords';
                     $perma_link = 'perma_link';
                 }
+                $urls = [];
+                if (isset($property->property->urls) && $property->property->urls != '') {
+                    foreach ($langugesSystem as $lang_sys) {
+                        $lang_sys_key = strtolower($lang_sys['key']);
+                        if (isset($property->property->urls->sale->$lang_sys_key) && $property->property->urls->sale->$lang_sys_key != '' && isset($property->property->sale) && $property->property->sale == 1) {
+                            $urls['sale_urls'][$lang_sys_key] = $property->property->urls->sale->$lang_sys_key;
+                        } 
+                        if (isset($property->property->urls->rent->$lang_sys_key) && $property->property->urls->rent->$lang_sys_key != '' && isset($property->property->rent) && $property->property->rent == 1) {
+                            $urls['rent_urls'][$lang_sys_key] = $property->property->urls->rent->$lang_sys_key;
+                        }
+                    }
+                }
+                $return_data['urls'] = $urls;
                 //    start slug_all
                 $slugs = [];
                 foreach ($langugesSystem as $lang_sys) {
@@ -952,14 +989,24 @@ class Properties extends Model
                 if (isset($property->property->allotment_permit)) {
                     $return_data['allotment_permit'] = $property->property->allotment_permit;
                 }
+                
+                if (isset($property->property->environmental_permit)) {
+                    $return_data['environmental_permit'] = $property->property->environmental_permit;
+                }
+                if (isset($property->property->right_to_sell)) {
+                    $return_data['right_to_sell'] = $property->property->right_to_sell;
+                }
                 if (isset($property->property->soil_certificate)) {
                     $return_data['soil_certificate'] = $property->property->soil_certificate;
                 }
                 if (isset($property->property->summons)) {
                     $return_data['summons'] = $property->property->summons;
                 }
-                if (isset($property->property->right_to_sell)) {
-                    $return_data['right_to_sell'] = $property->property->right_to_sell;
+                if (isset($property->property->destination)) {
+                    $return_data['destination'] = $property->property->destination;
+                }
+                if (isset($property->property->flood_risk)) {
+                    $return_data['flood_risk'] = $property->property->flood_risk;
                 }
                 if (isset($property->property->protected_heritage)) {
                     $return_data['protected_heritage'] = $property->property->protected_heritage;
@@ -1022,6 +1069,9 @@ class Properties extends Model
                 }
                 if (isset($property->featured) && !empty($property->featured)) {
                     $return_data['featured'] = $property->featured;
+                }
+                if (isset($property->property->price_per_built)){
+                    $return_data['price_per_built'] = $property->property->price_per_built;
                 }
                 if (isset($property->property->own) && $property->property->own == true) {
                     $return_data['own'] = true;
@@ -1480,7 +1530,9 @@ class Properties extends Model
                     $return_data['booking_group_with_enquiry'] = $booking_group_with_enquiry;
                     $return_data['booked_dates_costa'] = $booked_dates_costa;
                 }
-
+                if (isset($property->bookings) && count($property->bookings) > 0) {
+                    $return_data['bookings'] = ArrayHelper::toArray($property->bookings);
+                }
                 if (isset($property->testimonials)) {
                     $testimonials = [];
                     foreach ($property->testimonials as $test) {
