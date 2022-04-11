@@ -718,7 +718,7 @@ class CommercialProperties extends Model
         return json_decode($response);
     }
 
-    public static function cteateProperty($data){
+    public static function createProperty($data){
         $languages = Cms::siteLanguages();
         $fields = [
         'sale' => (isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ? (Boolean)'1' : (Boolean)'0'),
@@ -778,8 +778,8 @@ class CommercialProperties extends Model
         }
         if(isset($languages) && !empty($languages)){
             foreach($languages as $lang){
-                $fields['title'][strtoupper($lang)] = (isset($data['title']) ? $data['title'] : '');
-                $fields['description'][strtoupper($lang)] =(isset($data['description']) ? $data['description'] : '');
+                $fields['title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
+                $fields['description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
             }
         }
         $curl = new curl\Curl();
