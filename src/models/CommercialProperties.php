@@ -688,6 +688,9 @@ class CommercialProperties extends Model
                 $post_data['query'][$int_val] = (boolean)'true';
             }
         }
+        if (isset($query['property_valuation']) && !empty($query['property_valuation'])) {
+            $post_data['query']['property_valuation'] = $query['property_valuation'];
+        }
         $node_url = Yii::$app->params['node_url'] . 'companies/search-company?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
