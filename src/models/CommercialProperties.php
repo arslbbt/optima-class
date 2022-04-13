@@ -733,7 +733,7 @@ class CommercialProperties extends Model
         'built'  => (isset($data['built']) && !empty($data['built']) ? (int)$data['built'] : ''),
         'plot'  => (isset($data['plot']) && !empty($data['plot']) ? (int)$data['plot'] : ''),
         'energy_certificate_one' => (isset($data['energy_certificate_one']) && !empty($data['energy_certificate_one']) ? (string)$data['energy_certificate_one'] : ''),
-        'cadastral_numbers' => (isset($data['cadastral_numbers']) && !empty($data['cadastral_numbers']) ? (string)$data['cadastral_numbers'] : ''),
+        'private_info_object' => [Yii::$app->params['agency'] => ['cadastral_numbers' => [0 => ['cadastral_number'=> (isset($data['cadastral_numbers']) && !empty($data['cadastral_numbers']) ? (int)$data['cadastral_numbers'] : '')]]]],
         'address' => ['formatted_address' => (isset($data['formatted_address']) && !empty($data['formatted_address']) ? (string)$data['formatted_address'] : '')],
         'country' => (isset($data['country']) && !empty($data['country']) ? (int)$data['country'] : ''),
         'region'  => (isset($data['region']) && !empty($data['region']) ? (int)$data['region'] : ''),
@@ -781,8 +781,13 @@ class CommercialProperties extends Model
         }
         if(isset($languages) && !empty($languages)){
             foreach($languages as $lang){
-                $fields['title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
-                $fields['description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
+                if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale'){
+                    $fields['title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
+                    $fields['description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
+                } else {
+                    $fields['rental_title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
+                    $fields['rental_description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
+                }
             }
         }
         $curl = new curl\Curl();
