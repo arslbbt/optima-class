@@ -748,6 +748,17 @@ class CommercialProperties extends Model
         'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? $data['lat'] : ''),
         'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? $data['lng'] : ''),
         ];
+        $fields['project'] = false;
+        $fields['features'] = ['lift_elevator' => false];
+        $fields['security'] = ['gated_complex' => false];
+        $fields['categories']['freehold'] = false;
+        $fields['categories']['leasehold'] = false;
+        $fields['parking']['private'] = false;
+        $fields['parking']['parking_communal'] = false;
+        $fields['garden']['garden_private'] = false;
+        $fields['garden']['garden_communal'] = false;
+        $fields['pool']['pool_private'] = false;
+        $fields['pool']['pool_communal'] = false;
         if(isset($data['parking']) && !empty($data['parking'])){
             foreach($data['parking'] as $parking){
                 $fields['parking'][$parking] = true;
