@@ -106,7 +106,6 @@ class CommercialProperties extends Model
 ;
        
         $response = json_decode($response, TRUE);
-
         $property = self::formateProperty($response);
         
         return $property;
@@ -348,7 +347,7 @@ class CommercialProperties extends Model
         if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
             $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
         }
-        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0 && isset($_GET['rent']) && $_GET['rent'] == 1) {
+        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0) {
             $f_property['rental_season_data'] = [];
             foreach($property['rental_seasons'] as $season){
                 $f_property['rental_season_data'][] = $season;
@@ -386,6 +385,9 @@ class CommercialProperties extends Model
         }
         if (isset($property['current_price'])) {
             $f_property['price'] = $property['current_price'];
+        }
+        if (isset($property['old_price'])) {
+            $f_property['old_price'] = $property['old_price'];
         }
         if (isset($property['currency'])) {
             $f_property['currency'] = $property['currency'];
