@@ -266,6 +266,16 @@ class CommercialProperties extends Model
         if (isset($property['keywords'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
+        $urls = [];
+        if (isset($property['agency_data']['property_url_website_cp']) && !empty($property['agency_data']['property_url_website_cp']) ) {
+            if (isset($property['agency_data']['property_url_website_cp']['sale']) && $property['agency_data']['property_url_website_cp']['sale'] != '' && !empty($property['agency_data']['property_url_website_cp']['sale'])) {
+                $urls['sale_urls'] = $property['agency_data']['property_url_website_cp']['sale'];
+            } 
+            if (isset($property['agency_data']['property_url_website_cp']['rent']) && $property['agency_data']['property_url_website_cp']['rent'] != '' && !empty($property['agency_data']['property_url_website_cp']['rent'])) {
+                $urls['rent_urls'] = $property['agency_data']['property_url_website_cp']['rent'];
+            }
+        }
+        $f_property['urls'] = $urls;
         if(isset($property['videos']) && !empty($property['videos'])){
             $videos = [];
             $virtual_tours = [];
@@ -728,6 +738,7 @@ class CommercialProperties extends Model
         $fields = [
         'sale' => (isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ? (Boolean)'1' : (Boolean)'0'),
         'rent' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
+        'lt_rental' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
         'type_one' => (isset($data['type_one']) && !empty($data['type_one']) ? (int)$data['type_one'] : ''),
         'type_two' => (isset($data['type_two']) && !empty($data['type_two']) ? (int)$data['type_two'] : ''),
         'bedrooms' => (isset($data['bedrooms']) && !empty($data['bedrooms']) ? (int)$data['bedrooms'] : ''),
@@ -746,10 +757,16 @@ class CommercialProperties extends Model
         'street_number' => (isset($data['street_number']) && !empty($data['street_number']) ? (string)$data['street_number'] : ''),
         'postal_code'  => (isset($data['postal_code']) && !empty($data['postal_code']) ? (string)$data['postal_code'] : ''),
         'currency' => (isset($data['currency']) && !empty($data['currency']) ? (string)$data['currency'] : ''),
-        'current_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''),
         'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? $data['lat'] : ''),
         'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? $data['lng'] : ''),
+        'status' => (isset($data['status']) && !empty($data['status']) ? $data['status'] : 'Valuation'),
         ];
+        if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale'){
+            $fields['current_price'] = (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '');
+        } 
+        elseif(isset($data['transaction_type']) && $data['transaction_type'] == 'rent'){
+            $fields['period_seasons'][] = ['seasons' => (isset($data['seasons']) && !empty($data['seasons']) ? $data['seasons'] : 'All year'), 'new_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''), 'total_per_month' => ($data['current_price'] / 12)];
+        }
         $fields['project'] = false;
         $fields['features'] = ['lift_elevator' => false];
         $fields['security'] = ['gated_complex' => false];
