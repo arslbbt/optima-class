@@ -1772,10 +1772,10 @@ class Properties extends Model
                     }
                 }
                 if (isset($property->property->feet_moorings) && !empty($property->property->feet_moorings) && count($property->property->feet_moorings) > 0) {
-                    foreach ($property->property->feet_moorings as $mooring) {
-                        foreach ($mooring as $key => $value) {
+                    foreach ($property->property->feet_moorings as $mooring_key => $mooring) {
+                        foreach ($mooring as $key => $value) { 
                             if ($value) {
-                                $moorings[$key] = $value;
+                                $moorings[$mooring_key][$key] = $value;
                             }
                         }
                     }
