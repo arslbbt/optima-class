@@ -765,7 +765,7 @@ class CommercialProperties extends Model
             $fields['current_price'] = (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '');
         } 
         elseif(isset($data['transaction_type']) && $data['transaction_type'] == 'rent'){
-            $fields['period_seasons'][] = ['seasons' => (isset($data['seasons']) && !empty($data['seasons']) ? $data['seasons'] : 'All year'), 'new_price' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : ''), 'total_per_month' => ($data['current_price'] / 12)];
+            $fields['period_seasons'][] = ['seasons' => (isset($data['seasons']) && !empty($data['seasons']) ? $data['seasons'] : 'All year'), 'new_price' => (isset($data['current_price']) && !empty($data['current_price']) ? ((int)$data['current_price'] * 12) : ''), 'total_per_month' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '')];
         }
         $fields['project'] = false;
         $fields['features'] = ['lift_elevator' => false];
