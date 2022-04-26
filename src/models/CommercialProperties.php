@@ -760,6 +760,7 @@ class CommercialProperties extends Model
         'latitude_alt' => (isset($data['lat']) && !empty($data['lat']) ? $data['lat'] : ''),
         'longitude_alt' => (isset($data['lng']) && !empty($data['lng']) ? $data['lng'] : ''),
         'status' => (isset($data['status']) && !empty($data['status']) ? $data['status'] : 'Valuation'),
+        'owner' => (isset($data['user_id']) ? $data['user_id'] : ''),
         ];
         if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale'){
             $fields['current_price'] = (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '');
