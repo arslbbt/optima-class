@@ -345,6 +345,9 @@ class CommercialProperties extends Model
         if (isset($property['sale']) && $property['sale']) {
             $f_property['sale'] = TRUE;
         }
+        if (isset($property['rent']) && $property['rent']) {
+            $f_property['rent'] = TRUE;
+        }
         if (isset($property['transfer']) && $property['transfer']) {
             $f_property['transfer'] = TRUE;
         }
@@ -357,17 +360,11 @@ class CommercialProperties extends Model
         if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
             $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
         }
-        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0) {
-            $f_property['rental_season_data'] = [];
-            foreach($property['rental_seasons'] as $season){
-                $f_property['rental_season_data'][] = $season;
-            }
+        if (isset($property['period_seasons']) && !empty($property['period_seasons']) && count($property['period_seasons']) > 0) {
+            $f_property['rental_season_data'] = $property['period_seasons'];
         }
         if (isset($property['leasehold_unit']) && $property['leasehold_unit']) {
             $f_property['leasehold_unit'] = $property['leasehold_unit'];
-        }
-        if (isset($property['rent']) && $property['rent']) {
-            $f_property['rent'] = TRUE;
         }
         if (isset($property['bedrooms']) && $property['bedrooms'] > 0) {
             $f_property['bedrooms'] = $property['bedrooms'];
