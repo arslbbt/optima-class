@@ -146,6 +146,9 @@ class CommercialProperties extends Model
         if (isset($get['auction']) && !empty($get['auction'])) {
             $query['auction_records'] = true;
         }
+        if (isset($get['auction_latlng']) && !empty($get['auction_latlng'])) {
+            $query['auction_tab'] = true;
+        }
         if (isset($get['country']) && !empty($get['country'])) {
             $query['$and'][]['country'] = (int) $get['country'];
         }
@@ -577,7 +580,7 @@ class CommercialProperties extends Model
         return $f_property;
     }
 
-    public static function findAllWithLatLang($qry = 'true', $cache = false, $query)
+    public static function findAllWithLatLang($qry = 'true', $cache = false)
     {
         $webroot = Yii::getAlias('@webroot');
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
