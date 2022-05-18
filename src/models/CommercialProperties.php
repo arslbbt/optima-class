@@ -34,7 +34,7 @@ class CommercialProperties extends Model
         }
         $options['sort'] = $sort;
 
-        
+        $get = Yii::$app->request->get();
         if(isset($query) && $query != '' && !is_array($query)){
             $vars = explode('&', $query);
             foreach($vars as $var){
@@ -63,6 +63,9 @@ class CommercialProperties extends Model
         $post_data = ["options" => $options];
         if(!empty($query_array)){
             $post_data["query"] =  $query_array;
+        }
+        if ((isset($get['rental_price_from']) && !empty($get['rental_price_from'])) || (isset($get['rental_price_to']) && !empty($get['rental_price_to']))) {
+            $post_data['selectRecords'] = false;
         }
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
@@ -142,7 +145,16 @@ class CommercialProperties extends Model
             }
             $query['$and'][]['type_two'] = ['$in' => $intArray];
         }
-
+        
+        if ((isset($get['rental_price_from']) && !empty($get['rental_price_from'])) || (isset($get['rental_price_to']) && !empty($get['rental_price_to']))) {
+            $query['rental_seasons_price'] = true;
+        }
+        if (isset($get['rental_price_from']) && !empty($get['rental_price_from'])) {
+            $query['rental_seasons_price_from'] = $get['rental_price_from'];
+        }
+        if (isset($get['rental_price_to']) && !empty($get['rental_price_to'])) {
+            $query['rental_seasons_price_to'] = $get['rental_price_to'];
+        }
         if (isset($get['auction']) && !empty($get['auction'])) {
             $query['auction_records'] = true;
         }
