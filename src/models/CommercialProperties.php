@@ -280,7 +280,7 @@ class CommercialProperties extends Model
         if (isset($property['seo_description'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_desc'] = $property['seo_description'][$lang];
         }
-        if (isset($property['keywords'][$lang]) && $property['seo_description'][$lang] != '') {
+        if (isset($property['keywords'][$lang]) && $property['keywords'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
         $urls = [];
@@ -298,13 +298,13 @@ class CommercialProperties extends Model
             $virtual_tours = [];
             foreach($property['videos'] as $video){
                 if(isset($video['type']) && $video['type'] == 'Video' && isset($video['status']) && $video['status'] == 1){
-                    $videos[] = $video['url'][strtoupper(Yii::$app->language)];
+                    $videos[] = (isset($video['url'][strtoupper(Yii::$app->language)]) ? $video['url'][strtoupper(Yii::$app->language)] : '');
                 }
             }
             $f_property['videos'] = $videos;
             foreach($property['videos'] as $vt){
                 if(isset($vt['type']) && $vt['type'] == '2' && isset($vt['status']) && $vt['status'] == 1){
-                    $virtual_tours[] = $vt['url'][strtoupper(Yii::$app->language)];
+                    $virtual_tours[] = (isset($vt['url'][strtoupper(Yii::$app->language)]) ? $vt['url'][strtoupper(Yii::$app->language)] : '');
                 }
             }
             $f_property['vt'] = $virtual_tours;
