@@ -18,16 +18,14 @@ use function PHPSTORM_META\type;
 class MooringProperties extends Model
 {
 
-    public static function findAll($page =1, $page_size=10 , $query = '',$sort = ['current_price' => '-1'], $options = [] )
+    public static function findAll($page = 1, $page_size= 10 , $query = '', $sort = [ 'current_price' => -1 ], $options = [] )
     {        
         $query_options = [
             "page" => (int)$page,
             "limit" => (int)$page_size,
             "sort" => $sort,
         ];     
-        if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby') == 2)) {
-            $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
-        }
+        
         $query_array=[];
         if(isset($query) && !empty($query)){
             $query = self::setQuery();

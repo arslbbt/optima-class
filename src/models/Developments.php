@@ -16,7 +16,7 @@ use optima\models\Functions;
 class Developments extends Model
 {
 
-    public static function findAll($query, $cache = false)
+    public static function findAll($query, $cache = false, $set_query = true)
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -26,7 +26,9 @@ class Developments extends Model
                 $contentLang = $sysLang['key'];
             }
         }
-        $query .= self::setQuery();
+        if($set_query){
+            $query .= self::setQuery();
+        }
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
         // echo "<pre>";print_r($url);die;
         if ($cache == true) {
