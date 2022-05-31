@@ -271,6 +271,9 @@ class CommercialProperties extends Model
         if (isset($property['agency_data']['logo']['name']) && !empty($property['agency_data']['logo']['name']) ) {
             $f_property['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property['agency_data']['_id']) ? $property['agency_data']['_id'] : '') . '/' . (isset($property['agency_data']['logo']['name']) ? $property['agency_data']['logo']['name'] : '');
         }
+        if (isset($property['listing_agency_data']['logo']['name']) && !empty($property['listing_agency_data']['logo']['name']) ) {
+            $f_property['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property['listing_agency_data']['_id']) ? $property['listing_agency_data']['_id'] : '') . '/' . (isset($property['listing_agency_data']['logo']['name']) ? $property['listing_agency_data']['logo']['name'] : '');
+        }
         if (isset($property['description'][$lang])) {
             $f_property['description'] = $property['description'][$lang];
         }
