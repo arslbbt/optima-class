@@ -921,7 +921,7 @@ class CommercialProperties extends Model
         $post_data['options'] = [
             'page' => isset($options['page']) ? (int)$options['page'] : 1,
             'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
-            "populate" => ["property_attachments", "property_type_one", "property_type_two"],
+            "populate" => ["property_attachments", "property_type_one", "property_type_two", "listing_agency_data", "agency_data"],
             'sort' => $sort,
         ];
         $post_data['query'] = [
