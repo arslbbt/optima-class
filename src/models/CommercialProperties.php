@@ -254,6 +254,17 @@ class CommercialProperties extends Model
         if (isset($property['external_reference'])) {
             $f_property['external_reference'] = $property['external_reference'];
         }
+        $agency = '';
+        if(isset($property['agency']) && !empty($property['agency'])){
+            $agency = $property['agency'];
+            $f_property['agency'] = $property['agency'];
+        }
+        if(isset($property['agency_data']['commercial_name']) && !empty($property['agency_data']['commercial_name'])){
+            $f_property['agency_name'] = $property['agency_data']['commercial_name'];
+        }
+        if (isset($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) && !empty($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) ) {
+            $f_property['cadastral_number'] = $property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number'];
+        }
         if (isset($property['_id'])) {
             $f_property['_id'] = $property['_id'];
         }
@@ -937,5 +948,13 @@ class CommercialProperties extends Model
             ->post($node_url);
         return json_decode($response);
 
+    }
+
+    public static function getCadastralData()
+    {
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
+        $curl = new curl\Curl();
+        $response = $curl->post($node_url);
+        return json_decode($response);
     }
 }
