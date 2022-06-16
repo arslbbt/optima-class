@@ -71,6 +71,8 @@ class ContactUs extends Model
     public $cv_file;
     public $language;
     public $listing_agency_email;
+    public $listing_agency_id;
+    public $user_id;
     public $buyer;
     public $mobile_phone;
     public $lgroups;
@@ -148,7 +150,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name', 'mobile_phone', 'phone', 'home_phone', 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'last_name', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_from_date', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'imageFiles', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories', 'account_alert', 'title', 'work_phone', 'only_investments', 'only_urgent_sales'], 'safe'],
+            [['name', 'mobile_phone', 'phone', 'home_phone', 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'last_name', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_from_date', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'imageFiles', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'listing_agency_id', 'user_id', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories', 'account_alert', 'title', 'work_phone', 'only_investments', 'only_urgent_sales'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             // ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -484,6 +486,8 @@ class ContactUs extends Model
             'appt'  => isset($this->appt) ? $this->appt : null,
             'date'  => isset($this->visit_date) ? $this->visit_date : null,
             'mobile_phone' => isset($this->mobile_phone) ? $this->mobile_phone : null,
+            'listing_agency_id' => isset($this->listing_agency_id) ? $this->listing_agency_id : null,
+            'user_id' => isset($this->user_id) ? $this->user_id : null,
             'id_number' => isset($this->id_number) ? $this->id_number : null,
             'min_sleeps' => isset($this->min_sleeps) ? $this->min_sleeps : null,
             'postal_code' => isset($this->postal_code) ? $this->postal_code : null,
