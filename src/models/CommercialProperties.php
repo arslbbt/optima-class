@@ -76,7 +76,7 @@ class CommercialProperties extends Model
             ])
             ->post($node_url);
         $response = json_decode($response, TRUE);
-
+        
         $properties = [];
 
         if(isset($response) && isset($response['docs']))
@@ -956,5 +956,29 @@ class CommercialProperties extends Model
         $curl = new curl\Curl();
         $response = $curl->post($node_url);
         return json_decode($response);
+    }
+    public static function getCadastralProperties($same_cadastral_prop_ids)
+    {
+        $url = Yii::$app->params['node_url'] .'/commercial_properties/get-same-properties-of-cadastral-number/?user=' . Yii::$app->params['user'];
+        $query['query'] = [
+            'ids' => $same_cadastral_prop_ids,
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($query))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($query))
+            ])
+            ->post($url);
+            $response = json_decode($response, TRUE);
+            $properties = [];
+    
+            if(isset($response) && isset($response['docs']))
+            foreach ($response['docs'] as $property) {
+                $properties[] = self::formateProperty($property);
+            }
+            $response['docs'] = $properties;
+    
+            return $response;
     }
 }
