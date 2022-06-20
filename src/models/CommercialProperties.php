@@ -297,16 +297,9 @@ class CommercialProperties extends Model
         if (isset($property['keywords'][$lang]) && $property['keywords'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
-        $urls = [];
-        if (isset($property['agency_data']['property_url_website_cp']) && !empty($property['agency_data']['property_url_website_cp']) ) {
-            if (isset($property['agency_data']['property_url_website_cp']['sale']) && $property['agency_data']['property_url_website_cp']['sale'] != '' && !empty($property['agency_data']['property_url_website_cp']['sale'])) {
-                $urls['sale_urls'] = $property['agency_data']['property_url_website_cp']['sale'];
-            } 
-            if (isset($property['agency_data']['property_url_website_cp']['rent']) && $property['agency_data']['property_url_website_cp']['rent'] != '' && !empty($property['agency_data']['property_url_website_cp']['rent'])) {
-                $urls['rent_urls'] = $property['agency_data']['property_url_website_cp']['rent'];
-            }
+        if (isset($property['property_urls']) && !empty($property['property_urls']) ) {
+            $f_property['urls'] =  $property['property_urls'];
         }
-        $f_property['urls'] = $urls;
         if(isset($property['videos']) && !empty($property['videos'])){
             $videos = [];
             $virtual_tours = [];
