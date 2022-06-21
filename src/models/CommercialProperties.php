@@ -76,7 +76,7 @@ class CommercialProperties extends Model
             ])
             ->post($node_url);
         $response = json_decode($response, TRUE);
-        
+
         $properties = [];
 
         if(isset($response) && isset($response['docs']))
@@ -261,6 +261,9 @@ class CommercialProperties extends Model
         }
         if(isset($property['agency_data']['commercial_name']) && !empty($property['agency_data']['commercial_name'])){
             $f_property['agency_name'] = $property['agency_data']['commercial_name'];
+        }
+        if(isset($property['listing_agency_data']['commercial_name']) && !empty($property['listing_agency_data']['commercial_name'])){
+            $f_property['agency_name'] = $property['listing_agency_data']['commercial_name'];
         }
         if (isset($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) && !empty($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) ) {
             $f_property['cadastral_number'] = $property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number'];
