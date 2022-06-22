@@ -84,7 +84,7 @@ class Dropdowns extends Model
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
         $return_data = [];
-        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . '.json';
+        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries) . '.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
 
