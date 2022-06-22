@@ -681,7 +681,7 @@ class CommercialProperties extends Model
         $post_data['options'] = [
             'page' => $options['page'],
             'limit' => $options['limit'],
-            'populate' => 'property_attachments'
+            'populate' => ['property_attachments','agency_data']
         ];
         $post_data['query'] = [
             'id' => $id
@@ -697,7 +697,6 @@ class CommercialProperties extends Model
         
         $response = json_decode($response, TRUE);
         $properties = [];
-
         if(isset($response) && isset($response['docs']))
         foreach ($response['docs'] as $property) {
             $properties[] = self::formateProperty($property);
@@ -750,7 +749,7 @@ class CommercialProperties extends Model
         return json_decode($response);
     }
 
-    public static function findAnAgency($id){
+    public static function findListingAgency($id){
         $post_data['option'] = [
             "skipLimit" => 0,
             "endLimit" => 3
@@ -759,6 +758,25 @@ class CommercialProperties extends Model
             "type" => "Agency"
         ];
         $node_url = Yii::$app->params['node_url'] . 'companies/company-type-of-agency/' . $id;
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($post_data))
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen(json_encode($post_data))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+
+    public static function findAnAgency($id){
+        $post_data['option'] = [
+            "skipLimit" => 0,
+            "endLimit" => 3
+        ];
+        $post_data['query'] = [
+            "type" => "Agency"
+        ];
+        $node_url = Yii::$app->params['node_url'] . 'companies/get-agency-data/' . $id;
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
