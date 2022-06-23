@@ -453,10 +453,11 @@ class CommercialProperties extends Model
             $attachments = [];
             foreach ($property['attachments'] as $pic) {
                 if(isset($pic['document']) && $pic['document'] != 1 && isset($set_options['image_size']) && !empty($set_options['image_size'])){
-                    $attachments[] = Yii::$app->params['mls_img_url'] . (isset($property['agency']) ? $property['agency'] : '') . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                    // $attachments[] = Yii::$app->params['mls_img_url'] . (isset($property['agency']) ? $property['agency'] : '') . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                    $attachments[] = Yii::$app->params['img_url_without_wm'] . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
                 }
                 elseif(isset($pic['document']) && $pic['document'] != 1){
-                    $attachments[] = Yii::$app->params['mls_img_url'] . (isset($property['agency']) ? $property['agency'] : '') . '/' . $pic['model_id'] . '/1200/' .  urldecode($pic['file_md5_name']);
+                    $attachments[] = Yii::$app->params['img_url_without_wm'] . '/' . $pic['model_id'] . '/1200/' .  urldecode($pic['file_md5_name']);
                 }
             }
             $f_property['attachments'] = $attachments;
