@@ -162,7 +162,7 @@ class CommercialProperties extends Model
             $query['auction_tab'] = true;
         }
         if (isset($get['country']) && !empty($get['country'])) {
-            $query['$and'][]['country'] = (int) $get['country'];
+            $query['country'] = (int) $get['country'];
         }
         if (isset($get['city']) && $get['city']) {
             $intArray = array();
@@ -197,10 +197,10 @@ class CommercialProperties extends Model
             }
         }
         if (isset($get['sale']) && !empty($get['sale'])) {
-            $query['$and'][]['sale'] = true;
+            $query['sale'] = true;
         }
         if (isset($get['rent']) && !empty($get['rent'])) {
-            $query['$and'][]['rent'] = true;
+            $query['rent'] = true;
         }
         if (isset($get['bedrooms']) && !empty($get['bedrooms'])) {
             $query['$and'][]['bedrooms'] = $get['bedrooms'];
