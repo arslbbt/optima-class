@@ -18,7 +18,7 @@ use function PHPSTORM_META\type;
 class CommercialProperties extends Model
 {
 
-    public static function findAll($page = 1, $page_size = 10, $query = '', $sort = ['current_price' => '-1'])
+    public static function findAll($page = 1, $page_size = 10, $query = '', $sort = ['current_price' => '-1'], $set_options = [])
     {
         $query_array=[];
         $options = ["page" => $page, "limit" => $page_size];
@@ -81,14 +81,14 @@ class CommercialProperties extends Model
 
         if(isset($response) && isset($response['docs']))
         foreach ($response['docs'] as $property) {
-            $properties[] = self::formateProperty($property);
+            $properties[] = self::formateProperty($property, $set_options);
         }
         $response['docs'] = $properties;
 
         return $response;
     }
 
-    public static function findOne($id)
+    public static function findOne($id, $set_options = [])
     {
         $options = [];
         $options['populate'] = [
@@ -108,7 +108,7 @@ class CommercialProperties extends Model
 ;
        
         $response = json_decode($response, TRUE);
-        $property = self::formateProperty($response);
+        $property = self::formateProperty($response, $set_options);
         
         return $property;
     }
@@ -236,7 +236,7 @@ class CommercialProperties extends Model
         return $query;
     }
 
-    public static function formateProperty($property)
+    public static function formateProperty($property, $set_options = [])
     {
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
@@ -441,7 +441,10 @@ class CommercialProperties extends Model
         if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
             $attachments = [];
             foreach ($property['property_attachments'] as $pic) {
-               if(isset($pic['document']) && $pic['document'] != 1){
+               if(isset($pic['document']) && $pic['document'] != 1 && isset($set_options['image_size']) && !empty($set_options['image_size'])){
+                   $attachments[] = Yii::$app->params['property_img_resize_link'] . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+               }
+               elseif(isset($pic['document']) && $pic['document'] != 1){
                 $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
                }
             }
