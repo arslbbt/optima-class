@@ -438,15 +438,26 @@ class CommercialProperties extends Model
         if (isset($property['currency'])) {
             $f_property['currency'] = $property['currency'];
         }
-        if (isset($property['property_attachments']) && count($property['property_attachments']) > 0) {
+        if (isset($property['property_attachments']) && count($property['property_attachments']) > 0 && !isset($property['from_residential'])) {
             $attachments = [];
             foreach ($property['property_attachments'] as $pic) {
-               if(isset($pic['document']) && $pic['document'] != 1 && isset($set_options['image_size']) && !empty($set_options['image_size'])){
-                   $attachments[] = Yii::$app->params['property_img_resize_link'] . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
-               }
-               elseif(isset($pic['document']) && $pic['document'] != 1){
-                $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
-               }
+                if(isset($pic['document']) && $pic['document'] != 1 && isset($set_options['image_size']) && !empty($set_options['image_size'])){
+                    $attachments[] = Yii::$app->params['property_img_resize_link'] . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                }
+                elseif(isset($pic['document']) && $pic['document'] != 1){
+                    $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
+                }
+            }
+            $f_property['attachments'] = $attachments;
+        }elseif(isset($property['attachments']) && count($property['attachments']) > 0 && isset($property['from_residential']) && $property['from_residential'] == 1){
+            $attachments = [];
+            foreach ($property['attachments'] as $pic) {
+                if(isset($pic['document']) && $pic['document'] != 1 && isset($set_options['image_size']) && !empty($set_options['image_size'])){
+                    $attachments[] = Yii::$app->params['mls_img_url'] . (isset($property['agency']) ? $property['agency'] : '') . '/' . $pic['model_id'] . '/' . $set_options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                }
+                elseif(isset($pic['document']) && $pic['document'] != 1){
+                    $attachments[] = Yii::$app->params['mls_img_url'] . (isset($property['agency']) ? $property['agency'] : '') . '/' . $pic['model_id'] . '/1200/' .  urldecode($pic['file_md5_name']);
+                }
             }
             $f_property['attachments'] = $attachments;
         }
