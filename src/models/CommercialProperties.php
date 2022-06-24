@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use optima\models\Cms;
 use linslin\yii2\curl;
+use optima\models\Functions;
 use phpDocumentor\Reflection\Location;
 use function PHPSTORM_META\type;
 
@@ -981,11 +982,18 @@ class CommercialProperties extends Model
 
     public static function getCadastralData()
     {
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
-        $curl = new curl\Curl();
-        $response = $curl->post($node_url);
-        return json_decode($response);
+        $file = Functions::directory() . 'cadastral-data.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
+            $curl = new curl\Curl();
+            $file_data = $curl->post($node_url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
     }
+
     public static function getCadastralProperties($same_cadastral_prop_ids)
     {
         $url = Yii::$app->params['node_url'] .'/commercial_properties/get-same-properties-of-cadastral-number/?user=' . Yii::$app->params['user'];
