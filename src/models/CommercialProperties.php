@@ -283,10 +283,32 @@ class CommercialProperties extends Model
         if (isset($property['reference'])) {
             $f_property['id'] = $property['reference'];
         }
-        if (isset($property['title'][$lang]) && $property['title'][$lang] != '') {
-            $f_property['title'] = $property['title'][$lang];
-        } else {
-            $f_property['title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
+        if(isset($get['rent']) && $get['rent'] == 1){
+            if (isset($property['shared_data']['rental_external_title'][$lang]) && $property['shared_data']['rental_external_title'][$lang] != '') {
+                $f_property['title'] = $property['shared_data']['rental_external_title'][$lang];
+            }elseif (isset($property['rental_title'][$lang]) && $property['rental_title'][$lang] != '') {
+                $f_property['title'] = $property['rental_title'][$lang];
+            }else{
+                $f_property['title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
+            }
+            if (isset($property['shared_data']['rental_external_description'][$lang]) && $property['shared_data']['rental_external_description'][$lang] != '') {
+                $f_property['description'] = $property['shared_data']['rental_external_description'][$lang];
+            } elseif (isset($property['rental_description'][$lang]) && $property['rental_description'][$lang] != '') {
+                $f_property['description'] = $property['rental_description'][$lang];
+            }  
+        }elseif((isset($get['sale']) && $get['sale'] == 1) || (isset($get['auction_latlng']) && $get['auction_latlng'] == 1)){
+            if (isset($property['shared_data']['title'][$lang]) && $property['shared_data']['title'][$lang] != '') {
+                $f_property['title'] = $property['shared_data']['title'][$lang];
+            }else if (isset($property['title'][$lang]) && $property['title'][$lang] != '') {
+                $f_property['title'] = $property['title'][$lang];
+            } else {
+                $f_property['title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
+            }
+            if (isset($property['shared_data']['description'][$lang]) && $property['shared_data']['description'][$lang] != '') {
+                $f_property['description'] = $property['shared_data']['description'][$lang];
+            }elseif (isset($property['description'][$lang]) && $property['description'][$lang] != '') {
+                $f_property['description'] = $property['description'][$lang];
+            }            
         }
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
@@ -296,9 +318,6 @@ class CommercialProperties extends Model
         }
         if (isset($property['listing_agency_data']['logo']['name']) && !empty($property['listing_agency_data']['logo']['name']) ) {
             $f_property['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property['listing_agency_data']['_id']) ? $property['listing_agency_data']['_id'] : '') . '/' . (isset($property['listing_agency_data']['logo']['name']) ? $property['listing_agency_data']['logo']['name'] : '');
-        }
-        if (isset($property['description'][$lang])) {
-            $f_property['description'] = $property['description'][$lang];
         }
         if (isset($property['seo_title'][$lang]) && $property['seo_title'][$lang] != '') {
             $f_property['meta_title'] = $property['seo_title'][$lang];
