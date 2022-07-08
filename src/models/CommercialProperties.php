@@ -249,6 +249,7 @@ class CommercialProperties extends Model
     {
         $settings = Cms::settings();
         $lang = strtoupper(\Yii::$app->language);
+        $get = Yii::$app->request->get();
         $contentLang = strtolower(\Yii::$app->language);
         if(strtolower(\Yii::$app->language) == 'es'){
             $contentLang = 'es_AR';
