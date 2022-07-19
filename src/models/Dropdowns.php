@@ -83,13 +83,19 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
+        $type = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries) . '.json';
-
+        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $type) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
 
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
+            if(isset($type) && !empty($type))
+            {
+                foreach($type as $p_type){
+                    $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
+                }
+            }
             $options = [
                 "page" => 1,
                 "limit" => 50,
@@ -97,7 +103,7 @@ class Dropdowns extends Model
             ];
 
             $post_data = ["query" => (object) $query, "options" => $options];
-
+            
             $curl = new curl\Curl();
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
@@ -157,13 +163,19 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', $params['provinces']) : [];
+        $type = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'cities_' . implode(',', $provinces) . '.json';
+        $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $type). '.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
+            if(isset($type) && !empty($type))
+            {
+                foreach($type as $p_type){
+                    $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
+                }
+            }
             $options = [
                 "page" => 1,
                 "limit" => 1000,
@@ -171,7 +183,6 @@ class Dropdowns extends Model
             ];
 
             $post_data = ["query" => (object) $query, "options" => $options];
-
             $curl = new curl\Curl();
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
                 ->setHeaders([
@@ -391,9 +402,17 @@ class Dropdowns extends Model
         return json_decode($file_data, TRUE);
     }
 
-    public static function CommercialType()
+    public static function CommercialType($params = [])
     {
         $query = [];
+        $type = isset($params['type']) ? $params['type'] : [];
+        if(isset($type) && !empty($type))
+        {
+            foreach($type as $p_type){
+                $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
+            }
+        }
+     
         $options = [
             "page" => 1,
             "limit" => 200,
