@@ -146,7 +146,10 @@ class CommercialProperties extends Model
             }
             $query['$and'][]['type_two'] = ['$in' => $intArray];
         }
-        
+        if (isset($get['price_on_demand']) && !empty($get['price_on_demand'])) {
+            $query['$or'][]['price_on_demand'] = ['$exists' => (int) 1];
+            $query['$or'][]['price_on_demand'] = ['$exists' => (int) 0];
+        }
         if ((isset($get['rental_price_from']) && !empty($get['rental_price_from'])) || (isset($get['rental_price_to']) && !empty($get['rental_price_to']))) {
             $query['rental_seasons_price'] = true;
         }
