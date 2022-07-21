@@ -272,11 +272,20 @@ class CommercialProperties extends Model
             $agency = $property['agency'];
             $f_property['agency'] = $property['agency'];
         }
+        if (isset($property['price_on_demand'])) {
+            $f_property['price_on_demand'] = $property['price_on_demand'];
+        }
         if(isset($property['agency_data']['commercial_name']) && !empty($property['agency_data']['commercial_name'])){
             $f_property['agency_name'] = $property['agency_data']['commercial_name'];
         }
         if(isset($property['listing_agency_data']['commercial_name']) && !empty($property['listing_agency_data']['commercial_name'])){
             $f_property['agency_name'] = $property['listing_agency_data']['commercial_name'];
+        }
+        if(isset($property['agency_data']['agency_email']) && !empty($property['agency_data']['agency_email'])){
+            $f_property['agency_email'] = $property['agency_data']['agency_email'];
+        }
+        if(isset($property['listing_agency_data']['agency_email']) && !empty($property['listing_agency_data']['agency_email'])){
+            $f_property['agency_email'] = $property['listing_agency_data']['agency_email'];
         }
         if (isset($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) && !empty($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) ) {
             $f_property['cadastral_number'] = $property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number'];
