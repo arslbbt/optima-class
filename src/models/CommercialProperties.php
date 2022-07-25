@@ -208,11 +208,12 @@ class CommercialProperties extends Model
         }
         if (isset($get['rent']) && !empty($get['rent'])) {
             $query['rent'] = true;
-        } if (isset($get['lt_rental']) && !empty($get['lt_rental'])) {
-            $query['lt_rental'] = true;
+        }
+        if (isset($get['lt_rental']) && !empty($get['lt_rental'])) {
+            $query['$or'][]['lt_rental'] = true;
         }
         if (isset($get['st_rental']) && !empty($get['st_rental'])) {
-            $query['st_rental'] = true;
+            $query['$or'][]['st_rental'] = true;
         }
         if (isset($get['bedrooms']) && !empty($get['bedrooms'])) {
             $query['$and'][]['bedrooms'] = $get['bedrooms'];
