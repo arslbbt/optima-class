@@ -656,7 +656,7 @@ class CommercialProperties extends Model
         return $f_property;
     }
 
-    public static function findAllWithLatLang($qry = 'true', $cache = false)
+    public static function findAllWithLatLang($qry = 'true',$map_query =[], $cache = false)
     {
         $webroot = Yii::getAlias('@webroot');
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
@@ -706,7 +706,8 @@ class CommercialProperties extends Model
         {
             $post_data["query"] =  $query_array;
         }
-       
+
+        $post_data["query"] = isset($map_query['ids']) && !empty($map_query['ids']) ? array_merge($post_data["query"] ,["id"  => $map_query['ids']]  ) : $post_data["query"];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
