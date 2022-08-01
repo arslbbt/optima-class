@@ -83,16 +83,17 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
-        $type = isset($params['type']) ? $params['type'] : [];
+        $types = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $type) . '.json';
+        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $types) . '.json';
+
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
 
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
-            if(isset($type) && !empty($type))
+            if(isset($types) && !empty($types))
             {
-                foreach($type as $p_type){
+                foreach($types as $p_type){
                     $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
                 }
             }
@@ -163,16 +164,16 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', $params['provinces']) : [];
-        $type = isset($params['type']) ? $params['type'] : [];
+        $types = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $type). '.json';
+        $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $types). '.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
-            if(isset($type) && !empty($type))
+            if(isset($types) && !empty($types))
             {
-                foreach($type as $p_type){
+                foreach($types as $p_type){
                     $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
                 }
             }
@@ -405,10 +406,13 @@ class Dropdowns extends Model
     public static function CommercialType($params = [])
     {
         $query = [];
-        $type = isset($params['type']) ? $params['type'] : [];
-        if(isset($type) && !empty($type))
-        {
-            foreach($type as $p_type){
+        $types = isset($params['type']) ? $params['type'] : [];
+        $countries = isset($params['countries']) && is_array($params['countries']) ? $params['countries'] : [];
+        $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+        $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
+        $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+        if(isset($types) && !empty($types)){
+            foreach($types as $p_type){
                 $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
             }
         }
