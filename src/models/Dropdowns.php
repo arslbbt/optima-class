@@ -83,14 +83,16 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
+        $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
         $types = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $types) . '.json';
+        $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $types).'_'.implode('-', $transaction_types). '.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
 
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
+            $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
             if(isset($types) && !empty($types))
             {
                 foreach($types as $p_type){
@@ -164,13 +166,15 @@ class Dropdowns extends Model
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', $params['provinces']) : [];
+        $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
         $types = isset($params['type']) ? $params['type'] : [];
         $return_data = [];
-        $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $types). '.json';
+        $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $types).'_'.implode('-', $transaction_types). '.json';
 
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
+            $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
             if(isset($types) && !empty($types))
             {
                 foreach($types as $p_type){
