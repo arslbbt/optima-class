@@ -131,7 +131,11 @@ class CommercialProperties extends Model
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
             ];
         }
-
+        if (isset($get['prop_ids']) && !empty($get['prop_ids'])) {
+            $prop_ids = $get['prop_ids'] != '' ? $get['prop_ids'] : [];
+                $prop_ids = explode(',', $prop_ids);
+                 $query['_id'] = ['$in' =>  $prop_ids];
+        }
         if (isset($get['type']) && !empty($get['type']) && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
             $intArray = array();
             foreach ($get['type'] as $int_val) {
