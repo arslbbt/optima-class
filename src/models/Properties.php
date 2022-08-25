@@ -69,8 +69,8 @@ class Properties extends Model
             $response = $curl->setPostParams($fields)->post($url);
             return json_decode($response, true);
         }
-        //  echo $url;
-        //  die;
+            //  echo $url;
+            //   die;
 
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
@@ -84,7 +84,6 @@ class Properties extends Model
             return json_decode($JsonData, true);
         }
         $apiData = json_decode($JsonData);
-
         $settings = Cms::settings();
 
         try {
@@ -799,7 +798,6 @@ class Properties extends Model
         }
         if (isset($reference) && !empty($reference)) {
             $url = Yii::$app->params['apiUrl'] . 'properties/view-by-ref&ref=' . $reference . '&ip=' . \Yii::$app->getRequest()->getUserIP() . '&user_apikey=' . Yii::$app->params['api_key'];
-            // echo $url;die;
             if (isset($with_booking) && $with_booking == true) {
                 $url .= '&with_booking=true';
             }
@@ -826,7 +824,6 @@ class Properties extends Model
                     $url .= '&status[]=' . $status;
                 }
             }
-            // echo $url;die;
             $JsonData = Functions::getCRMData($url, false);
             $property = json_decode($JsonData);
             if (isset($property->property->reference)) {
@@ -2909,7 +2906,6 @@ class Properties extends Model
                 echo $_SESSION["pricerate"];
             }
         }
-        //die('1111');
         if (!isset($_SESSION["pricerate"])) {
             $_SESSION["pricerate"] = 1;
         }
