@@ -30,7 +30,6 @@ class Developments extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
-        // echo "<pre>";print_r($url);die;
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -90,6 +89,11 @@ class Developments extends Model
             if (isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0) {
                 $data['bathrooms_to'] = $property->property->bathrooms_to;
             }
+            if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                $data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+            } elseif ((!isset($property->property->own) || !$property->property->own) && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                $data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+            }
             if (isset($property->property->built_size_from) && $property->property->built_size_from > 0) {
                 $data['built_from'] = $property->property->built_size_from;
             }
@@ -142,7 +146,6 @@ class Developments extends Model
         }
         $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
-        // echo '<pre>'; print_r($url); die;
         $JsonData = Functions::getCRMData($url, false);
         $property = json_decode($JsonData);
         $return_data = [];
@@ -164,7 +167,9 @@ class Developments extends Model
         } else {
             $return_data['reference'] = $property->property->reference;
         }
-
+        if (isset($property->property->type[0])) {
+            $return_data['type'] = $property->property->type[0];
+        }
         if (isset($property->property->reference) && $property->property->reference != '')
             $return_data['id'] = $property->property->reference;
 
@@ -175,6 +180,7 @@ class Developments extends Model
             
         if (isset($property->property->city) && $property->property->city != '')
             $return_data['city'] = $property->property->city;
+
         if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
             $return_data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
 
@@ -198,6 +204,9 @@ class Developments extends Model
             $return_data['location'] = $property->property->location;
             $return_data['location_key'] = isset($property->property->location_key) ? $property->property->location_key : '';
         }
+        if (isset($property->property->province)) {
+            $return_data['province'] = $property->property->province;
+        }        
         if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
             $return_data['bedrooms_from'] = $property->property->bedrooms_from;
         }
@@ -230,6 +239,12 @@ class Developments extends Model
         }
         if (isset($property->property->videos) && $property->property->videos > 0) {
             $return_data['videos'] = $property->property->videos;
+        }
+
+        if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+            $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+        } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
+            $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
         }
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
@@ -335,6 +350,10 @@ class Developments extends Model
         $properties = [];
         foreach ($property->properties as $key => $value) {
             $data = [];
+            if (isset($value->property->sale))
+             $data['sale'] = $value->property->sale;
+             if (isset($value->property->rent) && !empty($value->property->rent))
+             $data['rent'] = $value->property->rent;
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
             if (isset($value->property->price_from) && $value->property->price_from > 0)
@@ -355,10 +374,16 @@ class Developments extends Model
                 $data['portal'] = $value->property->portal;
             if (isset($value->property->status))
                 $data['status'] = $value->property->status;
+            if (isset($value->property->plot))
+                $data['plot'] = $value->property->plot;
+            if (isset($value->property->terrace))
+                $data['terrace'] = $value->property->terrace;
             if (isset($value->property->built))
                 $data['built'] = $value->property->built;
             if (isset($value->property->location))
                 $data['location'] = $value->property->location;
+            if (isset($value->property->address_city))
+                $data['city'] = $value->property->address_city;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
             if (isset($value->property->year_built))
@@ -435,6 +460,7 @@ class Developments extends Model
         $return_data['property_features']['views'] = $views;
         $return_data['property_features']['distances'] = $distances;
         $return_data['properties'] = $properties;
+
         return $return_data;
     }
 
