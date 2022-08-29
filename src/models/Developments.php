@@ -150,9 +150,11 @@ class Developments extends Model
         // echo '<pre>'; print_r($url); die;
         $JsonData = Functions::getCRMData($url, false);
         $property = json_decode($JsonData);
+        
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
+        $home_staging = [];
         $quality_specifications = [];
         $settings = Cms::settings();
 
@@ -248,7 +250,14 @@ class Developments extends Model
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                if(isset($pic->identification_type) && $pic->identification_type == '104' ){
+                    $home_staging['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '105' ){
+                    $home_staging['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
             }
+            $return_data['home_staging'] = $home_staging;
             $return_data['attachments'] = $attachments;
         }
         if (isset($property->documents) && count($property->documents) > 0) {
@@ -263,9 +272,12 @@ class Developments extends Model
                         );
                     }
                 }
+              
             }
+
             $return_data['floor_plans'] = $floor_plans;
         }
+
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'QS') {
