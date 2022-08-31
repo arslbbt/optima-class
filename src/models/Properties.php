@@ -67,15 +67,20 @@ class Properties extends Model
             ];
             $curl = new \linslin\yii2\curl\Curl();
             $response = $curl->setPostParams($fields)->post($url);
-            return json_decode($response, true);
+            if(Yii::$app->request->post('return_property') == 1){
+                $JsonData = $response;
+            }else{
+                return json_decode($response, true);
+            }
         }
         //  echo $url;
         //  die;
-
-        if ($cache == true) {
-            $JsonData = self::DoCache($query, $url);
-        } else {
-            $JsonData = Functions::getCRMData($url, false);
+        if(!Yii::$app->request->post('return_property')){
+            if ($cache == true) {
+                $JsonData = self::DoCache($query, $url);
+            } else {
+                $JsonData = Functions::getCRMData($url, false);
+            }
         }
         if (strpos($query, "&latlng=true")) {
             return json_decode($JsonData, true);
