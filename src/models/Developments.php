@@ -147,7 +147,11 @@ class Developments extends Model
         }
         $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
-        // echo '<pre>'; print_r($url); die;
+        if (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status'])) {
+            foreach (Yii::$app->params['status'] as $status) {
+                $url .= '&status[]=' . $status;
+            }
+        }
         $JsonData = Functions::getCRMData($url, false);
         $property = json_decode($JsonData);
         
@@ -241,7 +245,7 @@ class Developments extends Model
         if (isset($property->property->videos) && $property->property->videos > 0) {
             $return_data['videos'] = $property->property->videos;
         }
-
+        
         if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
             $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
         } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
