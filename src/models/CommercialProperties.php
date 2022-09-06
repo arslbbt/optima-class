@@ -448,8 +448,8 @@ class CommercialProperties extends Model
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
         }
-        if (isset($property['city_value'][$contentLang])) {
-            $f_property['city'] = $property['city_value'][$contentLang];
+        if (isset($property['property_city']['value'][$contentLang])) {
+            $f_property['city'] = $property['property_city']['value'][$contentLang];
         }
         if (isset($property['province_value'][$contentLang])) {
             $f_property['province'] = $property['province_value'][$contentLang];
@@ -457,8 +457,8 @@ class CommercialProperties extends Model
         if (isset($property['location'])) {
             $f_property['location_key'] = $property['location'];
         }
-        if (isset($property['location_value'][$contentLang])) {
-            $f_property['location'] = $property['location_value'][$contentLang];
+        if (isset($property['property_location']['value'][$contentLang])) {
+            $f_property['location'] = $property['property_location']['value'][$contentLang];
         }
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
