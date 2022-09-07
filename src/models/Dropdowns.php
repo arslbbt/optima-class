@@ -425,16 +425,20 @@ class Dropdowns extends Model
             "page" => 1,
             "limit" => 200,
         ];
-
+        $file = Functions::directory() . 'Commercial_types_'.implode('_', $types).implode('_', $countries).implode('_', $transaction_types).'.json';
         $post_data = ["query" => (object) $query, "options" => $options];
-        $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
-            ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
-
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data))
+                ])
+                ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
+                file_put_contents($file, $response);
+        }else{
+            $response = file_get_contents($file);
+        }
         return json_decode($response, TRUE);
     }
 
