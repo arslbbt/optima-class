@@ -383,6 +383,8 @@ class Developments extends Model
                 $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
             if (isset($value->property->type_one))
                 $data['type'] = $value->property->type_one;
+            if (isset($value->property->property_name))
+                $data['property_name'] = $value->property->property_name;
             if (isset($value->property->block))
                 $data['block'] = $value->property->block;
             if (isset($value->property->portal))
