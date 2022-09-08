@@ -69,13 +69,17 @@ class CommercialProperties extends Model
             $post_data['selectRecords'] = false;
         }
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
-        $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
-            ->post($node_url);
+        if(isset($set_options['cache']) && $set_options['cache'] == true){
+            $response = self::DoCache($post_data, $node_url);
+        }else{
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data))
+                ])
+                ->post($node_url);
+        }
         $response = json_decode($response, TRUE);
 
         $properties = [];
@@ -658,6 +662,35 @@ class CommercialProperties extends Model
         $f_property['offices'] = $offices;
 
         return $f_property;
+    }
+
+    public static function DoCache($query, $url)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        $file_name = 'cached_properties_';
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        if(isset($_GET) && !empty($_GET)){
+            foreach($_GET as $key => $value){
+                $file_name .= $key . '_';
+            }
+        }
+        $file = $webroot . '/uploads/temp/' . sha1($file_name) . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $curl = new curl\Curl();
+            $file_data = $curl->setRequestBody(json_encode($query))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($query))
+                ])
+                ->post($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return $file_data;
     }
 
     public static function findAllWithLatLang($qry = 'true',$map_query =[], $cache = false)
