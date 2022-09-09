@@ -255,10 +255,28 @@ class Developments extends Model
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 if(isset($pic->identification_type) && $pic->identification_type == '104' ){
-                    $home_staging['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[0]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                 if(isset($pic->identification_type) && $pic->identification_type == '106' ){
+                    $home_staging[1]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '107' ){
+                    $home_staging[2]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '108' ){
+                    $home_staging[3]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '105' ){
-                    $home_staging['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[0]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '109' ){
+                    $home_staging[1]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '110' ){
+                    $home_staging[2]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '111' ){
+                    $home_staging[3]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 }
             }
             $return_data['home_staging'] = $home_staging;
