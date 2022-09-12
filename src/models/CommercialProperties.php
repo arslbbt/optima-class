@@ -122,15 +122,15 @@ class CommercialProperties extends Model
     {
         $get = Yii::$app->request->get();
         $query = [];
-        if (isset($get['price_from']) && !empty($get['price_from'])) {
+        if (isset($get['auction_price_from']) && !empty($get['auction_price_from'])) {
+            $query['starting_price'] = ['$gte' => (int) $get['auction_price_from']];
+        }elseif(isset($get['price_from']) && !empty($get['price_from'])) {
             $query['current_price'] = ['$gte' => (int) $get['price_from']];
         }
-        if (isset($get['price_to']) && !empty($get['price_to'])) {
-            if((isset($get['rent']) && !empty($get['rent'])) || (isset($get['sale']) && !empty($get['sale']))){
-                $query['current_price'] = ['$lte' => (int) $get['price_to']];
-            }else{
-                $query['starting_price'] = ['$lte' => (int) $get['price_to']];
-            }
+        if((isset($get['auction_price_to']) && !empty($get['auction_price_to']))) {
+            $query['starting_price'] = ['$lte' => (int) $get['auction_price_to']];
+        }elseif(isset($get['price_to']) && !empty($get['price_to'])) {
+            $query['current_price'] = ['$lte' => (int) $get['price_to']];
         }
         if (isset($get['reference']) && !empty($get['reference'])) {
             $query['$or'] = [
