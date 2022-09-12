@@ -57,7 +57,7 @@ class CommercialProperties extends Model
             }
             if (count($query)){
                 $query_array = $query;
-                $query_array['$and'][]['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
+                $query_array['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
             }
         }
         
@@ -123,13 +123,17 @@ class CommercialProperties extends Model
         $get = Yii::$app->request->get();
         $query = [];
         if (isset($get['price_from']) && !empty($get['price_from'])) {
-            $query['$and'][]['current_price'] = ['$gte' => (int) $get['price_from']];
+            $query['current_price'] = ['$gte' => (int) $get['price_from']];
         }
         if (isset($get['price_to']) && !empty($get['price_to'])) {
-            $query['$and'][]['current_price'] = ['$lte' => (int) $get['price_to']];
+            if((isset($get['rent']) && !empty($get['rent'])) || (isset($get['sale']) && !empty($get['sale']))){
+                $query['current_price'] = ['$lte' => (int) $get['price_to']];
+            }else{
+                $query['starting_price'] = ['$lte' => (int) $get['price_to']];
+            }
         }
         if (isset($get['reference']) && !empty($get['reference'])) {
-            $query['$and'][]['$or'] = [
+            $query['$or'] = [
                 ["reference" => (int) $get['reference']],
                 ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
@@ -145,14 +149,14 @@ class CommercialProperties extends Model
             foreach ($get['type'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['type_one'] = ['$in' => $intArray];
+            $query['type_one'] = ['$in' => $intArray];
         }
         if (isset($get['sub_type']) && !empty($get['sub_type']) && is_array($get['sub_type']) && count($get['sub_type']) > 0 && $get['sub_type'][0] != 0 && $get['sub_type'][0] != '' && $get['sub_type'][0] != '0') {
             $intArray = array();
             foreach ($get['sub_type'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['type_two'] = ['$in' => $intArray];
+            $query['type_two'] = ['$in' => $intArray];
         }
         if (isset($get['price_on_demand']) && !empty($get['price_on_demand'])) {
             $query['$or'][]['price_on_demand'] = ['$exists' => (int) 1];
@@ -184,21 +188,21 @@ class CommercialProperties extends Model
             foreach ($get['city'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['city'] = ['$in' => $intArray];
+            $query['city'] = ['$in' => $intArray];
         }
         if (isset($get['location']) && !empty($get['location'])) {
             $intArray = array();
             foreach ($get['location'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['location'] = ['$in' => $intArray];
+            $query['location'] = ['$in' => $intArray];
         }
         if (isset($get['province']) && !empty($get['province'])) {
             $intArray = array();
             foreach ($get['province'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['province'] = ['$in' => $intArray];
+            $query['province'] = ['$in' => $intArray];
         }
         if (isset($get['cp_features']) && !empty($get['cp_features'])) {
             foreach($get['cp_features'] as $features){
@@ -208,7 +212,7 @@ class CommercialProperties extends Model
                         $search_features[$key] = $feature;
                     }
                 }
-                $query['$and'][]['$or'] = $search_features;
+                $query['$or'] = $search_features;
             }
         }
         if (isset($get['sale']) && !empty($get['sale'])) {
@@ -218,41 +222,41 @@ class CommercialProperties extends Model
             $query['rent'] = true;
         }
         if (isset($get['lt_rental']) && !empty($get['lt_rental'])) {
-            $query['$or'][]['lt_rental'] = true;
+            $query['lt_rental'] = true;
         }
         if (isset($get['st_rental']) && !empty($get['st_rental'])) {
-            $query['$or'][]['st_rental'] = true;
+            $query['st_rental'] = true;
         }
         if (isset($get['bedrooms']) && !empty($get['bedrooms'])) {
-            $query['$and'][]['bedrooms'] = $get['bedrooms'];
+            $query['bedrooms'] = $get['bedrooms'];
         }
         if (isset($get['min_bed']) && !empty($get['min_bed'])) {
-            $query['$and'][]['bedrooms'] = ['$lte' => (int)$get['min_bed']];
+            $query['bedrooms'] = ['$lte' => (int)$get['min_bed']];
         } elseif (isset($get['max_bed']) && !empty($get['max_bed'])) {
-            $query['$and'][]['bedrooms'] = ['$gte' => (int)$get['max_bed']];
+            $query['bedrooms'] = ['$gte' => (int)$get['max_bed']];
         }
         if (isset($get['bathrooms']) && $get['bathrooms']) {
-            $query['$and'][]['bathrooms'] = $get['bathrooms'];
+            $query['bathrooms'] = $get['bathrooms'];
         }
         if (isset($get['min_bath']) && !empty($get['min_bath'])) {
-            $query['$and'][]['bathrooms'] = ['$lte' => (int)$get['min_bath']];
+            $query['bathrooms'] = ['$lte' => (int)$get['min_bath']];
         } elseif (isset($get['max_bath']) && !empty($get['max_bath'])) {
-            $query['$and'][]['bathrooms'] = ['$gte' => (int)$get['max_bath']];
+            $query['bathrooms'] = ['$gte' => (int)$get['max_bath']];
         }
         if (isset($get['new_built']) && !empty($get['new_built'])) {
-            $query['$and'][]['project'] = true;
+            $query['project'] = true;
         }
         if (isset($get['region']) && !empty($get['region'])) {
-            $query['$and'][]['region'] = (int) $get['region'];
+            $query['region'] = (int) $get['region'];
         }
 
-        $query['$and'][]['archived']['$ne'] = true;
+        $query['archived']['$ne'] = true;
 
         if (isset($get['featured']) && !empty($get['featured'])) {
-            $query['$and'][]['featured'] = true;
+            $query['featured'] = true;
         }
         if (isset($get['office']) && !empty($get['office'])) {
-            $query['$and'][]['offices'] =['$in' => $get['office']];
+            $query['offices'] =['$in' => $get['office']];
         }
         return $query;
     }
