@@ -285,6 +285,9 @@ class CommercialProperties extends Model
             $agency = $property['agency'];
             $f_property['agency'] = $property['agency'];
         }
+        if(isset($property['from_residential']) && !empty($property['from_residential'])){
+            $f_property['from_residential'] = $property['from_residential'];
+        }
         if (isset($property['price_on_demand'])) {
             $f_property['price_on_demand'] = $property['price_on_demand'];
         }
