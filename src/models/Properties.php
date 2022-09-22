@@ -75,7 +75,7 @@ class Properties extends Model
         }
         //  echo $url;
         //  die;
-        if(!Yii::$app->request->post('return_property')){
+        if(!isset($_POST['return_property']) || empty($_POST['return_property'])){
             if ($cache == true) {
                 $JsonData = self::DoCache($query, $url);
             } else {
@@ -89,7 +89,6 @@ class Properties extends Model
             return json_decode($JsonData, true);
         }
         $apiData = json_decode($JsonData);
-
         $settings = Cms::settings();
 
         try {
