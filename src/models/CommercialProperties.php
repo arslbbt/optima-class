@@ -172,7 +172,7 @@ class CommercialProperties extends Model
             $query['rental_seasons_price_to'] = (int) $get['rental_price_to'];
         }
         if (isset($get['auction']) && !empty($get['auction'])) {
-            $query['auction_records'] = true;
+            $query['auction_tab'] = true;
         }
         if (isset($get['auction_featured']) && !empty($get['auction_featured'])) {
             $query['auction_featured'] = 1;
