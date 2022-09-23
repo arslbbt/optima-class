@@ -93,6 +93,7 @@ class Dropdowns extends Model
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
             $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+            $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
             if(isset($types) && !empty($types))
             {
                 foreach($types as $p_type){
@@ -175,6 +176,7 @@ class Dropdowns extends Model
             $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
             $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
             $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+            $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
             if(isset($types) && !empty($types))
             {
                 foreach($types as $p_type){
@@ -415,12 +417,12 @@ class Dropdowns extends Model
         $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
         $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
         $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+        $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
         if(isset($types) && !empty($types)){
             foreach($types as $p_type){
                 $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
             }
         }
-     
         $options = [
             "page" => 1,
             "limit" => 200,
