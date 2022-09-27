@@ -139,6 +139,7 @@ class Developments extends Model
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
+        $agency = Yii::$app->params['agency'];
         $contentLang = $lang;
         foreach ($langugesSystem as $sysLang) {
             if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
@@ -254,6 +255,11 @@ class Developments extends Model
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+            }
+            $return_data['attachments'] = $attachments;
+        }
+        if (isset($property->identification_type_images) && count($property->identification_type_images) > 0) {
+            foreach ($property->identification_type_images as $pic) {
                 if(isset($pic->identification_type) && $pic->identification_type == '104' ){
                     $home_staging[0]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
                 }
@@ -280,8 +286,7 @@ class Developments extends Model
                 }
             }
             $return_data['home_staging'] = $home_staging;
-            $return_data['attachments'] = $attachments;
-        }
+        }        
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
@@ -411,6 +416,10 @@ class Developments extends Model
                 $data['status'] = $value->property->status;
             if (isset($value->property->plot))
                 $data['plot'] = $value->property->plot;
+            if (isset($value->property->floors->floor))
+                $data['floor'] = $value->property->floors->floor;
+            if (isset($value->property->private_info_object->$agency->apartment_no))
+                $data['apartment_no'] = $value->property->private_info_object->$agency->apartment_no;
             if (isset($value->property->terrace))
                 $data['terrace'] = $value->property->terrace;
             if (isset($value->property->built))
