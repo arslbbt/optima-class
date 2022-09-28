@@ -174,6 +174,9 @@ class CommercialProperties extends Model
         if (isset($get['auction']) && !empty($get['auction'])) {
             $query['auction_tab'] = true;
         }
+        if (isset($get['show_on']) && !empty($get['show_on'])) {
+            $query['show_on'] = ['$in' => $get['show_on']];
+        }
         if (isset($get['auction_featured']) && !empty($get['auction_featured'])) {
             $query['auction_featured'] = 1;
         }
