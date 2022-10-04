@@ -363,6 +363,7 @@ class CommercialProperties extends Model
         if(isset($property['videos']) && !empty($property['videos'])){
             $videos = [];
             $virtual_tours = [];
+            $link_to_auction = [];
             foreach($property['videos'] as $video){
                 if(isset($video['type']) && $video['type'] == 'Video' && isset($video['status']) && $video['status'] == 1){
                     $videos[] = (isset($video['url'][strtoupper(Yii::$app->language)]) ? $video['url'][strtoupper(Yii::$app->language)] : '');
@@ -372,9 +373,13 @@ class CommercialProperties extends Model
             foreach($property['videos'] as $vt){
                 if(isset($vt['type']) && $vt['type'] == '2' && isset($vt['status']) && $vt['status'] == 1){
                     $virtual_tours[] = (isset($vt['url'][strtoupper(Yii::$app->language)]) ? $vt['url'][strtoupper(Yii::$app->language)] : '');
+                }elseif(isset($vt['type']) && $vt['type'] == '112' && isset($vt['status']) && $vt['status'] == 1){
+                    $link_to_auction['link'] = (isset($vt['url'][strtoupper(Yii::$app->language)]) ? $vt['url'][strtoupper(Yii::$app->language)] : '');
+                    $link_to_auction['status'] = (isset($vt['status']) ? $vt['status'] : '');
                 }
             }
             $f_property['vt'] = $virtual_tours;
+            $f_property['link_to_auction'] = $link_to_auction;
         }
         if (isset($property['created_at']) && !empty($property['created_at'])) {
             $f_property['created_at'] = strtotime($property['created_at']);
@@ -894,6 +899,11 @@ class CommercialProperties extends Model
         $fields = [
         'sale' => (isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ? (Boolean)'1' : (Boolean)'0'),
         'rent' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
+        'auction_tab' => (isset($data['transaction_type']) && $data['transaction_type'] == 'auction' ? (Boolean)'1' : (Boolean)'0'),
+        'starting_price' => (isset($data['starting_price']) && !empty($data['starting_price']) ? (int)$data['starting_price'] : ''),
+        'minimum_price' => (isset($data['minimum_price']) && !empty($data['minimum_price']) ? (int)$data['minimum_price'] : ''),
+        'auction_start_date' => (isset($data['auction_start_date']) && !empty($data['auction_start_date']) ? $data['auction_start_date'] : ''),
+        'auction_end_date' => (isset($data['auction_end_date']) && !empty($data['auction_end_date']) ? $data['auction_end_date'] : ''),
         'lt_rental' => (isset($data['transaction_type']) && $data['transaction_type'] == 'rent' ? (Boolean)'1' : (Boolean)'0'),
         'type_one' => (isset($data['type_one']) && !empty($data['type_one']) ? (int)$data['type_one'] : ''),
         'type_two' => (isset($data['type_two']) && !empty($data['type_two']) ? (int)$data['type_two'] : ''),
@@ -968,10 +978,13 @@ class CommercialProperties extends Model
         }
         if(isset($languages) && !empty($languages)){
             foreach($languages as $lang){
-                if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale'){
+                if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale' ){
                     $fields['title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
                     $fields['description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
-                } else {
+                }elseif(isset($data['transaction_type']) && $data['transaction_type'] == 'auction' ){
+                    $fields['title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
+                    $fields['description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
+                }else {
                     $fields['rental_title'][strtoupper($lang)] = (isset($data['title'][strtoupper($lang)]) && !empty($data['title'][strtoupper($lang)]) ? $data['title'][strtoupper($lang)] : $data['title']['EN']);
                     $fields['rental_description'][strtoupper($lang)] =(isset($data['description'][strtoupper($lang)]) && !empty($data['description'][strtoupper($lang)]) ? $data['description'][strtoupper($lang)] : $data['description']['EN']);
                 }
