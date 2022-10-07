@@ -320,7 +320,7 @@ class CommercialProperties extends Model
         }else if (isset($property['title'][$lang]) && $property['title'][$lang] != '') {
             $f_property['sale_title'] = $property['title'][$lang];
         } else {
-            $f_property['sale_title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
+            $f_property['sale_title'] = (isset($property['property_type_one']['value'][$contentLang]) ? \Yii::t('app', $property['property_type_one']['value'][$contentLang]) : '') . ' ' . (isset($property['property_location']['value'][$contentLang]) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value'][$contentLang]) : '');
         }
         if (isset($property['shared_data']['description'][$lang]) && $property['shared_data']['description'][$lang] != '') {
             $f_property['sale_description'] = $property['shared_data']['description'][$lang];
@@ -332,7 +332,7 @@ class CommercialProperties extends Model
         }elseif (isset($property['rental_title'][$lang]) && $property['rental_title'][$lang] != '') {
             $f_property['rent_title'] = $property['rental_title'][$lang];
         }else{
-            $f_property['rent_title'] = (isset($property['type_one_value']['en']) ? \Yii::t('app', $property['type_one_value']['en']) : '') . ' ' . (isset($property['property_location']['value']['en']) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value']['en']) : '');
+            $f_property['rent_title'] = (isset($property['property_type_one']['value'][$contentLang]) ? \Yii::t('app', $property['property_type_one']['value'][$contentLang]) : '') . ' ' . (isset($property['property_location']['value'][$contentLang]) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value'][$contentLang]) : '');
         }
         if (isset($property['shared_data']['rental_external_description'][$lang]) && $property['shared_data']['rental_external_description'][$lang] != '') {
             $f_property['rent_description'] = $property['shared_data']['rental_external_description'][$lang];
