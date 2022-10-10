@@ -347,6 +347,7 @@ class CommercialProperties extends Model
         }
         if (isset($property['listing_agency_data']['logo']['name']) && !empty($property['listing_agency_data']['logo']['name']) ) {
             $f_property['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property['listing_agency_data']['_id']) ? $property['listing_agency_data']['_id'] : '') . '/' . (isset($property['listing_agency_data']['logo']['name']) ? $property['listing_agency_data']['logo']['name'] : '');
+            $f_property['compnay_id'] = isset($property['listing_agency_data']['_id']) ? $property['listing_agency_data']['_id'] : '';
         }
         if (isset($property['seo_title'][$lang]) && $property['seo_title'][$lang] != '') {
             $f_property['meta_title'] = $property['seo_title'][$lang];
@@ -788,7 +789,7 @@ class CommercialProperties extends Model
         $post_data['options'] = [
             'page' => $options['page'],
             'limit' => $options['limit'],
-            'populate' => ['property_attachments','agency_data']
+            'populate' => ['property_attachments','agency_data','listing_agency_data']
         ];
         $post_data['query'] = [
             'id' => $id
