@@ -183,6 +183,9 @@ class CommercialProperties extends Model
         if (isset($get['auction_latlng']) && !empty($get['auction_latlng'])) {
             $query['auction_tab'] = true;
         }
+        if (isset($get['auction_end_date']) && !empty($get['auction_end_date'])) {
+            $query['auction_end_date'] = ['$gte' => $get['auction_end_date']];
+        }
         if (isset($get['country']) && !empty($get['country'])) {
             $query['country'] = (int) $get['country'];
         }
