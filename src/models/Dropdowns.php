@@ -16,12 +16,21 @@ use optima\assets\OptimaAsset;
 class Dropdowns extends Model
 {
 
-    public static function countries($model_type = '')
+    public static function countries($model_type = [])
     {
-
-        $file = Functions::directory() . 'countries'.(!empty($model_type) ? $model_type : '').'.json';
+        $query = '';
+        $types = isset($model_type['type']) && !empty($model_type['type']) ? $model_type['type'] : [];
+        if(isset($types) && !empty($types))
+        {
+            foreach($types as $p_type){
+                $query .='&'.$p_type.'=1';
+            }
+        }
+        $query .= isset($model_type['system_lang']) && !empty($model_type['system_lang']) ? '&system_lang='.$model_type['system_lang'] : '';
+        $query .= isset($model_type['transaction_types']) && !empty($model_type['transaction_types']) ? '&transaction_types='.$model_type['transaction_types'] : '';
+        $file = Functions::directory() . 'countries'.(!empty($types) ?  '_'.implode('-', $types) : '').'.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key'].(!empty($model_type) ? '&model_type=' . $model_type : '');
+            $url = Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key'].(!empty($query) ? $query : '');
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
         } else {
