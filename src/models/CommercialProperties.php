@@ -36,20 +36,14 @@ class CommercialProperties extends Model
         $options['sort'] = $sort;
 
         $get = Yii::$app->request->get();
-        if(isset($query) && $query != '' && !is_array($query)){
-            $vars = explode('&', $query);
-            foreach($vars as $var){
-                $k = explode('=', $var);
-                if(isset($k[0]) && isset($k[1])){
-                    if($k[0] == 'favourite_ids'){
-                        $query_array['$and'][]['favourite_ids'] = explode(',', $k[1]);
-                        $query_array['$and'][]['archived']['$ne'] = true;
-                    }else{
-                        $post_data[$k[0]] = $k[1];
-                        $post_data['archived']['$ne'] = true;
-                    }
-                }
-            }
+        if(isset($get['favorite_ids']) && !empty($get['favorite_ids'])){
+            $query_array["archived"] = [
+                '$ne' => true
+            ];
+            $query_array["reference"] = 
+            [
+                '$in' => $get['favorite_ids'],
+            ];
         }
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
