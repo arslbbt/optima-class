@@ -453,7 +453,6 @@ class ContactUs extends Model
     public function saveAccount()
     {
         $settings = Cms::settings();
-
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == '9:00 to 18:00') {
             $call_rememeber = 'call me back:  9:00 to 18:00';
@@ -639,6 +638,10 @@ class ContactUs extends Model
             'social_id' => isset($data['social_id']) ? $data['social_id'] : null,
             'first_name' => isset($data['first_name']) ? $data['first_name'] : null,
             'last_name' => isset($data['last_name']) ? $data['last_name'] : null,
+            'company_name' => isset($data['company_name']) ? $data['company_name'] : '', //For company registration
+            'tax_id' => isset($data['tax_id']) ? $data['tax_id'] : '',                   //For company registration
+            'nationality' => isset($data['nationality']) ? $data['nationality'] : '',    //For company registration
+            'full_name' => isset($data['full_name']) ? $data['full_name'] : '',          //For company registration
             'user_email' => isset($data['user_email']) ? $data['user_email'] : null,
             "password_hash" =>  isset($data['password_hash']) ? $data['password_hash'] : null,
             "password_repeat" =>  isset($data['password_repeat']) ? $data['password_repeat'] : null,
