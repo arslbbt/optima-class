@@ -180,6 +180,13 @@ class CommercialProperties extends Model
         if (isset($get['auction_end_date']) && !empty($get['auction_end_date'])) {
             $query['auction_end_date'] = ['$gte' => $get['auction_end_date']];
         }
+        if (isset($get['categories']) && !empty($get['categories'])) {
+            $intArray = array();
+            foreach ($get['categories'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['shared_categories'] = ['$in' => $intArray];
+        }
         if (isset($get['country']) && !empty($get['country'])) {
             $query['country'] = (int) $get['country'];
         }
