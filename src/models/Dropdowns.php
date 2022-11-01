@@ -37,6 +37,19 @@ class Dropdowns extends Model
         }
         return json_decode($file_data, TRUE);
     }
+    
+    public static function nationality($nation_word = '')
+    {
+        $file = Functions::directory().'nationalities'.'.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $url = Yii::$app->params['apiUrl'] . 'properties/nationalities&user_apikey='.Yii::$app->params['api_key'].'&lang=en&search_word='.(isset($nation_word) ? $nation_word : '').'&page=1&per-page=1000';
+            $file_data = Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return json_decode($file_data, TRUE);
+    }
 
     public static function getRegions($params = [])
     {
