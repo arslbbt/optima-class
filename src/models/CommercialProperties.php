@@ -1036,6 +1036,26 @@ class CommercialProperties extends Model
 
     }
 
+    public static function saveCompanyAttachments($company_id, $images, $type){
+
+        $node_url = Yii::$app->params['apiUrl'] . 'users/upload-images&user_apikey=' . Yii::$app->params['api_key'];
+
+        $fields = [
+            'id' => $company_id,
+            'model' => "companies",   // model name should never be changed        // depend on you to send or send empty value
+            'type' => $type,
+            'files' => $images,
+        ];
+        $curl = new curl\Curl();
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))
+            ])
+            ->post($node_url);
+        return json_decode($response);
+    }
+    
     public static function savePropertyOfInterest($data){
 
         $node_url = Yii::$app->params['node_url'] . 'accounts/update-with-email/?user_apikey=' . Yii::$app->params['api_key'];
