@@ -65,9 +65,15 @@ class Developments extends Model
                 
             if (isset($property->property->phase) && $property->property->phase != '')
                 $data['phase_name'] = isset($property->property->phase['0']->phase_name) ? $property->property->phase['0']->phase_name : '';
+
+            if (isset($property->property->phase) && $property->property->phase != '')
+                $data['phase_completion_date'] = isset($property->property->phase['0']->completion_date) ? $property->property->phase['0']->completion_date : '';
             
             if (isset($property->property->type) && $property->property->type != '')
                 $data['type'] = implode(', ', $property->property->type);
+
+            if (isset($property->property->total_number_of_unit) && $property->property->total_number_of_unit != '')
+                $data['total_number_of_unit'] = $property->property->total_number_of_unit;
             
             if (isset($property->property->city_name) && $property->property->city_name != '')
                 $data['city_name'] = $property->property->city_name;
