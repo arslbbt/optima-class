@@ -51,7 +51,7 @@ class CommercialProperties extends Model
             }
             if (count($query)){
                 $query_array = $query;
-                $query_array['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
+                $query_array['status'] = ['$in' => (isset($_GET['status']) && !empty($_GET['status']) ? $_GET['status'] : (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer']))];
             }
         }
         
@@ -170,6 +170,9 @@ class CommercialProperties extends Model
         }
         if (isset($get['show_on']) && !empty($get['show_on'])) {
             $query['show_on'] = ['$in' => $get['show_on']];
+        }
+        if (isset($get['status']) && !empty($get['status'])) {
+            $query['status'] = ['$in' => $get['status']];
         }
         if (isset($get['auction_featured']) && !empty($get['auction_featured'])) {
             $query['auction_featured'] = 1;
