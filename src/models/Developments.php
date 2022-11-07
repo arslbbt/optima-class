@@ -30,7 +30,6 @@ class Developments extends Model
             $query .= self::setQuery();
         }
         $url = Yii::$app->params['apiUrl'] . 'constructions&user=' . Yii::$app->params['user'] . $query;
-        // echo "<pre>";print_r($url);die;
         if ($cache == true) {
             $JsonData = self::DoCache($query, $url);
         } else {
@@ -90,6 +89,11 @@ class Developments extends Model
             if (isset($property->property->bathrooms_to) && $property->property->bathrooms_to > 0) {
                 $data['bathrooms_to'] = $property->property->bathrooms_to;
             }
+            if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+                $data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+            } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
+                $data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset($property->agency_logo->_id) ? $property->agency_logo->_id : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+            }
             if (isset($property->property->built_size_from) && $property->property->built_size_from > 0) {
                 $data['built_from'] = $property->property->built_size_from;
             }
@@ -134,6 +138,7 @@ class Developments extends Model
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
+        $get = Yii::$app->request->get();
         $contentLang = $lang;
         foreach ($langugesSystem as $sysLang) {
             if ((isset($sysLang['internal_key']) && $sysLang['internal_key'] != '') && $lang == $sysLang['internal_key']) {
@@ -142,12 +147,20 @@ class Developments extends Model
         }
         $ref = $reference;
         $url = Yii::$app->params['apiUrl'] . 'constructions/view-by-ref&user=' . Yii::$app->params['user'] . '&ref=' . $ref;
-        // echo '<pre>'; print_r($url); die;
+        $development_status = (isset($get['status']) && !empty($get['status']) ? $get['status'] : (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : []));
+        foreach ($development_status as $status) {
+            $url .= '&status[]=' . $status;
+        }
+        if(isset($get['model']) && !empty($get['model'])){
+            $url .= '&model='.$get['model'];
+        }
         $JsonData = Functions::getCRMData($url, false);
         $property = json_decode($JsonData);
+
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
+        $home_staging = [];
         $quality_specifications = [];
         $settings = Cms::settings();
 
@@ -164,7 +177,6 @@ class Developments extends Model
         } else {
             $return_data['reference'] = $property->property->reference;
         }
-
         if (isset($property->property->reference) && $property->property->reference != '')
             $return_data['id'] = $property->property->reference;
 
@@ -175,6 +187,7 @@ class Developments extends Model
             
         if (isset($property->property->city) && $property->property->city != '')
             $return_data['city'] = $property->property->city;
+
         if (isset($property->property->phase_low_price_from) && $property->property->phase_low_price_from != '')
             $return_data['price_from'] = number_format((int) $property->property->phase_low_price_from, 0, '', '.');
 
@@ -198,6 +211,9 @@ class Developments extends Model
             $return_data['location'] = $property->property->location;
             $return_data['location_key'] = isset($property->property->location_key) ? $property->property->location_key : '';
         }
+        if (isset($property->property->province)) {
+            $return_data['province'] = $property->property->province;
+        }      
         if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
             $return_data['bedrooms_from'] = $property->property->bedrooms_from;
         }
@@ -231,10 +247,41 @@ class Developments extends Model
         if (isset($property->property->videos) && $property->property->videos > 0) {
             $return_data['videos'] = $property->property->videos;
         }
+        
+        if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
+            $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+        } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
+            $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
+        }
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
                 $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                if(isset($pic->identification_type) && $pic->identification_type == '104' ){
+                    $home_staging[0]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                 if(isset($pic->identification_type) && $pic->identification_type == '106' ){
+                    $home_staging[1]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '107' ){
+                    $home_staging[2]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '108' ){
+                    $home_staging[3]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '105' ){
+                    $home_staging[0]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '109' ){
+                    $home_staging[1]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '110' ){
+                    $home_staging[2]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
+                if(isset($pic->identification_type) && $pic->identification_type == '111' ){
+                    $home_staging[3]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                }
             }
+            $return_data['home_staging'] = $home_staging;
             $return_data['attachments'] = $attachments;
         }
         if (isset($property->documents) && count($property->documents) > 0) {
@@ -249,9 +296,12 @@ class Developments extends Model
                         );
                     }
                 }
+              
             }
+
             $return_data['floor_plans'] = $floor_plans;
         }
+
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'QS') {
@@ -335,6 +385,10 @@ class Developments extends Model
         $properties = [];
         foreach ($property->properties as $key => $value) {
             $data = [];
+            if (isset($value->property->sale) && $value->property->sale == 1)
+                $data['sale'] = $value->property->sale;
+            if (isset($value->property->rent) && $value->property->rent == 1)
+                $data['rent'] = $value->property->rent;
             if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                 $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
             if (isset($value->property->price_from) && $value->property->price_from > 0)
@@ -349,16 +403,24 @@ class Developments extends Model
                 $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
             if (isset($value->property->type_one))
                 $data['type'] = $value->property->type_one;
+            if (isset($value->property->property_name))
+                $data['property_name'] = $value->property->property_name;
             if (isset($value->property->block))
                 $data['block'] = $value->property->block;
             if (isset($value->property->portal))
                 $data['portal'] = $value->property->portal;
             if (isset($value->property->status))
                 $data['status'] = $value->property->status;
+            if (isset($value->property->plot))
+                $data['plot'] = $value->property->plot;
+            if (isset($value->property->terrace))
+                $data['terrace'] = $value->property->terrace;
             if (isset($value->property->built))
                 $data['built'] = $value->property->built;
             if (isset($value->property->location))
                 $data['location'] = $value->property->location;
+            if (isset($value->property->address_city))
+                $data['city'] = $value->property->address_city;
             if (isset($value->property->reference))
                 $data['id'] = $value->property->reference;
             if (isset($value->property->year_built))
@@ -390,6 +452,80 @@ class Developments extends Model
                 $data['attachments'] = $attachments;
             }
             $properties[] = $data;
+        }
+        // commercial properties 
+        if(isset($get['model']) && !empty($get['model'])){
+            $commercial_properties = [];
+            foreach ($property->properties as $key => $value) {
+                $data = [];
+                if (isset($value->property->sale) && $value->property->sale == 1)
+                    $data['sale'] = $value->property->sale;
+                if (isset($value->property->rent) && $value->property->rent == 1)
+                    $data['rent'] = $value->property->rent;
+                if (isset($value->property->currentprice) && $value->property->currentprice > 0)
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
+                if (isset($value->property->price_from) && $value->property->price_from > 0)
+                    $data['price_from'] = str_replace(',', '.', (number_format((int) ($value->property->price_from))));
+                if (isset($value->property->price_to) && $value->property->price_to > 0)
+                    $data['price_to'] = str_replace(',', '.', (number_format((int) ($value->property->price_to))));
+                if (isset($value->property->plot) && $value->property->plot > 0)
+                    $data['plot'] = str_replace(',', '.', (number_format((int) ($value->property->plot))));
+                if (isset($value->property->bedrooms) && $value->property->bedrooms > 0)
+                    $data['bedrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bedrooms))));
+                if (isset($value->property->bathrooms) && $value->property->bathrooms > 0)
+                    $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
+                if (isset($value->property->type_one))
+                    $data['type'] = $value->property->type_one;
+                if (isset($value->property->property_name))
+                    $data['property_name'] = $value->property->property_name;
+                if (isset($value->property->block))
+                    $data['block'] = $value->property->block;
+                if (isset($value->property->portal))
+                    $data['portal'] = $value->property->portal;
+                if (isset($value->property->status))
+                    $data['status'] = $value->property->status;
+                if (isset($value->property->plot))
+                    $data['plot'] = $value->property->plot;
+                if (isset($value->property->terrace))
+                    $data['terrace'] = $value->property->terrace;
+                if (isset($value->property->built))
+                    $data['built'] = $value->property->built;
+                if (isset($value->property->location))
+                    $data['location'] = $value->property->location;
+                if (isset($value->property->address_city))
+                    $data['city'] = $value->property->address_city;
+                if (isset($value->property->reference))
+                    $data['id'] = $value->property->reference;
+                if (isset($value->property->year_built))
+                    $data['year_built'] = $value->property->year_built;
+                if (isset($value->property->new_construction) && $value->property->new_construction == true)
+                    $data['new_construction'] = $value->property->new_construction;
+                if (isset($value->property->description->$lang))
+                    $data['description'] = $property->property->description->$lang;
+    
+                if (isset($value->documents)) {
+                    $fplans = [];
+                    foreach ($value->documents as $pic) {
+                        if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
+                            if (isset(Yii::$app->params['floor_plans_url']))
+                                $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                        }
+                    }
+                    $data['floor_plans'] = $fplans;
+                }
+                if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
+                    $data['title'] = $value->property->title->$lang;
+                else if (isset($value->property->location))
+                    $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
+                if (isset($value->attachments)) {
+                    $attachments = [];
+                    foreach ($value->attachments as $pic) {
+                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    }
+                    $data['attachments'] = $attachments;
+                }
+                $commercial_properties[] = $data;
+            }
         }
         //        start slug_all
         $slugs = [];
@@ -435,6 +571,7 @@ class Developments extends Model
         $return_data['property_features']['views'] = $views;
         $return_data['property_features']['distances'] = $distances;
         $return_data['properties'] = $properties;
+        $return_data['commercial_properties'] = $commercial_properties;
         return $return_data;
     }
 

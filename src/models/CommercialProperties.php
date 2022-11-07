@@ -29,6 +29,7 @@ class CommercialProperties extends Model
                 'match' => ['document' => ['$ne' => true], 'publish_status' => ['$ne' => false]],
             ]
         ];
+        
 
         if (Yii::$app->request->get('orderby') && is_array(Yii::$app->request->get('orderby')) && count(Yii::$app->request->get('orderby')) == 2 ) {
             $sort = [Yii::$app->request->get('orderby')[0] => Yii::$app->request->get('orderby')[1]];
@@ -51,13 +52,14 @@ class CommercialProperties extends Model
                 }
             }
         }
+        
         if(isset($query) && $query != '' && is_array($query)){
             if (!count($query)) {
                 $query = self::setQuery();
             }
             if (count($query)){
                 $query_array = $query;
-                $query_array['$and'][]['status'] = ['$in' => (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer'])];
+                $query_array['status'] = ['$in' => (isset($_GET['status']) && !empty($_GET['status']) ? $_GET['status'] : (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer']))];
             }
         }
         
@@ -69,13 +71,17 @@ class CommercialProperties extends Model
             $post_data['selectRecords'] = false;
         }
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
-        $curl = new curl\Curl();
-        $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
-            ->post($node_url);
+        if(isset($set_options['cache']) && $set_options['cache'] == true){
+            $response = self::DoCache($post_data, $node_url);
+        }else{
+            $curl = new curl\Curl();
+            $response = $curl->setRequestBody(json_encode($post_data))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($post_data))
+                ])
+                ->post($node_url);
+        }
         $response = json_decode($response, TRUE);
 
         $properties = [];
@@ -85,7 +91,6 @@ class CommercialProperties extends Model
             $properties[] = self::formateProperty($property, $set_options);
         }
         $response['docs'] = $properties;
-
         return $response;
     }
 
@@ -118,33 +123,41 @@ class CommercialProperties extends Model
     {
         $get = Yii::$app->request->get();
         $query = [];
-        if (isset($get['price_from']) && !empty($get['price_from'])) {
-            $query['$and'][]['current_price'] = ['$gte' => (int) $get['price_from']];
+        if (isset($get['auction_price_from']) && !empty($get['auction_price_from'])) {
+            $query['starting_price'] = ['$gte' => (int) $get['auction_price_from']];
+        }elseif(isset($get['price_from']) && !empty($get['price_from'])) {
+            $query['current_price'] = ['$gte' => (int) $get['price_from']];
         }
-        if (isset($get['price_to']) && !empty($get['price_to'])) {
-            $query['$and'][]['current_price'] = ['$lte' => (int) $get['price_to']];
+        if((isset($get['auction_price_to']) && !empty($get['auction_price_to']))) {
+            $query['starting_price'] = ['$lte' => (int) $get['auction_price_to']];
+        }elseif(isset($get['price_to']) && !empty($get['price_to'])) {
+            $query['current_price'] = ['$lte' => (int) $get['price_to']];
         }
         if (isset($get['reference']) && !empty($get['reference'])) {
-            $query['$and'][]['$or'] = [
+            $query['$or'] = [
                 ["reference" => (int) $get['reference']],
                 ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
             ];
         }
-
+        if (isset($get['prop_ids']) && !empty($get['prop_ids'])) {
+            $prop_ids = $get['prop_ids'] != '' ? $get['prop_ids'] : [];
+                $prop_ids = explode(',', $prop_ids);
+                 $query['_id'] = ['$in' =>  $prop_ids];
+        }
         if (isset($get['type']) && !empty($get['type']) && is_array($get['type']) && count($get['type']) > 0 && $get['type'][0] != 0 && $get['type'][0] != '' && $get['type'][0] != '0') {
             $intArray = array();
             foreach ($get['type'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['type_one'] = ['$in' => $intArray];
+            $query['type_one'] = ['$in' => $intArray];
         }
         if (isset($get['sub_type']) && !empty($get['sub_type']) && is_array($get['sub_type']) && count($get['sub_type']) > 0 && $get['sub_type'][0] != 0 && $get['sub_type'][0] != '' && $get['sub_type'][0] != '0') {
             $intArray = array();
             foreach ($get['sub_type'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['type_two'] = ['$in' => $intArray];
+            $query['type_two'] = ['$in' => $intArray];
         }
         if (isset($get['price_on_demand']) && !empty($get['price_on_demand'])) {
             $query['$or'][]['price_on_demand'] = ['$exists' => (int) 1];
@@ -160,13 +173,19 @@ class CommercialProperties extends Model
             $query['rental_seasons_price_to'] = (int) $get['rental_price_to'];
         }
         if (isset($get['auction']) && !empty($get['auction'])) {
-            $query['auction_records'] = true;
+            $query['auction_tab'] = true;
         }
         if (isset($get['auction_featured']) && !empty($get['auction_featured'])) {
             $query['auction_featured'] = 1;
         }
         if (isset($get['auction_latlng']) && !empty($get['auction_latlng'])) {
             $query['auction_tab'] = true;
+        }
+        if (isset($get['own']) && !empty($get['own'])) {
+            $query['own'] = true;
+        }
+        if (isset($get['status']) && !empty($get['status'])) {
+            $query['status'] = ['$in' => $get['status']];
         }
         if (isset($get['country']) && !empty($get['country'])) {
             $query['country'] = (int) $get['country'];
@@ -176,21 +195,21 @@ class CommercialProperties extends Model
             foreach ($get['city'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['city'] = ['$in' => $intArray];
+            $query['city'] = ['$in' => $intArray];
         }
         if (isset($get['location']) && !empty($get['location'])) {
             $intArray = array();
             foreach ($get['location'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['location'] = ['$in' => $intArray];
+            $query['location'] = ['$in' => $intArray];
         }
         if (isset($get['province']) && !empty($get['province'])) {
             $intArray = array();
             foreach ($get['province'] as $int_val) {
                 $intArray[] = (int) $int_val;
             }
-            $query['$and'][]['province'] = ['$in' => $intArray];
+            $query['province'] = ['$in' => $intArray];
         }
         if (isset($get['cp_features']) && !empty($get['cp_features'])) {
             foreach($get['cp_features'] as $features){
@@ -200,7 +219,7 @@ class CommercialProperties extends Model
                         $search_features[$key] = $feature;
                     }
                 }
-                $query['$and'][]['$or'] = $search_features;
+                $query['$or'] = $search_features;
             }
         }
         if (isset($get['sale']) && !empty($get['sale'])) {
@@ -208,42 +227,43 @@ class CommercialProperties extends Model
         }
         if (isset($get['rent']) && !empty($get['rent'])) {
             $query['rent'] = true;
-        } if (isset($get['lt_rental']) && !empty($get['lt_rental'])) {
+        }
+        if (isset($get['lt_rental']) && !empty($get['lt_rental'])) {
             $query['lt_rental'] = true;
         }
         if (isset($get['st_rental']) && !empty($get['st_rental'])) {
             $query['st_rental'] = true;
         }
         if (isset($get['bedrooms']) && !empty($get['bedrooms'])) {
-            $query['$and'][]['bedrooms'] = $get['bedrooms'];
+            $query['bedrooms'] = $get['bedrooms'];
         }
         if (isset($get['min_bed']) && !empty($get['min_bed'])) {
-            $query['$and'][]['bedrooms'] = ['$lte' => (int)$get['min_bed']];
+            $query['bedrooms'] = ['$lte' => (int)$get['min_bed']];
         } elseif (isset($get['max_bed']) && !empty($get['max_bed'])) {
-            $query['$and'][]['bedrooms'] = ['$gte' => (int)$get['max_bed']];
+            $query['bedrooms'] = ['$gte' => (int)$get['max_bed']];
         }
         if (isset($get['bathrooms']) && $get['bathrooms']) {
-            $query['$and'][]['bathrooms'] = $get['bathrooms'];
+            $query['bathrooms'] = $get['bathrooms'];
         }
         if (isset($get['min_bath']) && !empty($get['min_bath'])) {
-            $query['$and'][]['bathrooms'] = ['$lte' => (int)$get['min_bath']];
+            $query['bathrooms'] = ['$lte' => (int)$get['min_bath']];
         } elseif (isset($get['max_bath']) && !empty($get['max_bath'])) {
-            $query['$and'][]['bathrooms'] = ['$gte' => (int)$get['max_bath']];
+            $query['bathrooms'] = ['$gte' => (int)$get['max_bath']];
         }
         if (isset($get['new_built']) && !empty($get['new_built'])) {
-            $query['$and'][]['project'] = true;
+            $query['project'] = true;
         }
         if (isset($get['region']) && !empty($get['region'])) {
-            $query['$and'][]['region'] = (int) $get['region'];
+            $query['region'] = (int) $get['region'];
         }
 
-        $query['$and'][]['archived']['$ne'] = true;
+        $query['archived']['$ne'] = true;
 
         if (isset($get['featured']) && !empty($get['featured'])) {
-            $query['$and'][]['featured'] = true;
+            $query['featured'] = true;
         }
         if (isset($get['office']) && !empty($get['office'])) {
-            $query['$and'][]['offices'] =['$in' => $get['office']];
+            $query['offices'] =['$in' => $get['office']];
         }
         return $query;
     }
@@ -272,11 +292,23 @@ class CommercialProperties extends Model
             $agency = $property['agency'];
             $f_property['agency'] = $property['agency'];
         }
+        if(isset($property['from_residential']) && !empty($property['from_residential'])){
+            $f_property['from_residential'] = $property['from_residential'];
+        }
+        if (isset($property['price_on_demand'])) {
+            $f_property['price_on_demand'] = $property['price_on_demand'];
+        }
         if(isset($property['agency_data']['commercial_name']) && !empty($property['agency_data']['commercial_name'])){
             $f_property['agency_name'] = $property['agency_data']['commercial_name'];
         }
         if(isset($property['listing_agency_data']['commercial_name']) && !empty($property['listing_agency_data']['commercial_name'])){
             $f_property['agency_name'] = $property['listing_agency_data']['commercial_name'];
+        }
+        if(isset($property['agency_data']['agency_email']) && !empty($property['agency_data']['agency_email'])){
+            $f_property['agency_email'] = $property['agency_data']['agency_email'];
+        }
+        if(isset($property['listing_agency_data']['agency_email']) && !empty($property['listing_agency_data']['agency_email'])){
+            $f_property['agency_email'] = $property['listing_agency_data']['agency_email'];
         }
         if (isset($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) && !empty($property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number']) ) {
             $f_property['cadastral_number'] = $property['private_info_object'][$agency]['cadastral_numbers'][0]['cadastral_number'];
@@ -434,8 +466,8 @@ class CommercialProperties extends Model
         if (isset($property['city'])) {
             $f_property['city_key'] = $property['city'];
         }
-        if (isset($property['city_value'][$contentLang])) {
-            $f_property['city'] = $property['city_value'][$contentLang];
+        if (isset($property['property_city']['value'][$contentLang])) {
+            $f_property['city'] = $property['property_city']['value'][$contentLang];
         }
         if (isset($property['province_value'][$contentLang])) {
             $f_property['province'] = $property['province_value'][$contentLang];
@@ -443,8 +475,8 @@ class CommercialProperties extends Model
         if (isset($property['location'])) {
             $f_property['location_key'] = $property['location'];
         }
-        if (isset($property['location_value'][$contentLang])) {
-            $f_property['location'] = $property['location_value'][$contentLang];
+        if (isset($property['property_location']['value'][$contentLang])) {
+            $f_property['location'] = $property['property_location']['value'][$contentLang];
         }
         if (isset($property['type_one_key'])) {
             $f_property['type_key'] = $property['type_one_key'];
@@ -646,7 +678,36 @@ class CommercialProperties extends Model
         return $f_property;
     }
 
-    public static function findAllWithLatLang($qry = 'true', $cache = false)
+    public static function DoCache($query, $url)
+    {
+        $webroot = Yii::getAlias('@webroot');
+        $file_name = 'cached_properties_';
+        if (!is_dir($webroot . '/uploads/'))
+            mkdir($webroot . '/uploads/');
+        if (!is_dir($webroot . '/uploads/temp/'))
+            mkdir($webroot . '/uploads/temp/');
+        if(isset($_GET) && !empty($_GET)){
+            foreach($_GET as $key => $value){
+                $file_name .= $key . '_';
+            }
+        }
+        $file = $webroot . '/uploads/temp/' . sha1($file_name) . '.json';
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+            $curl = new curl\Curl();
+            $file_data = $curl->setRequestBody(json_encode($query))
+                ->setHeaders([
+                    'Content-Type' => 'application/json',
+                    'Content-Length' => strlen(json_encode($query))
+                ])
+                ->post($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        return $file_data;
+    }
+
+    public static function findAllWithLatLang($qry = 'true',$map_query =[], $cache = false)
     {
         $webroot = Yii::getAlias('@webroot');
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
@@ -696,7 +757,8 @@ class CommercialProperties extends Model
         {
             $post_data["query"] =  $query_array;
         }
-       
+
+        $post_data["query"] = isset($map_query['ids']) && !empty($map_query['ids']) ? array_merge($post_data["query"] ,["id"  => $map_query['ids']]  ) : $post_data["query"];
         $curl = new curl\Curl();
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders([
