@@ -183,6 +183,20 @@ class CommercialProperties extends Model
         if (isset($get['auction_end_date']) && !empty($get['auction_end_date'])) {
             $query['auction_end_date'] = ['$gte' => $get['auction_end_date']];
         }
+        if (isset($get['booking_created_to']) && !empty($get['booking_created_to'])) {
+            $query['booking_created_to'] = $get['booking_created_to'];
+        }
+        if (isset($get['booking_created_from']) && !empty($get['booking_created_from'])) {
+            $query['booking_created_from'] = $get['booking_created_from'];
+        }
+        if (isset($get['sleeps']) && !empty($get['sleeps'])) {
+            $query['sleeps'] = $get['sleeps'];
+        }
+        if (isset($get['min_built']) && !empty($get['min_built'])) {
+            $query['built'] = ['$lte' => (int)$get['min_built']];
+        } elseif (isset($get['max_built']) && !empty($get['max_built'])) {
+            $query['built'] = ['$gte' => (int)$get['max_built']];
+        }
         if (isset($get['categories']) && !empty($get['categories'])) {
             $intArray = array();
             foreach ($get['categories'] as $int_val) {
