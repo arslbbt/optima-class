@@ -243,6 +243,9 @@ class Developments extends Model
         if (isset($property->property->total_number_of_unit) && $property->property->total_number_of_unit != ''){
             $return_data['total_number_of_unit'] = $property->property->total_number_of_unit;
         }
+        if (isset($property->property->phase) && $property->property->phase != ''){
+            $return_data['phase_completion_date'] = isset($property->property->phase['0']->completion_date) ? $property->property->phase['0']->completion_date : '';
+        }
         if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0) {
             $return_data['bathrooms_from'] = $property->property->bathrooms_from;
         }
