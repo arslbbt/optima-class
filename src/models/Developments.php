@@ -240,6 +240,9 @@ class Developments extends Model
         if (isset($property->property->terrace_to) && $property->property->terrace_to != '') {
             $return_data['terrace_to'] = $property->property->terrace_to;
         }
+        if (isset($property->property->total_number_of_unit) && $property->property->total_number_of_unit != ''){
+            $return_data['total_number_of_unit'] = $property->property->total_number_of_unit;
+        }
         if (isset($property->property->bathrooms_from) && $property->property->bathrooms_from > 0) {
             $return_data['bathrooms_from'] = $property->property->bathrooms_from;
         }
