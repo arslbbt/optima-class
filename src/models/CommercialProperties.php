@@ -221,6 +221,13 @@ class CommercialProperties extends Model
             }
             $query['location'] = ['$in' => $intArray];
         }
+        if (isset($get['lg_by_key']) && !empty($get['lg_by_key'])) {
+            $intArray = array();
+            foreach ($get['lg_by_key'] as $int_val) {
+                $intArray[] = (int) $int_val;
+            }
+            $query['lg_by_key'] = ['$in' => $intArray];
+        }
         if (isset($get['province']) && !empty($get['province'])) {
             $intArray = array();
             foreach ($get['province'] as $int_val) {
