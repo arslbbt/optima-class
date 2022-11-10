@@ -477,6 +477,9 @@ class CommercialProperties extends Model
         if (isset($property['period_seasons']) && !empty($property['period_seasons']) && count($property['period_seasons']) > 0) {
             $f_property['rental_season_data'] = $property['period_seasons'];
         }
+        if (isset($property['rental_seasons']) && !empty($property['rental_seasons']) && count($property['rental_seasons']) > 0) {
+            $f_property['rental_seasons'] = $property['rental_seasons'];
+        }
         if (isset($property['leasehold_unit']) && $property['leasehold_unit']) {
             $f_property['leasehold_unit'] = $property['leasehold_unit'];
         }
