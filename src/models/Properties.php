@@ -1373,6 +1373,9 @@ class Properties extends Model
                 if (isset($property->property->kilowatt)) {
                     $return_data['kilowatt'] = $property->property->kilowatt;
                 }
+                if (isset($property->property->exempt_number)) {
+                    $return_data['exempt_number'] = $property->property->exempt_number;
+                }
                 if (isset($property->property->energy_certificate_two) && $property->property->energy_certificate_two != '') {
                     if ($property->property->energy_certificate_two == 'X' || $property->property->energy_certificate_two == 'x') {
                         $return_data['energy_certificate_two'] = strtolower('In Progress');
