@@ -6,7 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\base\ViewNotFoundException;
 use yii\helpers\Url;
-
+use linslin\yii2\curl;
 class Functions extends Model
 {
 
@@ -256,6 +256,15 @@ class Functions extends Model
                 'page_data' => isset($page_data) ? $page_data : ''
             ]);
         }
+    }
+
+    public static function getAgentsList($agent_name = '')
+    {
+        $url = Yii::$app->params['apiUrl'] .'properties/get-assigned-to-listing-agent&user_apikey=' . Yii::$app->params['api_key'].'&search_word='. $agent_name;
+        $curl = new curl\Curl();
+        $response = $curl->get($url);
+        $response = json_decode($response);
+        return $response;
     }
 
     public static function getCRMData($url, $cache = true, $fields = array(), $auth = false)
