@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\base\ViewNotFoundException;
 use yii\helpers\Url;
+use linslin\yii2\curl;
 
 class Functions extends Model
 {
@@ -197,7 +198,7 @@ class Functions extends Model
             ]);
         }
     }
-
+    
     public static function dynamicPage($object)
     {
         $cmsModel = Cms::Slugs('page');
@@ -258,6 +259,15 @@ class Functions extends Model
         }
     }
 
+    public static function getAgentsList($agent_name = '')
+    {
+        $url = Yii::$app->params['apiUrl'] .'properties/get-assigned-to-listing-agent&user_apikey=' . Yii::$app->params['api_key'].'&search_word='. $agent_name;
+        $curl = new curl\Curl();
+        $response = $curl->get($url);
+        $response = json_decode($response);
+        return $response;
+    }
+
     public static function getCRMData($url, $cache = true, $fields = array(), $auth = false)
     {
         return Functions::getCurlData($url, $cache);
@@ -265,7 +275,7 @@ class Functions extends Model
 
     public static function getCurlData($url, $cache = true, $fields = array(), $auth = false)
     {
-
+        $url = str_replace(' ' ,'%20', $url);
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
