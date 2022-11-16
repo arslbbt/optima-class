@@ -476,8 +476,8 @@ class Developments extends Model
             $properties[] = $data;
         }
         // commercial properties 
+        $commercial_properties = [];
         if(isset($get['model']) && !empty($get['model'])){
-            $commercial_properties = [];
             foreach ($property->properties as $key => $value) {
                 $data = [];
                 if (isset($value->property->sale) && $value->property->sale == 1)
