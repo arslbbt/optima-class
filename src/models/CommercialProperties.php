@@ -116,15 +116,10 @@ class CommercialProperties extends Model
     {
         $get = Yii::$app->request->get();
         $query = [];
-        if (isset($get['auction_price_from']) && !empty($get['auction_price_from'])) {
-            $query['starting_price'] = ['$gte' => (int) $get['auction_price_from']];
-        }elseif(isset($get['price_from']) && !empty($get['price_from'])) {
-            $query['current_price'] = ['$gte' => (int) $get['price_from']];
-        }
-        if((isset($get['auction_price_to']) && !empty($get['auction_price_to']))) {
-            $query['starting_price'] = ['$lte' => (int) $get['auction_price_to']];
-        }elseif(isset($get['price_to']) && !empty($get['price_to'])) {
-            $query['current_price'] = ['$lte' => (int) $get['price_to']];
+        if (isset($get['auction_price_from']) && !empty($get['auction_price_from']) || isset($get['auction_price_to']) && !empty($get['auction_price_to'])) {
+            $query['starting_price'] = ['$gte' => (int) $get['auction_price_from'], '$lte' => isset($get['auction_price_to']) && !empty($get['auction_price_to']) ?  (int) $get['auction_price_to'] : ''];
+        }elseif(isset($get['price_from']) && !empty($get['price_from']) || isset($get['price_to']) && !empty($get['price_to'])) {
+            $query['current_price'] = ['$gte' => (int) $get['price_from'],'$lte' => isset($get['price_to']) && !empty($get['price_to']) ?  (int) $get['price_to'] : ''];
         }
         if (isset($get['reference']) && !empty($get['reference'])) {
             $query['$or'] = [
@@ -239,11 +234,11 @@ class CommercialProperties extends Model
             $query['province'] = ['$in' => $intArray];
         }
         if (isset($get['cp_features']) && !empty($get['cp_features'])) {
-            foreach($get['cp_features'] as $features){
-                $search_features = [];
+            foreach($get['cp_features'] as $key => $features){
+                $search_features[$key] = [];
                 if(isset($features) && !empty($features)){
-                    foreach($features as $key => $feature){
-                        $search_features[$key] = $feature;
+                    foreach($features as $list_key => $feature){
+                        $search_features[$key][$list_key] = $feature;
                     }
                 }
                 $query['$or'] = $search_features;
