@@ -241,7 +241,7 @@ class CommercialProperties extends Model
                         $search_features[$key][$list_key] = $feature;
                     }
                 }
-                $query['$or'] = $search_features;
+                $query['$and'] = $search_features;
             }
         }
         if (isset($get['sale']) && !empty($get['sale'])) {
