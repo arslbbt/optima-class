@@ -234,15 +234,19 @@ class CommercialProperties extends Model
             $query['province'] = ['$in' => $intArray];
         }
         if (isset($get['cp_features']) && !empty($get['cp_features'])) {
-            foreach($get['cp_features'] as $key => $features){
-                $search_features[$key] = [];
-                if(isset($features) && !empty($features)){
-                    foreach($features as $list_key => $feature){
-                        $search_features[$key][$list_key] = $feature;
+            foreach($_GET['cp_features'] as $features){
+                if(isset($features) && count($features) > 1 ){
+                    $group_feature['$or'] = $features;
+                    $search_feature[] = $group_feature;
+                }else{
+                    if(!empty($features)){
+                        foreach($features as $feature){
+                            $search_feature[] = $feature;
+                        }
                     }
                 }
-                $query['$and'] = $search_features;
             }
+            $query['$and'] = $search_feature;
         }
         if (isset($get['sale']) && !empty($get['sale'])) {
             $query['sale'] = true;
