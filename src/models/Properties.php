@@ -2647,7 +2647,7 @@ class Properties extends Model
     public static function getAgency()
     {
         $file = Functions::directory() . 'agency' . '.json';
-        $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'];
+        $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'] . '&site_id=' . Yii::$app->params['site_id'];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $file_data = Functions::getCRMData($url);
             if ($file_data) {
