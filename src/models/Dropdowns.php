@@ -26,6 +26,7 @@ class Dropdowns extends Model
         }
         $query .= isset($prop_types['system_lang']) && !empty($prop_types['system_lang']) ? '&system_lang='.$prop_types['system_lang'] : '';
         $query .= isset($prop_types['transaction_types']) && !empty($prop_types['transaction_types']) ? '&transaction_types='.$prop_types['transaction_types'] : '';
+        $query .= isset($prop_types['prop_status']) && !empty($prop_types['prop_status']) ? '&prop_status='.implode(',', $prop_types['prop_status']) : '';
         $query .= isset($model_type) && !empty($model_type) ? '&model_type=' . $model_type : '';
         $file = Functions::directory() . 'countries'.(!empty($model_type) ? $model_type : '').(!empty($prop_types['type']) ?  '_'.implode('-', $prop_types['type']) : '').'.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
