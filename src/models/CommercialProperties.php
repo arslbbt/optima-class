@@ -618,6 +618,9 @@ class CommercialProperties extends Model
         if (isset($property['terrace']) && $property['terrace'] !='') {
             $f_property['terrace'] = $property['terrace'];
         }
+        if (isset($property['terraces']) && $property['terraces'] !='') {
+            $f_property['terraces'] = $property['terraces'];
+        }
         if (isset($property['cee']) && $property['cee'] !='') {
             $f_property['cee'] = $property['cee'];
         }
