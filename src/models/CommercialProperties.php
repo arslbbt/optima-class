@@ -321,6 +321,9 @@ class CommercialProperties extends Model
         if(isset($property['from_residential']) && !empty($property['from_residential'])){
             $f_property['from_residential'] = $property['from_residential'];
         }
+        if(isset($property['shared_categories']) && !empty($property['shared_categories'])){
+            $f_property['shared_categories'] = $property['shared_categories'];
+        }
         if (isset($property['price_on_demand'])) {
             $f_property['price_on_demand'] = $property['price_on_demand'];
         }
