@@ -16,7 +16,7 @@ use optima\models\Functions;
 class Developments extends Model
 {
 
-    public static function findAll($query, $cache = false, $set_query = true)
+    public static function findAll($query, $cache = false, $set_query = true, $options = [])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -117,9 +117,10 @@ class Developments extends Model
                 $data['lng'] = $property->property->longitude;
             }
             if (isset($property->attachments) && count($property->attachments) > 0) {
+                $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
                 $attachments = [];
                 foreach ($property->attachments as $pic) {
-                    $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
@@ -141,7 +142,7 @@ class Developments extends Model
         return $return_data;
     }
 
-    public static function findOne($reference)
+    public static function findOne($reference, $options = [])
     {
         $langugesSystem = Cms::SystemLanguages();
         $lang = strtoupper(\Yii::$app->language);
@@ -267,37 +268,38 @@ class Developments extends Model
         } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
             $return_data['agency_logo'] = 'https://images.optima-crm.com/companies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
         }
+        $attachments_size = isset($options['images_size']) && !empty($options['images_size']) ? $options['images_size'] . '/' : '1200/';
         if (isset($property->attachments) && count($property->attachments) > 0) {
             foreach ($property->attachments as $pic) {
-                $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                $attachments[] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size. $pic->file_md5_name;
             }
             $return_data['attachments'] = $attachments;
         }
         if (isset($property->identification_type_images) && count($property->identification_type_images) > 0) {
             foreach ($property->identification_type_images as $pic) {
                 if(isset($pic->identification_type) && $pic->identification_type == '104' ){
-                    $home_staging[0]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[0]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                  if(isset($pic->identification_type) && $pic->identification_type == '106' ){
-                    $home_staging[1]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[1]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '107' ){
-                    $home_staging[2]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[2]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '108' ){
-                    $home_staging[3]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[3]['before'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '105' ){
-                    $home_staging[0]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[0]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '109' ){
-                    $home_staging[1]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[1]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '110' ){
-                    $home_staging[2]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[2]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 if(isset($pic->identification_type) && $pic->identification_type == '111' ){
-                    $home_staging[3]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $home_staging[3]['after'] = Yii::$app->params['dev_img'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
             }
             $return_data['home_staging'] = $home_staging;
@@ -471,7 +473,7 @@ class Developments extends Model
             if (isset($value->attachments)) {
                 $attachments = [];
                 foreach ($value->attachments as $pic) {
-                    $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                    $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                 }
                 $data['attachments'] = $attachments;
             }
@@ -544,7 +546,7 @@ class Developments extends Model
                 if (isset($value->attachments)) {
                     $attachments = [];
                     foreach ($value->attachments as $pic) {
-                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/1200/' . $pic->file_md5_name;
+                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
                     }
                     $data['attachments'] = $attachments;
                 }
