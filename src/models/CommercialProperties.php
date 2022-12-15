@@ -190,6 +190,14 @@ class CommercialProperties extends Model
         if (isset($get['sleeps']) && !empty($get['sleeps'])) {
             $query['sleeps'] = $get['sleeps'];
         }
+        if (isset($get['min_sleeps']) && !empty($get['min_sleeps'])) {
+            $query['sleeps'] = ['$lte' => (int)$get['min_sleeps']];
+        } elseif (isset($get['max_sleeps']) && !empty($get['max_sleeps'])) {
+            $query['sleeps'] = ['$gte' => (int)$get['max_sleeps']];
+        }
+        if (isset($get['property_name']) && !empty($get['property_name'])) {
+            $query['property_name'] = $get['property_name'];
+        }
         if (isset($get['min_built']) && !empty($get['min_built'])) {
             $query['built'] = ['$lte' => (int)$get['min_built']];
         } elseif (isset($get['max_built']) && !empty($get['max_built'])) {
@@ -279,6 +287,9 @@ class CommercialProperties extends Model
         if (isset($get['new_built']) && !empty($get['new_built'])) {
             $query['project'] = true;
         }
+        if (isset($get['hairdryer']) && !empty($get['hairdryer'])) {
+            $query['hairdryer'] = true;
+        }
         if (isset($get['region']) && !empty($get['region'])) {
             $query['region'] = (int) $get['region'];
         }
@@ -323,6 +334,9 @@ class CommercialProperties extends Model
         }
         if(isset($property['shared_categories']) && !empty($property['shared_categories'])){
             $f_property['shared_categories'] = $property['shared_categories'];
+        }
+        if(isset($property['own']) && !empty($property['own'])){
+            $f_property['own'] = $property['own'];
         }
         if (isset($property['price_on_demand'])) {
             $f_property['price_on_demand'] = $property['price_on_demand'];
