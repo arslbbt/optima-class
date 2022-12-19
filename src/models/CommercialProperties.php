@@ -478,6 +478,9 @@ class CommercialProperties extends Model
         } elseif (isset($property['address']['lat']) && isset($property['address']['lng']) && $property['address']['lat'] != '' && $property['address']['lng'] != '') {
             $f_property['lat'] = $property['address']['lat'];
             $f_property['lng'] = $property['address']['lng'];
+        } elseif (isset($property['private_info_object'][Yii::$app->params['agency']]['latitude']) && !empty($property['private_info_object'][Yii::$app->params['agency']]['latitude'])){
+            $f_property['lat'] = isset($property['private_info_object'][Yii::$app->params['agency']]['latitude']) ? $property['private_info_object'][Yii::$app->params['agency']]['latitude'] : '';
+            $f_property['lng'] = isset($property['private_info_object'][Yii::$app->params['agency']]['longitude']) ? $property['private_info_object'][Yii::$app->params['agency']]['longitude'] : '';
         }
         if (isset($property['sale']) && $property['sale']) {
             $f_property['sale'] = TRUE;
