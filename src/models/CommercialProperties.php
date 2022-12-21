@@ -531,6 +531,12 @@ class CommercialProperties extends Model
         if (isset($property['auction_end_date']) && !empty($property['auction_end_date'])) {
             $f_property['auction_end_date'] = $property['auction_end_date'];
         }
+        if (isset($property['start_time']) && !empty($property['start_time'])) {
+            $f_property['start_time'] = $property['start_time'];
+        }
+        if (isset($property['end_time']) && !empty($property['end_time'])) {
+            $f_property['end_time'] = $property['end_time'];
+        }
         if (isset($property['currency'])) {
             $f_property['currency'] = $property['currency'];
         }
@@ -617,6 +623,9 @@ class CommercialProperties extends Model
         }
         if (isset($property['terrace']) && $property['terrace'] !='') {
             $f_property['terrace'] = $property['terrace'];
+        }
+        if (isset($property['terraces']) && $property['terraces'] !='') {
+            $f_property['terraces'] = $property['terraces'];
         }
         if (isset($property['cee']) && $property['cee'] !='') {
             $f_property['cee'] = $property['cee'];
