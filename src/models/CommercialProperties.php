@@ -335,6 +335,9 @@ class CommercialProperties extends Model
         if(isset($property['shared_categories']) && !empty($property['shared_categories'])){
             $f_property['shared_categories'] = $property['shared_categories'];
         }
+        if(isset($property['hairdryer']) && !empty($property['hairdryer'])){
+            $f_property['hairdryer'] = $property['hairdryer'];
+        }
         if(isset($property['own']) && !empty($property['own'])){
             $f_property['own'] = $property['own'];
         }
@@ -731,6 +734,7 @@ class CommercialProperties extends Model
         $f_property['property_features']['leisure'] = (isset($property['leisure']))?$property['leisure']:'';
         $f_property['property_features']['features'] = (isset($property['features']))?$property['features']:'';
         $f_property['property_features']['rooms'] = (isset($property['rooms']))?$property['rooms']:'';
+        $f_property['property_features']['living_room'] = (isset($property['living_room']))?$property['living_room']:'';
         $f_property['offices'] = $offices;
 
         return $f_property;
