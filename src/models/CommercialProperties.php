@@ -335,6 +335,9 @@ class CommercialProperties extends Model
         if(isset($property['shared_categories']) && !empty($property['shared_categories'])){
             $f_property['shared_categories'] = $property['shared_categories'];
         }
+        if(isset($property['property_name']) && !empty($property['property_name'])){
+            $f_property['property_name'] = $property['property_name'];
+        }
         if(isset($property['own']) && !empty($property['own'])){
             $f_property['own'] = $property['own'];
         }
