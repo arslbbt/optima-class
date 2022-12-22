@@ -405,6 +405,15 @@ class CommercialProperties extends Model
         if (isset($property['seo_description'][$lang]) && $property['seo_description'][$lang] != '') {
             $f_property['meta_desc'] = $property['seo_description'][$lang];
         }
+        if (isset($property['rental_seo_title'][$lang]) && $property['rental_seo_title'][$lang] != '') {
+            $f_property['meta_title'] = $property['rental_seo_title'][$lang];
+        }
+        if (isset($property['rental_seo_description'][$lang]) && $property['rental_seo_description'][$lang] != '') {
+            $f_property['meta_desc'] = $property['rental_seo_description'][$lang];
+        }
+        if (isset($property['rental_keywords'][$lang]) && $property['rental_keywords'][$lang] != '') {
+            $f_property['meta_keywords'] = $property['rental_keywords'][$lang];
+        }
         if (isset($property['keywords'][$lang]) && $property['keywords'][$lang] != '') {
             $f_property['meta_keywords'] = $property['keywords'][$lang];
         }
