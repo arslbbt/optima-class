@@ -488,8 +488,11 @@ class Developments extends Model
                     $data['sale'] = $value->property->sale;
                 if (isset($value->property->rent) && $value->property->rent == 1)
                     $data['rent'] = $value->property->rent;
-                if (isset($value->property->currentprice) && $value->property->currentprice > 0)
+                if (isset($value->property->currentprice) && $value->property->currentprice > 0){
                     $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
+                }elseif(isset($value->property->current_price) && $value->property->current_price > 0){
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->current_price))));
+                }
                 if (isset($value->property->price_from) && $value->property->price_from > 0)
                     $data['price_from'] = str_replace(',', '.', (number_format((int) ($value->property->price_from))));
                 if (isset($value->property->price_to) && $value->property->price_to > 0)
