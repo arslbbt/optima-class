@@ -128,6 +128,12 @@ class CommercialProperties extends Model
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
             ];
         }
+        if (isset($get['project']) && !empty($get['project'])) {
+            $query['$and'] = [['project' => ['$exists' => $get['project']]],["project" => $get['project']]];
+        }
+        if (isset($get['project_on']) && !empty($get['project_on'])) {
+            $query['$or'] = [["own" => false],['own' => ['$exists' => false]] ];
+        }
         if (isset($get['prop_ids']) && !empty($get['prop_ids'])) {
             $prop_ids = $get['prop_ids'] != '' ? $get['prop_ids'] : [];
                 $prop_ids = explode(',', $prop_ids);
