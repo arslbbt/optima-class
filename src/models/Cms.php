@@ -873,6 +873,7 @@ class Cms extends Model
             $array['meta_keywords'] = isset($data_each['meta_keywords'][$lang]) ? $data_each['meta_keywords'][$lang] : '';
             $array['custom_settings'] = isset($data_each['custom_settings']) ? $data_each['custom_settings'] : '';
             $array['categories'] = isset($data_each['categories']) ? $data_each['categories'] : [];
+            $array['totalCount'] = isset($data_each['total_count']) ? $data_each['total_count'] : 0;
             $ret_data[] = $array;
         }
         return $ret_data;
