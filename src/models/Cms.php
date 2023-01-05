@@ -256,6 +256,7 @@ class Cms extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $query = isset($options['seoimage']) ? '&seoimage=yes' : '';
             $query .= isset($options['template']) ? '&expand=template' : '';
+            $query .= isset($_GET['created_full_name']) ? '&created_full_name=' . $_GET['created_full_name'] : '';
             if ($id == null) {
                 $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
                 $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $query;
@@ -299,6 +300,7 @@ class Cms extends Model
             'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
             'categories' => isset($data['categories']) ? $data['categories'] : [],
+            'created_username' => isset($data['created_username']) ? $data['created_username'] : [],
         ];
     }
 
