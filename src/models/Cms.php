@@ -301,6 +301,7 @@ class Cms extends Model
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
             'categories' => isset($data['categories']) ? $data['categories'] : [],
             'created_username' => isset($data['created_username']) ? $data['created_username'] : [],
+            'created_by' => isset($data['created_by']) ? $data['created_by'] : [],
         ];
     }
 
@@ -858,6 +859,71 @@ class Cms extends Model
                 $attachment_url = isset($data_each['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data_each['_id'] . '/' . $data_each['featured_image'][$lang]['file_md5_name'] : $attachment_url;
             }
             // $name = isset($data_each['featured_image'][$lang]['name']) ? $data_each['featured_image'][$lang]['name'] : '';
+            if ($forRoutes == true) {
+                $array['featured_image'] = $attachment_url;
+            } else {
+                $array['featured_image'] = isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '';
+            }
+            $array['featured_image_seo_alt_desc'] = isset($data_each['featured_image'][$lang]['seo_alt_desc']) ? $data_each['featured_image'][$lang]['seo_alt_desc'] : '';
+            $array['featured_image_seo_meta_title'] = isset($data_each['featured_image'][$lang]['seo_meta_title']) ? $data_each['featured_image'][$lang]['seo_meta_title'] : '';
+            $array['content'] = isset($data_each['content'][$lang]) ? $data_each['content'][$lang] : '';
+            $array['created_at'] = isset($data_each['created_at']) ? $data_each['created_at'] : '';
+            $array['title'] = isset($data_each['title'][$lang]) ? $data_each['title'][$lang] : '';
+            $array['slug'] = isset($data_each['slug'][$lang]) ? $data_each['slug'][$lang] : '';
+            $array['slug_all'] = isset($data_each['slug']) ? $data_each['slug'] : '';
+            $array['meta_title'] = isset($data_each['meta_title'][$lang]) ? $data_each['meta_title'][$lang] : '';
+            $array['meta_desc'] = isset($data_each['meta_desc'][$lang]) ? $data_each['meta_desc'][$lang] : '';
+            $array['meta_keywords'] = isset($data_each['meta_keywords'][$lang]) ? $data_each['meta_keywords'][$lang] : '';
+            $array['custom_settings'] = isset($data_each['custom_settings']) ? $data_each['custom_settings'] : '';
+            $array['categories'] = isset($data_each['categories']) ? $data_each['categories'] : [];
+            $array['totalCount'] = isset($data_each['total_count']) ? $data_each['total_count'] : 0;
+            $ret_data[] = $array;
+        }
+        return $ret_data;
+    }
+
+    public static function postUsers($name, $user = null, $forRoutes = null, $pageSize = 10, $imageseo = false, $options = [])
+    {
+        $file_name = $name;
+        if ($name != 'page' && $pageSize == false)
+            $file_name = $name . '-all';
+        $file = Functions::directory() . str_replace(' ', '_', strtolower(Functions::clean($file_name))) .'User'.str_replace(' ', '_', strtolower(Functions::clean($user))) . '.json';
+        $query = isset($user) ? '&user=' . $user : '';
+        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
+        $query .= isset($_GET['pagination']) ? '&pagination=' . $_GET['pagination'] : '';
+        if ($name == 'page' || $pageSize == false)
+            $query .= '&page_size=false';
+        if ($pageSize != false) {
+            $query .= '&page_size=' . $pageSize;
+            if (isset($options['page'])) {
+                $query .= '&page=' . $options['page'];
+            }
+        }
+        if ($imageseo)
+            $query .= '&seoimage=yes';
+
+        $cache = isset($options['cache']) ? $options['cache'] : true;
+
+        $url = Yii::$app->params['apiUrl'] . 'cms/get-all-user-post' . $query;
+        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600) || !$cache) {
+            $file_data = Functions::getCRMData($url);
+            file_put_contents($file, $file_data);
+        } else {
+            $file_data = file_get_contents($file);
+        }
+        $header = get_headers($url, 1);
+        $data = json_decode($file_data, TRUE);
+        $lang = strtoupper(\Yii::$app->language);
+        $ret_data = [];
+        $array = [];
+        foreach ($data as $data_each) {
+            if (isset($header['X-Pagination-Total-Count'])) {
+                $array['totalCount'] = $header['X-Pagination-Total-Count'];
+            }
+            $attachment_url = isset($data_each['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data_each['_id'] . '/' . $data_each['featured_image'][$lang]['name'] : '';
+            if ($imageseo) {
+                $attachment_url = isset($data_each['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data_each['_id'] . '/' . $data_each['featured_image'][$lang]['file_md5_name'] : $attachment_url;
+            }
             if ($forRoutes == true) {
                 $array['featured_image'] = $attachment_url;
             } else {
