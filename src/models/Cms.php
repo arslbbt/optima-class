@@ -301,6 +301,7 @@ class Cms extends Model
             'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
             'categories' => isset($data['categories']) ? $data['categories'] : [],
             'created_username' => isset($data['created_username']) ? $data['created_username'] : [],
+            'created_by' => isset($data['created_by']) ? $data['created_by'] : [],
         ];
     }
 
@@ -812,14 +813,22 @@ class Cms extends Model
 
     public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10, $imageseo = false, $options = [])
     {
-        $file_name = $name;
+        if(isset($options['user_id']) && !empty($options['user_id'])){
+            $file_name = $name .'UserList'.$options['user_id'];    
+        }else{
+            $file_name = $name;
+        }
         if ($name != 'page' && $pageSize == false)
             $file_name = $name . '-all';
         $file = Functions::directory() . str_replace(' ', '_', strtolower(Functions::clean($file_name))) . str_replace(' ', '_', strtolower(Functions::clean($category))) . '.json';
-
-        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+        if(isset($options['user_id']) && !empty($options['user_id'])){
+            $query = '&user=' . $options['user_id'];
+            $query .= isset($options['pagination']) ? '&pagination=' . $options['pagination'] : '';
+        }else{
+            $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
+            $query .= is_numeric($name) ? '&post_type_id=' . $name : '&post_type=' . $name;
+        }
         $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $query .= is_numeric($name) ? '&post_type_id=' . $name : '&post_type=' . $name;
 
         if ($name == 'page' || $pageSize == false)
             $query .= '&page-size=false';
@@ -836,8 +845,11 @@ class Cms extends Model
 
         $cache = isset($options['cache']) ? $options['cache'] : true;
 
-        $url = Yii::$app->params['apiUrl'] . 'cms/posts' . $query;
-
+        if(isset($options['user_id']) && !empty($options['user_id'])){
+            $url = Yii::$app->params['apiUrl'] . 'cms/get-all-user-post' . $query;
+        }else{
+            $url = Yii::$app->params['apiUrl'] . 'cms/posts' . $query;
+        }
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600) || !$cache) {
             $file_data = Functions::getCRMData($url);
             file_put_contents($file, $file_data);
