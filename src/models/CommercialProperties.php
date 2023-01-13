@@ -383,17 +383,32 @@ class CommercialProperties extends Model
         }elseif (isset($property['description'][$lang]) && $property['description'][$lang] != '') {
             $f_property['sale_description'] = $property['description'][$lang];
         }
-        if (isset($property['shared_data']['rental_external_title'][$lang]) && $property['shared_data']['rental_external_title'][$lang] != '') {
-            $f_property['rent_title'] = $property['shared_data']['rental_external_title'][$lang];
-        }elseif (isset($property['rental_title'][$lang]) && $property['rental_title'][$lang] != '') {
-            $f_property['rent_title'] = $property['rental_title'][$lang];
-        }else{
-            $f_property['rent_title'] = (isset($property['property_type_one']['value'][$contentLang]) ? \Yii::t('app', $property['property_type_one']['value'][$contentLang]) : '') . ' ' . (isset($property['property_location']['value'][$contentLang]) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value'][$contentLang]) : '');
-        }
-        if (isset($property['shared_data']['rental_external_description'][$lang]) && $property['shared_data']['rental_external_description'][$lang] != '') {
-            $f_property['rent_description'] = $property['shared_data']['rental_external_description'][$lang];
-        } elseif (isset($property['rental_description'][$lang]) && $property['rental_description'][$lang] != '') {
-            $f_property['rent_description'] = $property['rental_description'][$lang];
+        if ( Yii::$app->params['agency'] == '6110fa9b8334050aac21e779' ) { // For ImmoMarket
+            if (isset($property['shared_data']['rental_external_title'][$lang]) && $property['shared_data']['rental_external_title'][$lang] != '' && isset($property['agency']) && $property['agency'] != Yii::$app->params['agency']) {
+                $f_property['rent_title'] = $property['shared_data']['rental_external_title'][$lang];
+            }elseif (isset($property['rental_title'][$lang]) && $property['rental_title'][$lang] != '') {
+                $f_property['rent_title'] = $property['rental_title'][$lang];
+            }else{
+                $f_property['rent_title'] = (isset($property['property_type_one']['value'][$contentLang]) ? \Yii::t('app', $property['property_type_one']['value'][$contentLang]) : '') . ' ' . (isset($property['property_location']['value'][$contentLang]) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value'][$contentLang]) : '');
+            }
+            if (isset($property['shared_data']['rental_external_description'][$lang]) && $property['shared_data']['rental_external_description'][$lang] != '' && isset($property['agency']) && $property['agency'] != Yii::$app->params['agency']) {
+                $f_property['rent_description'] = $property['shared_data']['rental_external_description'][$lang];
+            } elseif (isset($property['rental_description'][$lang]) && $property['rental_description'][$lang] != '') {
+                $f_property['rent_description'] = $property['rental_description'][$lang];
+            }
+        }else{ // For Other Sites
+            if (isset($property['shared_data']['rental_external_title'][$lang]) && $property['shared_data']['rental_external_title'][$lang] != '' && (isset($property['agency']) && $property['agency'] != Yii::$app->params['agency']) && (isset($property['mls']) && $property['mls'] == 1)) {
+                $f_property['rent_title'] = $property['shared_data']['rental_external_title'][$lang];
+            }elseif (isset($property['rental_title'][$lang]) && $property['rental_title'][$lang] != '') {
+                $f_property['rent_title'] = $property['rental_title'][$lang];
+            }else{
+                $f_property['rent_title'] = (isset($property['property_type_one']['value'][$contentLang]) ? \Yii::t('app', $property['property_type_one']['value'][$contentLang]) : '') . ' ' . (isset($property['property_location']['value'][$contentLang]) ? \Yii::t('app', 'in'). ' ' .\Yii::t('app', $property['property_location']['value'][$contentLang]) : '');
+            }
+            if (isset($property['shared_data']['rental_external_description'][$lang]) && $property['shared_data']['rental_external_description'][$lang] != '' && (isset($property['agency']) && $property['agency'] != Yii::$app->params['agency']) && (isset($property['mls']) && $property['mls'] == 1)) {
+                $f_property['rent_description'] = $property['shared_data']['rental_external_description'][$lang];
+            } elseif (isset($property['rental_description'][$lang]) && $property['rental_description'][$lang] != '') {
+                $f_property['rent_description'] = $property['rental_description'][$lang];
+            }
         }
         if (isset($property['status'])) {
             $f_property['status'] = \Yii::t('app', $property['status']);
