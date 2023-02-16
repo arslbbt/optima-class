@@ -888,6 +888,7 @@ class Cms extends Model
             $array['custom_settings'] = isset($data_each['custom_settings']) ? $data_each['custom_settings'] : '';
             $array['categories'] = isset($data_each['categories']) ? $data_each['categories'] : [];
             $array['totalCount'] = isset($data_each['total_count']) ? $data_each['total_count'] : 0;
+            $array['post_order'] = isset($data_each['post_order']) ? $data_each['post_order'] : 0;
             $ret_data[] = $array;
         }
         return $ret_data;
