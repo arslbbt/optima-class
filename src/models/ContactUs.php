@@ -647,6 +647,14 @@ class ContactUs extends Model
             "password_hash" =>  isset($data['password_hash']) ? $data['password_hash'] : null, //For company and user registration
             "password_repeat" =>  isset($data['password_repeat']) ? $data['password_repeat'] : null, //For company and user registration
             "type" => isset($data['type']) ? $data['type'] : null,        //For company and user registration
+            "company_type" => isset($data['company_type']) ? $data['company_type'] : null,        //For company and user registration
+            'address' => isset($data['address']) ? $data['address'] : '', //For company agency registration
+            'country' => isset($data['country']) ? $data['country'] : '', //For company agency registration
+            'province' => isset($data['province']) ? $data['province'] : '', //For company agency registration
+            "city" =>  isset($data['city']) ? $data['city'] : '', //For company agency registration
+            "location" =>  isset($data['location']) ? $data['location'] : '', //For company agency registration
+            "street" => isset($data['street']) ? $data['street'] : '', //For company agency registration
+            "street_number" => isset($data['street_number']) ? $data['street_number'] : '', //For company agency registration
             "phone" => isset($data['phone']) ? $data['phone'] : null,
             "office" => isset($data['office']) ? $data['office'] : null,
             "status" => isset($data['status']) ? $data['status'] : null,
