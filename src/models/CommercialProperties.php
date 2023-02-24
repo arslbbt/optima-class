@@ -201,8 +201,11 @@ class CommercialProperties extends Model
         } elseif (isset($get['max_sleeps']) && !empty($get['max_sleeps'])) {
             $query['sleeps'] = ['$gte' => (int)$get['max_sleeps']];
         }
-        if (isset($get['property_name']) && !empty($get['property_name'])) {
-            $query['property_name'] = $get['property_name'];
+        if (isset($get['search_by_property_name']) && !empty($get['search_by_property_name'])) {
+            $query['search_by_property_name'] = $get['search_by_property_name'];
+        }
+        if (isset($get['lang']) && !empty($get['lang'])) {
+            $query['current_lang'] = $get['lang'];
         }
         if (isset($get['min_built']) && !empty($get['min_built'])) {
             $query['built'] = ['$lte' => (int)$get['min_built']];
