@@ -153,6 +153,9 @@ class CommercialProperties extends Model
             }
             $query['type_two'] = ['$in' => $intArray];
         }
+        if (isset($get['set_types_for_or_query']) && !empty($get['set_types_for_or_query'])) {
+            $query['set_types_for_or_query'] = true;
+        }
         if (isset($get['price_on_demand']) && !empty($get['price_on_demand'])) {
             $query['$or'][]['price_on_demand'] = ['$exists' => (int) 1];
             $query['$or'][]['price_on_demand'] = ['$exists' => (int) 0];
