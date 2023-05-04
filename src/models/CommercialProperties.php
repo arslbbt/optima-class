@@ -62,8 +62,7 @@ class CommercialProperties extends Model
         if ((isset($get['rental_price_from']) && !empty($get['rental_price_from'])) || (isset($get['rental_price_to']) && !empty($get['rental_price_to']))) {
             $post_data['selectRecords'] = false;
         }
-        $random_query = isset($get['random']) && !empty($get['random']) ? '&random='.$get['random'] : '';
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'].$random_query;
+        $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'];
         if(isset($set_options['cache']) && $set_options['cache'] == true){
             $response = self::DoCache($post_data, $node_url);
         }else{
