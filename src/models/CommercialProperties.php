@@ -135,6 +135,9 @@ class CommercialProperties extends Model
         if (isset($get['project_on']) && !empty($get['project_on'])) {
             $query['$or'] = [["own" => false],['own' => ['$exists' => false]] ];
         }
+        if (isset($get['license_number']) && !empty($get['license_number'])) {
+            $query['$and'] = [['license_number' => ['$exists' => true]],['license_number' => ['$ne' => null]]];
+        }
         if (isset($get['prop_ids']) && !empty($get['prop_ids'])) {
             $prop_ids = $get['prop_ids'] != '' ? $get['prop_ids'] : [];
                 $prop_ids = explode(',', $prop_ids);
