@@ -99,14 +99,14 @@ class CommercialProperties extends Model
         ];
         $post_data = ['options' => $options];
         $curl = new curl\Curl();
+
+        $headers = Functions::getApiHeaders();
+        $headers = ['Content-Length' => strlen(json_encode($post_data))];
+
         $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
+            ->setHeaders($headers)
             ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
-;
-       
+            
         $response = json_decode($response, TRUE);
         $property = self::formateProperty($response, $set_options);
         

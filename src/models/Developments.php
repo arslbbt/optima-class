@@ -164,7 +164,9 @@ class Developments extends Model
             $url .= '&model='.$get['model'];
         }
 
-        $JsonData = Functions::getCRMData($url, false);
+        $headers = Functions::getApiHeaders();
+        
+        $JsonData = Functions::getCRMData($url, false, array(), false, $headers);
         $property = json_decode($JsonData);
         
         $return_data = [];
