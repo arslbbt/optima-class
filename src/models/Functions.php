@@ -267,12 +267,12 @@ class Functions extends Model
         return $response;
     }
 
-    public static function getCRMData($url, $cache = true, $fields = array(), $auth = false)
+    public static function getCRMData($url, $cache = true, $fields = array(), $auth = false, $headers = array())
     {
-        return Functions::getCurlData($url, $cache);
+        return Functions::getCurlData($url, $cache, $fields, $auth, $headers);
     }
 
-    public static function getCurlData($url, $cache = true, $fields = array(), $auth = false)
+    public static function getCurlData($url, $cache = true, $fields = array(), $auth = false, $headers = array())
     {
 
         $curl = curl_init($url);
@@ -284,6 +284,18 @@ class Functions extends Model
         if ($auth) {
             curl_setopt($curl, CURLOPT_USERPWD, "$auth");
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        }
+
+        if ($headers && is_array($headers) && count($headers) > 0) {            
+            $curl_headers = array();
+            foreach ($headers as $key => $value) {
+                if (is_numeric($key)) {
+                    $curl_headers[] = $value;
+                } else {
+                    $curl_headers[] = $key . ': ' . $value;
+                }
+            }
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $curl_headers);
         }
 
         if ($fields) {
@@ -337,5 +349,26 @@ class Functions extends Model
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    }
+
+    
+    public static function getApiHeaders()
+    {
+        $client_ip = $_SERVER["REMOTE_ADDR"];
+        if (filter_var(@$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP)) {
+            $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
+            $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+        }
+
+        $headers = [
+            $headers['Content-Type'] = 'application/json'
+        ];
+
+        if (!empty($client_ip) && filter_var($client_ip, FILTER_VALIDATE_IP)) {
+            $headers['x-forwarded-for'] = $client_ip;
+        }
+
+        return $headers;
     }
 }

@@ -64,7 +64,8 @@ class MooringProperties extends Model
     {
         $curl = new curl\Curl();
         $node_url = Yii::$app->params['node_url'] . 'api/mooring_properties/view/' . $id . '?user_apikey=' . Yii::$app->params['api_key'];
-        $JsonData = Functions::getCRMData($node_url, false);
+        $headers = Functions::getApiHeaders();
+        $JsonData = Functions::getCRMData($node_url, false, array(), false, $headers);
         $response = json_decode($JsonData,True);
         $property = self::formateProperty($response, $options=[]);        
         return $property;

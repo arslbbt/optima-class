@@ -831,7 +831,8 @@ class Properties extends Model
                 }
             }
             // echo $url;die;
-            $JsonData = Functions::getCRMData($url, false);
+            $headers = Functions::getApiHeaders();
+            $JsonData = Functions::getCRMData($url, false, array(), false, $headers);
             $property = json_decode($JsonData);
             if (isset($property->property->reference)) {
                 $settings = Cms::settings();
