@@ -40,11 +40,9 @@ class MooringProperties extends Model
         $node_url = Yii::$app->params['node_url'] . '/api/mooring_properties/search?user_apikey=' . Yii::$app->params['api_key'];
 
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query_array))]);
         $response = $curl->setRequestBody(json_encode($query_array))
-                    ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($query_array))
-            ])
+                    ->setHeaders($headers)
             ->post($node_url);   
  
             $response = json_decode($response, TRUE);

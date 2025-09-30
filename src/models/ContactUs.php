@@ -569,7 +569,8 @@ class ContactUs extends Model
             'street_number' => isset($this->street_number) ? $this->street_number : null
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url); 
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url); 
         $res = json_decode($response);
         return $res->_id;
     }
@@ -595,7 +596,8 @@ class ContactUs extends Model
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
     }
 
     public function collaboratorEmail()
@@ -619,7 +621,8 @@ class ContactUs extends Model
             'collaborator' => 'true',
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
     }
 
 
@@ -632,7 +635,8 @@ class ContactUs extends Model
                 'token' => $token,
             );
             $curl = new \linslin\yii2\curl\Curl();
-            $response = $curl->setPostParams($fields)->post($url);
+            $headers = Functions::getApiHeaders();
+            $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
             $res = json_decode($response);
             return $res;
         } else {
@@ -670,7 +674,8 @@ class ContactUs extends Model
             "source" => isset($data['source']) ? $data['source'] : null,
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
         return json_decode($response);
     }
 }
