@@ -66,7 +66,8 @@ class Properties extends Model
                 'favourite_ids' => Yii::$app->request->post('pids'),
             ];
             $curl = new \linslin\yii2\curl\Curl();
-            $response = $curl->setPostParams($fields)->post($url);
+            $headers = Functions::getApiHeaders();
+            $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
             if(Yii::$app->request->post('return_property') == 1){
                 $JsonData = $response;
             }else{
@@ -2949,7 +2950,8 @@ class Properties extends Model
             'owner_id' => (isset($this->owner_id) ? $this->owner_id : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $response = $curl->setPostParams($fields)->post($url);
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
         // echo '<pre>'; print_r($response); die;
     }
 }

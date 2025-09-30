@@ -70,11 +70,9 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
 
             $data = json_decode($response, TRUE);
@@ -131,11 +129,9 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
             
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
 
             $data = json_decode($response, TRUE);
@@ -213,11 +209,9 @@ class Dropdowns extends Model
 
             $post_data = ["query" => (object) $query, "options" => $options];
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'cities?user=' . Yii::$app->params['user']);
 
             $data = json_decode($response, TRUE);
@@ -305,11 +299,9 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'locations?user=' . Yii::$app->params['user']);
 
             $data = json_decode($response, TRUE);
@@ -330,11 +322,9 @@ class Dropdowns extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
             $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
             $data = json_decode($response, TRUE);
             if (isset($data['docs']) && count($data['docs']) > 0) {
@@ -367,11 +357,9 @@ class Dropdowns extends Model
             $post_data = ["query" => (object) $query, "options" => $options];
 
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
             $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
 
             $data = json_decode($response, TRUE);
@@ -399,11 +387,9 @@ class Dropdowns extends Model
     public static function mooringTypes($params = [])
     {
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode([]))]);
         $response = $curl->setRequestBody(json_encode([]))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode([]))
-            ])
+            ->setHeaders($headers)
             ->post(Yii::$app->params['node_url'] . 'mooring_types/all?user_apikey=' . Yii::$app->params['api_key']);
 
         $return_data = json_decode($response, TRUE);
@@ -453,11 +439,9 @@ class Dropdowns extends Model
         $post_data = ["query" => (object) $query, "options" => $options];
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
             $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
+                ->setHeaders($headers)
                 ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
                 file_put_contents($file, $response);
         }else{

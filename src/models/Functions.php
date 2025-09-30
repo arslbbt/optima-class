@@ -262,7 +262,8 @@ class Functions extends Model
     {
         $url = Yii::$app->params['apiUrl'] .'properties/get-assigned-to-listing-agent&user_apikey=' . Yii::$app->params['api_key'].'&search_word='. $agent_name;
         $curl = new curl\Curl();
-        $response = $curl->get($url);
+        $headers = Functions::getApiHeaders();
+        $response = $curl->setHeaders($headers)->get($url);
         $response = json_decode($response);
         return $response;
     }
@@ -351,8 +352,7 @@ class Functions extends Model
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
 
-    
-    public static function getApiHeaders()
+    public static function getApiHeaders($headers_params = [])
     {
         $client_ip = $_SERVER["REMOTE_ADDR"];
         if (filter_var(@$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP)) {
@@ -362,8 +362,28 @@ class Functions extends Model
         }
 
         $headers = [
-            $headers['Content-Type'] = 'application/json'
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json, text/javascript, */*; q=0.01',
+            'Connection' => 'keep-alive',
         ];
+        
+        if (!empty($headers_params) && is_array($headers_params)) {
+            foreach ($headers_params as $key => $value) {
+                if (is_array($value)) {
+                    if (strtolower($key) === 'referer' && !empty($value)) {
+                        $headers['Referer'] = isset($value[0]) ? $value[0] : 'https://my3.optima-crm.com/';
+                        if (count($value) > 1) {
+                            $headers['X-Client-Origins'] = implode(',', $value);
+                        }
+                    } else {
+                        $headers[$key] = implode(',', $value);
+                    }
+                } else {
+                    $headers[$key] = $value;
+                }
+            }
+        }
 
         if (!empty($client_ip) && filter_var($client_ip, FILTER_VALIDATE_IP)) {
             $headers['x-forwarded-for'] = $client_ip;

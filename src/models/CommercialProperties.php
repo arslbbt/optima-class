@@ -68,11 +68,9 @@ class CommercialProperties extends Model
             $response = self::DoCache($post_data, $node_url);
         }else{
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
             $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($post_data))
-                ])
+                ->setHeaders($headers)
                 ->post($node_url);
         }
         $response = json_decode($response, TRUE);
@@ -100,8 +98,7 @@ class CommercialProperties extends Model
         $post_data = ['options' => $options];
         $curl = new curl\Curl();
 
-        $headers = Functions::getApiHeaders();
-        $headers = ['Content-Length' => strlen(json_encode($post_data))];
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
 
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders($headers)
@@ -815,11 +812,9 @@ class CommercialProperties extends Model
         $file = $webroot . '/uploads/temp/' . sha1($file_name) . '.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $curl = new curl\Curl();
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query))]);
             $file_data = $curl->setRequestBody(json_encode($query))
-                ->setHeaders([
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen(json_encode($query))
-                ])
+                ->setHeaders($headers)
                 ->post($url);
             file_put_contents($file, $file_data);
         } else {
@@ -881,11 +876,9 @@ class CommercialProperties extends Model
 
         $post_data["query"] = isset($map_query['ids']) && !empty($map_query['ids']) ? array_merge($post_data["query"] ,["id"  => $map_query['ids']]  ) : $post_data["query"];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
+            ->setHeaders($headers)
             ->post($node_url);
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
@@ -915,11 +908,9 @@ class CommercialProperties extends Model
         ];
         $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($post_data))
-        ])
+        ->setHeaders($headers)
         ->post($node_url);
         
         $response = json_decode($response, TRUE);
@@ -967,11 +958,9 @@ class CommercialProperties extends Model
         }
         $node_url = Yii::$app->params['node_url'] . 'companies/search-company?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
+            ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
     }
@@ -986,11 +975,9 @@ class CommercialProperties extends Model
         ];
         $node_url = Yii::$app->params['node_url'] . 'companies/company-type-of-agency/' . $id;
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
+            ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
     }
@@ -1005,11 +992,9 @@ class CommercialProperties extends Model
         ];
         $node_url = Yii::$app->params['node_url'] . 'companies/get-agency-data/' . $id;
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($post_data))
-            ])
+            ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
     }
@@ -1113,11 +1098,9 @@ class CommercialProperties extends Model
         $curl = new curl\Curl();
         if(isset($data['prop_id']) && !empty($data['prop_id'])){
             $node_url = Yii::$app->params['node_url'] . 'commercial_properties/update/'.$data['prop_id'].'?user=' . $data['user_id'];
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields))]);
             $response = $curl->setRequestBody(json_encode($fields))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($fields))
-                ])
+            ->setHeaders($headers)
                 ->put($node_url);
         }else{
             $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
@@ -1141,11 +1124,9 @@ class CommercialProperties extends Model
             'files' => $images,
         ];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
         $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))
-            ])
+        ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
 
@@ -1162,11 +1143,9 @@ class CommercialProperties extends Model
             'files' => $images,
         ];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
         $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))
-            ])
+        ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
     }
@@ -1185,11 +1164,9 @@ class CommercialProperties extends Model
             ],
         ];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields))]);
         $response = $curl->setRequestBody(json_encode($fields))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($fields))
-            ])
+        ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
 
@@ -1209,11 +1186,9 @@ class CommercialProperties extends Model
             "type" => $query['property_type'],
         ];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen(json_encode($post_data))
-            ])
+        ->setHeaders($headers)
             ->post($node_url);
         return json_decode($response);
 
@@ -1225,7 +1200,8 @@ class CommercialProperties extends Model
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
             $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
             $curl = new curl\Curl();
-            $file_data = $curl->post($node_url);
+            $headers = Functions::getApiHeaders();
+            $file_data = $curl->setHeaders($headers)->post($node_url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1240,11 +1216,9 @@ class CommercialProperties extends Model
             'ids' => $same_cadastral_prop_ids,
         ];
         $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query))]);
         $response = $curl->setRequestBody(json_encode($query))
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen(json_encode($query))
-            ])
+            ->setHeaders($headers)
             ->post($url);
             $response = json_decode($response, TRUE);
             $properties = [];
