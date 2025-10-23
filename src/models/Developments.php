@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use optima\models\Cms;
 use optima\models\Functions;
+use linslin\yii2\curl;
 
 /**
  * LoginForm is the model behind the login form.
@@ -405,85 +406,89 @@ class Developments extends Model
             }
         }
         $properties = [];
-        foreach ($property->properties as $key => $value) {
-            $data = [];
-            if (isset($value->property->sale) && $value->property->sale == 1)
-                $data['sale'] = $value->property->sale;
-            if (isset($value->property->rent) && $value->property->rent == 1)
-                $data['rent'] = $value->property->rent;
-            if (isset($value->property->oldprice->price_on_demand) && $value->property->oldprice->price_on_demand == true) 
-                $data['price_on_demand'] = true;     
-            if (isset($value->property->currentprice) && $value->property->currentprice > 0)
-                $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
-            if (isset($value->property->price_from) && $value->property->price_from > 0)
-                $data['price_from'] = str_replace(',', '.', (number_format((int) ($value->property->price_from))));
-            if (isset($value->property->price_to) && $value->property->price_to > 0)
-                $data['price_to'] = str_replace(',', '.', (number_format((int) ($value->property->price_to))));
-            if (isset($value->property->plot) && $value->property->plot > 0)
-                $data['plot'] = str_replace(',', '.', (number_format((int) ($value->property->plot))));
-            if (isset($value->property->bedrooms) && $value->property->bedrooms > 0)
-                $data['bedrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bedrooms))));
-            if (isset($value->property->bathrooms) && $value->property->bathrooms > 0)
-                $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
-            if (isset($value->property->type_one))
-                $data['type'] = $value->property->type_one;
-            if (isset($value->property->property_name))
-                $data['property_name'] = $value->property->property_name;
-            if (isset($value->property->block))
-                $data['block'] = $value->property->block;
-            if (isset($value->property->portal))
-                $data['portal'] = $value->property->portal;
-            if (isset($value->property->status))
-                $data['status'] = $value->property->status;
-            if (isset($value->property->plot))
-                $data['plot'] = $value->property->plot;
-            if (isset($value->property->floors->floor))
-                $data['floor'] = $value->property->floors->floor;
-            if (isset($value->property->private_info_object->$agency->apartment_no))
-                $data['apartment_no'] = $value->property->private_info_object->$agency->apartment_no;
-            if (isset($value->property->terrace))
-                $data['terrace'] = $value->property->terrace;
-            if (isset($value->property->built))
-                $data['built'] = $value->property->built;
-            if (isset($value->property->location))
-                $data['location'] = $value->property->location;
-            if (isset($value->property->address_city))
-                $data['city'] = $value->property->address_city;
-            if (isset($value->property->reference))
-                $data['id'] = $value->property->reference;
-            if (isset($value->property->year_built))
-                $data['year_built'] = $value->property->year_built;
-            if (isset($value->property->new_construction) && $value->property->new_construction == true)
-                $data['new_construction'] = $value->property->new_construction;
-            if (isset($value->property->description->$lang))
-                $data['description'] = $property->property->description->$lang;
+        
+        if(isset($property->properties) && !empty($property->properties)){
+            foreach ($property->properties as $key => $value) {
+                $data = [];
+                if (isset($value->property->sale) && $value->property->sale == 1)
+                    $data['sale'] = $value->property->sale;
+                if (isset($value->property->rent) && $value->property->rent == 1)
+                    $data['rent'] = $value->property->rent;
+                if (isset($value->property->oldprice->price_on_demand) && $value->property->oldprice->price_on_demand == true) 
+                    $data['price_on_demand'] = true;     
+                if (isset($value->property->currentprice) && $value->property->currentprice > 0)
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
+                if (isset($value->property->price_from) && $value->property->price_from > 0)
+                    $data['price_from'] = str_replace(',', '.', (number_format((int) ($value->property->price_from))));
+                if (isset($value->property->price_to) && $value->property->price_to > 0)
+                    $data['price_to'] = str_replace(',', '.', (number_format((int) ($value->property->price_to))));
+                if (isset($value->property->plot) && $value->property->plot > 0)
+                    $data['plot'] = str_replace(',', '.', (number_format((int) ($value->property->plot))));
+                if (isset($value->property->bedrooms) && $value->property->bedrooms > 0)
+                    $data['bedrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bedrooms))));
+                if (isset($value->property->bathrooms) && $value->property->bathrooms > 0)
+                    $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value->property->bathrooms))));
+                if (isset($value->property->type_one))
+                    $data['type'] = $value->property->type_one;
+                if (isset($value->property->property_name))
+                    $data['property_name'] = $value->property->property_name;
+                if (isset($value->property->block))
+                    $data['block'] = $value->property->block;
+                if (isset($value->property->portal))
+                    $data['portal'] = $value->property->portal;
+                if (isset($value->property->status))
+                    $data['status'] = $value->property->status;
+                if (isset($value->property->plot))
+                    $data['plot'] = $value->property->plot;
+                if (isset($value->property->floors->floor))
+                    $data['floor'] = $value->property->floors->floor;
+                if (isset($value->property->private_info_object->$agency->apartment_no))
+                    $data['apartment_no'] = $value->property->private_info_object->$agency->apartment_no;
+                if (isset($value->property->terrace))
+                    $data['terrace'] = $value->property->terrace;
+                if (isset($value->property->built))
+                    $data['built'] = $value->property->built;
+                if (isset($value->property->location))
+                    $data['location'] = $value->property->location;
+                if (isset($value->property->address_city))
+                    $data['city'] = $value->property->address_city;
+                if (isset($value->property->reference))
+                    $data['id'] = $value->property->reference;
+                if (isset($value->property->year_built))
+                    $data['year_built'] = $value->property->year_built;
+                if (isset($value->property->new_construction) && $value->property->new_construction == true)
+                    $data['new_construction'] = $value->property->new_construction;
+                if (isset($value->property->description->$lang))
+                    $data['description'] = $property->property->description->$lang;
 
-            if (isset($value->documents)) {
-                $fplans = [];
-                foreach ($value->documents as $pic) {
-                    if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
-                        if (isset(Yii::$app->params['floor_plans_url']))
-                            $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                if (isset($value->documents)) {
+                    $fplans = [];
+                    foreach ($value->documents as $pic) {
+                        if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
+                            if (isset(Yii::$app->params['floor_plans_url']))
+                                $fplans[] = Yii::$app->params['floor_plans_url'] . '/' . $pic->model_id . '/' . $pic->file_md5_name;
+                        }
                     }
+                    $data['floor_plans'] = $fplans;
                 }
-                $data['floor_plans'] = $fplans;
-            }
-            if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
-                $data['title'] = $value->property->title->$lang;
-            else if (isset($value->property->location))
-                $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
-            if (isset($value->attachments)) {
-                $attachments = [];
-                foreach ($value->attachments as $pic) {
-                    $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
+                if (isset($value->property->title->$lang) && $value->property->title->$lang != '')
+                    $data['title'] = $value->property->title->$lang;
+                else if (isset($value->property->location))
+                    $data['title'] = \Yii::t('app', $value->property->type_one) . ' ' . \Yii::t('app', 'in') . ' ' . \Yii::t('app', $value->property->location);
+                if (isset($value->attachments)) {
+                    $attachments = [];
+                    foreach ($value->attachments as $pic) {
+                        $attachments[] = Yii::$app->params['img_url'] . '/' . $pic->model_id . '/'.$attachments_size . $pic->file_md5_name;
+                    }
+                    $data['attachments'] = $attachments;
                 }
-                $data['attachments'] = $attachments;
+                $properties[] = $data;
             }
-            $properties[] = $data;
         }
         // commercial properties 
         $commercial_properties = [];
-        if(isset($get['model']) && !empty($get['model'])){
+
+        if(isset($get['model']) && !empty($get['model']) && isset($property->properties) && !empty($property->properties)){
             foreach ($property->properties as $key => $value) {
                 $data = [];
                 if (isset($value->property->sale) && $value->property->sale == 1)
@@ -558,6 +563,206 @@ class Developments extends Model
                 $commercial_properties[] = $data;
             }
         }
+
+        $related_project_properties = self::getRelatedProjectProperties(['reference' => $property->property->reference]);
+
+        $formatted_properties = [];
+
+        if (isset($related_project_properties) && !empty($related_project_properties)) {
+            $prop_lang = isset(Yii::$app->language) == 'es' ? 'es_AR' : strtolower(Yii::$app->language);
+            foreach ($related_project_properties as $key => $value) {
+                $data = [];
+                if (isset($value['sale']) && $value['sale'] == 1)
+                    $data['sale'] = $value['sale'];
+                if (isset($value['rent']) && $value['rent'] == 1)
+                    $data['rent'] = $value['rent'];
+                if (isset($value['price_on_demand']) && $value['price_on_demand'] == true)
+                    $data['price_on_demand'] = true;
+                if (isset($value['current_price']) && $value['current_price'] > 0)
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value['current_price']))));
+                else if (isset($value['currentprice']) && $value['currentprice'] > 0)
+                    $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value['currentprice']))));
+                if (isset($value['price_from']) && $value['price_from'] > 0)
+                    $data['price_from'] = str_replace(',', '.', (number_format((int) ($value['price_from']))));
+                if (isset($value['price_to']) && $value['price_to'] > 0)
+                    $data['price_to'] = str_replace(',', '.', (number_format((int) ($value['price_to']))));
+                if (isset($value['plot']) && $value['plot'] > 0)
+                    $data['plot'] = str_replace(',', '.', (number_format((int) ($value['plot']))));
+                if (isset($value['bedrooms']) && $value['bedrooms'] > 0)
+                    $data['bedrooms'] = str_replace(',', '.', (number_format((int) ($value['bedrooms']))));
+                if (isset($value['bathrooms']) && $value['bathrooms'] > 0)
+                    $data['bathrooms'] = str_replace(',', '.', (number_format((int) ($value['bathrooms']))));
+                if (isset($value['type_one_value']) && !empty($value['type_one_value']))
+                    $data['type_key'] = $value['type_one'];
+                if (isset($value['type_one_value'][$prop_lang]) && !empty($value['type_one_value'][$prop_lang]))
+                    $data['type'] = $value['type_one_value'][$prop_lang];
+                if (isset($value['property_name'])) {
+                    $data['property_name'] = $value['property_name'];
+                } elseif (isset($value['title'][strtoupper($lang)])) {
+                    $data['property_name'] = $value['title'][strtoupper($lang)];
+                }
+                if (isset($value['block']))
+                    $data['block'] = $value['block'];
+                if (isset($value['portal']))
+                    $data['portal'] = $value['portal'];
+                if (isset($value['status']))
+                    $data['status'] = $value['status'];
+                if (isset($value['plot']))
+                    $data['plot'] = $value['plot'];
+                if (isset($value['floors']['total_floors']))
+                    $data['floor'] = $value['floors']['total_floors'];
+                if (isset($value['private_info_object'][$agency]['apartment_no']))
+                    $data['apartment_no'] = $value['private_info_object'][$agency]['apartment_no'];
+                if (isset($value['terraces']))
+                    $data['terrace'] = $value['terraces'];
+                if (isset($value['built']))
+                    $data['built'] = $value['built'];
+                if (isset($value['location']))
+                    $data['location_key'] = $value['location'];
+                if (isset($value['location_value'][$prop_lang]))
+                    $data['location'] = $value['location_value'][$prop_lang];
+                if (isset($value['city']))
+                    $data['city_key'] = $value['city'];
+                if (isset($value['city_obj'][$prop_lang]))
+                    $data['city'] = $value['city_obj'][$prop_lang];
+                if (isset($value['reference']))
+                    $data['id'] = $value['reference'];
+                if (isset($value['year_built']))
+                    $data['year_built'] = $value['year_built'];
+                if (isset($value['project']) && $value['project'] == 1)
+                    $data['new_construction'] = $value['project'];
+                if (isset($value['description'][$lang]))
+                    $data['description'] = $value['description'][$lang];
+
+                if (isset($value['property_attachments']) && count($value['property_attachments']) > 0 && !isset($value['from_residential'])) {
+                    $attachments = [];
+                    $attachments_alt = [];
+                    foreach ($value['property_attachments'] as $pic) {
+                        if (isset($pic["publish_status"]) && !empty($pic["publish_status"])) {
+                            if (isset($pic['document']) && $pic['document'] != 1 && isset($options['image_size']) && !empty($options['image_size'])) {
+                                $attachments[] = Yii::$app->params['property_img_resize_link'] . '/' . $pic['model_id'] . '/' . $options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                            } elseif (isset($pic['document']) && $pic['document'] != 1) {
+                                $attachments[] = Yii::$app->params['com_img'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
+                            }
+                            if (isset($pic['alt_description'][$lang]) && !empty($pic['alt_description'][$lang])) {
+                                $attachments_alt[] = $pic['alt_description'][$lang];
+                            }
+                        }
+                    }
+                    $data['attachments'] = $attachments;
+                    $data['attachments_alt'] = $attachments_alt;
+                } elseif (isset($value['property_attachments']) && count($value['property_attachments']) > 0 && isset($value['from_residential']) && $value['from_residential'] == 1) {
+                    $attachments = [];
+                    $attachments_alt = [];
+                    foreach ($value['property_attachments'] as $pic) {
+                        if (isset($pic["publish_status"]) && !empty($pic["publish_status"])) {
+                            if (isset($pic['document']) && $pic['document'] != 1 && isset($options['image_size']) && !empty($options['image_size'])) {
+                                $attachments[] = Yii::$app->params['img_url_without_wm'] . '/' . $pic['model_id'] . '/' . $options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                            } elseif (isset($pic['document']) && $pic['document'] != 1) {
+                                $attachments[] = Yii::$app->params['img_url_without_wm'] . '/' . $pic['model_id'] . '/1200/' .  urldecode($pic['file_md5_name']);
+                            }
+                            if (isset($pic['alt_description'][$lang]) && !empty($pic['alt_description'][$lang])) {
+                                $attachments_alt[] = $pic['alt_description'][$lang];
+                            }
+                        }
+                    }
+                    $data['attachments'] = $attachments;
+                    $data['attachments_alt'] = $attachments_alt;
+                }
+
+                $type_img = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'tif', 'tiff', 'webp', 'heic', 'heif', 'avif', 'raw', 'cr2', 'nef', 'arw', 'orf', 'dng');
+
+                if (isset($value['property_attachments']) && count($value['property_attachments']) > 0 && !isset($value['from_residential'])) {
+                    $attachments_document = [];
+                    foreach ($value['property_attachments'] as $pic) {
+                        if (isset($pic["publish_status"]) && !empty($pic["publish_status"])) {
+                            $document = [];
+                            if (isset($pic['document']) && $pic['document'] == 1 && isset($options['image_size']) && !empty($options['image_size']) && isset($pic['file_type']) && in_array($pic['file_type'],  $type_img)) {
+                                $document["link"] = Yii::$app->params['property_img_resize_link'] . '/' . $pic['model_id'] . '/' . $options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                                $document["type"] = isset($pic["identification_type"]) && !empty($pic["identification_type"]) ? $pic["identification_type"] : 'document';
+                                $document["file_type"] = isset($pic["file_type"]) && !empty($pic["file_type"]) ? $pic["file_type"] : '';
+                            } elseif (isset($pic['document']) && $pic['document'] == 1) {
+                                $document["link"] = Yii::$app->params['floor_plans_url'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
+                                $document["type"] = isset($pic["identification_type"]) && !empty($pic["identification_type"]) ? $pic["identification_type"] : 'document';
+                                $document["file_type"] = isset($pic["file_type"]) && !empty($pic["file_type"]) ? $pic["file_type"] : '';
+                            }
+                            $attachments_document[] = $document;
+                        }
+                    }
+                    $data['attachments_document'] = array_merge(array_filter($attachments_document));
+                } elseif (isset($value['property_attachments']) && count($value['property_attachments']) > 0 && isset($value['from_residential']) && $value['from_residential'] == 1) {
+                    $attachments_document = [];
+                    foreach ($value['property_attachments'] as $pic) {
+                        if (isset($pic["publish_status"]) && !empty($pic["publish_status"])) {
+                            $document = [];
+                            if (isset($pic['document']) && $pic['document'] == 1 && isset($options['image_size']) && !empty($options['image_size']) && isset($pic['file_type']) && in_array($pic['file_type'],  $type_img)) {
+                                $document["link"] = Yii::$app->params['img_url_without_wm'] . '/' . $pic['model_id'] . '/' . $options['image_size'] . '/' .  urldecode($pic['file_md5_name']);
+                                $document["type"] = isset($pic["identification_type"]) && !empty($pic["identification_type"]) ? $pic["identification_type"] : 'document';
+                                $document["file_type"] = isset($pic["file_type"]) && !empty($pic["file_type"]) ? $pic["file_type"] : '';
+                            } elseif (isset($pic['document']) && $pic['document'] == 1) {
+                                $document["link"] = Yii::$app->params['floor_plans_url'] . '/' . $pic['model_id'] . '/' .  urldecode($pic['file_md5_name']);
+                                $document["type"] = isset($pic["identification_type"]) && !empty($pic["identification_type"]) ? $pic["identification_type"] : 'document';
+                                $document["file_type"] = isset($pic["file_type"]) && !empty($pic["file_type"]) ? $pic["file_type"] : '';
+                            }
+                            $attachments_document[] = $document;
+                        }
+                    }
+                    $data['attachments_document'] = array_merge(array_filter($attachments_document));
+                }
+
+                if (isset($value['videos']) && !empty($value['videos'])) {
+                    $videos = [];
+                    $virtual_tours = [];
+                    $floor_plan = [];
+                    $link_to_auction = [];
+                    foreach ($value['videos'] as $video) {
+                        if (isset($video['type']) && $video['type'] == 'Video' && isset($video['status']) && $video['status'] == 1) {
+                            $videos[] = (isset($video['url'][strtoupper($lang)]) ? $video['url'][strtoupper($lang)] : '');
+                        }
+                    }
+                    $data['videos'] = $videos;
+                    foreach ($value['videos'] as $vt) {
+                        if (isset($vt['type']) && $vt['type'] == '2' && isset($vt['status']) && $vt['status'] == 1) {
+                            $virtual_tours[] = [
+                                'url' => (isset($vt['url'][strtoupper($lang)]) ? $vt['url'][strtoupper($lang)] : ''),
+                                'description' => (isset($vt['description'][strtoupper($lang)]) ? $vt['description'][strtoupper($lang)] : '')
+                            ];
+                        } elseif (isset($vt['type']) && $vt['type'] == '112' && isset($vt['status']) && $vt['status'] == 1) {
+                            $link_to_auction['link'] = (isset($vt['url'][strtoupper($lang)]) ? $vt['url'][strtoupper($lang)] : '');
+                            $link_to_auction['status'] = (isset($vt['status']) ? $vt['status'] : '');
+                        }
+                        $floor_plan_types = array("FP", 118, 119, 120, 121, 122, 123, 124, 125, 130, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147);
+                        if (isset($vt['type']) && in_array($vt['type'], $floor_plan_types) && isset($vt['status']) && $vt['status'] == 1) {
+                            $floor_plan[] = (isset($vt['url'][strtoupper($lang)]) ? $vt['url'][strtoupper($lang)] : '');
+                        }
+                    }
+                    $data['vt'] = $virtual_tours;
+                    $data['fp'] = $floor_plan;
+                    $data['link_to_auction'] = $link_to_auction;
+                }
+
+                $floor_plans = [];
+                if (isset($data['attachments_document']) && !empty($data['attachments_document'])) {
+                    foreach ($data['attachments_document'] as $pic) {
+                        if (isset($pic['type']) && $pic['type'] == 'FP' && isset($pic['link']) && !empty($pic['link'])) {
+                            $floor_plans[] = $pic['link'];
+                        }
+                    }
+                    $data['floor_plans'] = array_merge(array_filter($floor_plans), (isset($data['fp']) && !empty($data['fp']) ? $data['fp'] : []));
+                }
+
+                if (isset($value['title'][$lang]) && $value['title'][$lang] != '')
+                    $data['title'] = $value['title'][$lang];
+                else if (isset($value['location_value'][$prop_lang]) && !empty($value['location_value'][$prop_lang]) && isset($value['type_one_value'][$prop_lang]) && !empty($value['type_one_value'][$prop_lang]))
+                    $data['title'] = $value['type_one_value'][$prop_lang] . ' ' . \Yii::t('app', 'in') . ' ' . $value['location_value'][$prop_lang];
+
+
+
+                $formatted_properties[] = $data;
+            }
+        }
+        $properties = $commercial_properties = $formatted_properties;
+
         //        start slug_all
         $slugs = [];
         foreach ($langugesSystem as $lang_sys) {
@@ -694,5 +899,37 @@ class Developments extends Model
             $file_data = file_get_contents($file);
         }
         return $file_data;
+    }
+
+    public static function getRelatedProjectProperties($query = [], $set_options = [])
+    {
+        if (!isset($query['reference']) || empty($query['reference'])) {
+            return [];
+        }
+
+        $query_data = [
+            "options" => [
+                "sort" => [
+                    "reference" => 1
+                ]
+            ],
+            "frontend" => true,
+            "query" => [
+                "status" => isset($query['status']) && !empty($query['status']) ? $query['status'] : ["Available"],
+                "similar_commercials" => 'include_similar'
+            ]
+        ];
+        $url = Yii::$app->params['node_url'] . 'commercial_properties/commercial-construction?user=' . Yii::$app->params['user'] . '&ref=' . $query['reference'];
+
+        $curl = new curl\Curl();
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query_data))]);
+
+        $response = $curl->setRequestBody(json_encode($query_data))
+            ->setHeaders($headers)
+            ->post($url);
+
+        $response = json_decode($response, TRUE);
+
+        return $response ?? [];
     }
 }
