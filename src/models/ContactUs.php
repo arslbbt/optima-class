@@ -5,6 +5,7 @@ namespace optima\models;
 use Yii;
 use yii\base\Model;
 use optima\models\Cms;
+use optima\models\Functions;
 
 class ContactUs extends Model
 {
@@ -22,6 +23,7 @@ class ContactUs extends Model
     public $url;
     public $attach;
     public $reference;
+    public $other_reference;
     public $agency_set_ref;
     public $verifyCode;
     public $transaction;
@@ -141,6 +143,7 @@ class ContactUs extends Model
     public $street_address;
     public $street_number;
     public $city_town;
+    public $commercial_profile;
 
     const SCENARIO_V3 = 'v3validation';
 
@@ -154,7 +157,7 @@ class ContactUs extends Model
     public function rules()
     {
         return [
-            [['name', 'mobile_phone', 'phone', 'home_phone', 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'last_name', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_from_date', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'imageFiles', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'listing_agency_id', 'user_id', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories', 'account_alert', 'title', 'work_phone', 'only_investments', 'only_urgent_sales','classification','street_address','street_number','city_town'], 'safe'],
+            [['name', 'mobile_phone', 'phone', 'home_phone', 'office', 'infants', 'call_remember', 'appt', 'visit_date', 'to_email', 'html_content', 'source', 'owner', 'last_name', 'lead_status', 'language', 'parking', 'redirect_url', 'attach', 'postal_code', 'reference', 'transaction', 'property_type', 'bedrooms', 'bathrooms', 'pool', 'address', 'house_area', 'plot_area', 'price', 'price_reduced', 'close_to_sea', 'sea_view', 'exclusive_property', 'accept_cookie', 'accept_cookie_text', 'get_updates', 'booking_period', 'guests', 'transaction_types', 'subscribe', 'booking_enquiry', 'sender_first_name', 'sender_last_name', 'sender_email', 'sender_phone', 'assigned_to', 'news_letter', 'arrival_date', 'buy_price_from', 'country', 'buy_price_to', 'ltrent_from_date', 'ltrent_price_from', 'ltrent_price_to', 'strent_price_from', 'strent_price_to', 'departure_date', 'contact_check_1', 'contact_check_2', 'contact_check_3', 'resume', 'imageFiles', 'application', 'cv_file', 'gdpr_status', 'buyer', 'listing_agency_email', 'listing_agency_id', 'user_id', 'lgroups', 'feet_setting', 'feet_views', 'sub_types', 'feet_categories', 'p_type', 'year_built_from', 'year_built_to', 'plot_size_from', 'plot_size_to', 'built_size_from', 'built_size_to', 'usefull_area_from', 'usefull_area_to', 'building_style', 'gated_comunity', 'elevator', 'settings', 'orientation', 'views', 'garden', 'only_golf_properties', 'only_off_plan', 'buy_from_date', 'countries', 'regions', 'provinces', 'cities', 'locations', 'urbanization', 'furniture', 'condition', 'occupancy_status', 'legal_status', 'total_floors', 'mooring_type', 'only_projects', 'only_holiday_homes', 'only_bank_repossessions', 'own', 'min_sleeps', 'id_number', 'custom_categories', 'account_alert', 'title', 'work_phone', 'only_investments', 'only_urgent_sales', 'classification', 'street_address', 'street_number', 'city_town', 'commercial_profile'], 'safe'],
             ['first_name', 'required', 'message' => Yii::t('app', 'first name cannot be blank.')],
             // ['last_name', 'required', 'message' => Yii::t('app', 'last name cannot be blank.')],
             ['email', 'required', 'message' => Yii::t('app', 'email cannot be blank.')],
@@ -165,11 +168,19 @@ class ContactUs extends Model
             [['resume', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, pdf, txt'],
             [['imageFiles', 'application'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, png, jpeg'],
             [['cv_file'], 'file', 'skipOnEmpty' => true],
-
+            [
+                'first_name',
+                function ($attribute, $params) {
+                    if ($this->first_name === $this->last_name) {
+                        $this->addError($attribute, Yii::t('app', 'first name and last name cannot be the same.'));
+                    }
+                },
+                'message' => Yii::t('app', 'first name and last name cannot be the same.')
+            ],
             [
                 ['reCaptcha'], isset(Yii::$app->params['recaptcha_secret_site_key']) ? \himiklab\yii2\recaptcha\ReCaptchaValidator2::className() : 'safe',
                 'when' => function ($model) {
-                    if (!isset(Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
+                    if (!isset (Yii::$app->params['recaptcha_secret_site_key']) || $model->reCaptcha == 'nulll') {
                         $return = false;
                     } else {
                         $return = true;
@@ -252,7 +263,7 @@ class ContactUs extends Model
             $from_email = trim($ae_array[0]);
         } else {
             $ae_array = explode(',', Yii::$app->params['from_email']);
-            $from_email = Yii::$app->params['from_email'];
+            $from_email = isset($ae_array[0]) ? trim($ae_array[0]) : Yii::$app->params['from_email'];
         }
 
         if ($this->validate() && isset($ae_array)) {
@@ -261,6 +272,7 @@ class ContactUs extends Model
                 $webroot = Yii::getAlias('@webroot');
                 if (is_dir($webroot . '/uploads/pdf')) {
 
+                    $this->saveAccount();
                     Yii::$app->mailer->compose()
                         ->setFrom($from_email)
                         ->setTo($this->email)
@@ -269,19 +281,18 @@ class ContactUs extends Model
                         ->attach($webroot . '/uploads/pdf/property.pdf')
                         ->send();
                     Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                        ->setFrom(isset($this->email) ? $this->email : '')
+                        ->setFrom($from_email)
                         ->setTo(isset($ae_array) ? $ae_array : '')
                         ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
                         ->send();
-                    $this->saveAccount();
                     if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone)) {
+                        $this->saveSenderAccount();
                         Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
                             ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]) : Yii::$app->params['from_email'])
                             ->setTo($this->sender_email)
                             ->setSubject('Suggested property')
                             ->attach($webroot . '/uploads/pdf/property.pdf')
                             ->send();
-                        $this->saveSenderAccount();
                     }
                 }
             } else if (isset($this->subscribe) && $this->subscribe == 1) {
@@ -298,20 +309,20 @@ class ContactUs extends Model
                 }
                 $htmlBody = $subscribe_msg . '<br><br><br><br> <img style="width:40%" src=' . $logo . '> ';
                 $email_response = isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing';
-
+            
+                $this->saveAccount();
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(isset($this->email) ? $this->email : '')
+                    ->setFrom($from_email)
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setSubject('Subscribing newsletter Email')
                     ->setHtmlBody($this->email . ' would like to be added to your newsletters')
                     ->send();
                 Yii::$app->mailer->compose()
-                    ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]) : Yii::$app->params['from_email'])
+                    ->setFrom($from_email)
                     ->setTo($this->email)
                     ->setSubject($subscribe_subject != '' ? $subscribe_subject : 'Thank you for contacting us')
                     ->setHtmlBody($subscribe_msg != '' ? $htmlBody : $email_response)
                     ->send();
-                $this->saveAccount();
             } else if (isset($this->booking_enquiry) && $this->booking_enquiry == 1) {
                 $html = '';
                 if (isset($this->first_name) && $this->first_name != '') {
@@ -339,7 +350,15 @@ class ContactUs extends Model
                 }
                 if (!(isset($this->agency_set_ref) && $this->agency_set_ref != '') && isset($this->reference) && $this->reference != '') {
                     $html .= '<br>';
-                    $html .= 'Prop.Ref : ' . $this->reference;
+                    $html .= 'System Ref : ' . $this->reference;
+                }
+                if (!(isset($this->agency_set_ref) && $this->agency_set_ref != '') && isset($this->other_reference) && $this->other_reference != '') {
+                    $html .= '<br>';
+                    $html .= 'Prop. Ref : ' . $this->other_reference;
+                }
+                if (isset($this->transaction_types) && $this->transaction_types != '') {
+                    $html .= '<br>';
+                    $html .= 'Enquiry type : ' . ($this->transaction_types == "Buy" ? "Sale Property" : ($this->transaction_types == "Short term rental" ? "Holiday Property" : ($this->transaction_types == "Long term rental" ? "Long Term Property" : "")));
                 }
                 if (isset($this->arrival_date) && $this->arrival_date != '') {
                     $html .= '<br>';
@@ -368,19 +387,19 @@ class ContactUs extends Model
                 } else if (isset($this->call_remember) && $this->call_remember == 'After 18:00') {
                     $call_rememeber = 'After 18:00';
                 }
+                $this->saveAccount();
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(isset($this->email) ? $this->email : '')
+                    ->setFrom($from_email)
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setSubject('Booking Enquiry')
                     ->setHtmlBody($html)
                     ->send();
                 Yii::$app->mailer->compose()
-                    ->setFrom(isset($ae_array[0]) ? trim($ae_array[0]) : Yii::$app->params['from_email'])
+                    ->setFrom($from_email)
                     ->setTo($this->email)
                     ->setSubject('Thank you for contacting us')
                     ->setHtmlBody(isset($settings['email_response'][strtoupper(\Yii::$app->language)]) ? $settings['email_response'][strtoupper(\Yii::$app->language)] : 'Thank you for Subscribing')
                     ->send();
-                $this->saveAccount();
             } elseif (isset($_GET['ContactUs']['file_link'])) {
                 $file = $_GET['ContactUs']['file_link'];
                 $subscribe_subject = '';
@@ -394,12 +413,15 @@ class ContactUs extends Model
                 $htmlBody = '';
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)])) {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
-                    if ($this->reference != '') {
+                    if($this->other_reference != ''){
+                        $htmlBody = '<br>' . \Yii::t('app', strtolower('Enquiry about property')) . ' (' . \Yii::t('app', strtolower('Ref')) . ' : ' . $this->other_reference . ')<br><br>' . $htmlBody;
+                    }elseif ($this->reference != '') {
                         $htmlBody = '<br>' . \Yii::t('app', strtolower('Enquiry about property')) . ' (' . \Yii::t('app', strtolower('Ref')) . ' : ' . $this->reference . ')<br><br>' . $htmlBody;
                     }
                 }
+                $this->saveAccount();
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(isset($this->email) ? $this->email : '')
+                    ->setFrom($from_email)
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
                     ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
@@ -410,7 +432,6 @@ class ContactUs extends Model
                     ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
                     ->setHtmlBody(isset($htmlBody) && isset($_GET['ContactUs']['file_link']) ? "<a href=" . $_GET['ContactUs']['file_link'] . ">Download File</a><br>" .  $htmlBody : 'Thank you for contacting us')
                     ->send();
-                $this->saveAccount();
 
                 if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
@@ -426,12 +447,15 @@ class ContactUs extends Model
                 }
                 if (isset($settings['email_response'][strtoupper(\Yii::$app->language)])) {
                     $htmlBody = $settings['email_response'][strtoupper(\Yii::$app->language)];
-                    if ($this->reference != '') {
+                    if($this->other_reference != ''){
+                        $htmlBody = '<br>' . \Yii::t('app', strtolower('Enquiry about property')) . ' (' . \Yii::t('app', strtolower('Ref')) . ' : ' . $this->other_reference . ')<br><br>' . $htmlBody;
+                    }elseif ($this->reference != '') {
                         $htmlBody = '<br>' . \Yii::t('app', strtolower('Enquiry about property')) . ' (' . \Yii::t('app', strtolower('Ref')) . ' : ' . $this->reference . ')<br><br>' . $htmlBody;
                     }
                 }
+                $this->saveAccount();
                 Yii::$app->mailer->compose('mail', ['model' => $this]) // a view rendering result becomes the message body here
-                    ->setFrom(isset($this->email) ? $this->email : '')
+                    ->setFrom($from_email)
                     ->setTo(isset($ae_array) ? $ae_array : '')
                     ->setCc(isset($this->listing_agency_email) && $this->listing_agency_email != '' ? $this->listing_agency_email : [])
                     ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Web enquiry'))
@@ -442,7 +466,6 @@ class ContactUs extends Model
                     ->setSubject(isset($settings['email_response_subject'][strtoupper(\Yii::$app->language)]) ? $settings['email_response_subject'][strtoupper(\Yii::$app->language)] : (isset($settings['email_response_subject'][0]) ? $settings['email_response_subject'][0]['key'] : 'Thank you for contacting us'))
                     ->setHtmlBody(isset($htmlBody) ? $htmlBody : 'Thank you for contacting us')
                     ->send();
-                $this->saveAccount();
 
                 if (isset($this->sender_first_name) || isset($this->sender_last_name) || isset($this->sender_email) || isset($this->sender_phone))
                     $this->saveSenderAccount();
@@ -458,6 +481,8 @@ class ContactUs extends Model
     {
         $settings = Cms::settings();
 
+        $spoken = $this->getSpokenLangFilePath();
+
         $call_rememeber = '';
         if (isset($this->call_remember) && $this->call_remember == '9:00 to 18:00') {
             $call_rememeber = 'call me back:  9:00 to 18:00';
@@ -467,9 +492,9 @@ class ContactUs extends Model
             $call_rememeber = $this->call_remember;
         }
         if ($this->owner)
-            $url = Yii::$app->params['apiUrl'] . "owners/index&user_apikey=" . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . "owners/index&user_apikey=" . Yii::$app->params['api_key']  . "&json=1";
         else
-            $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'];
+            $url = Yii::$app->params['apiUrl'] . "accounts/index&user_apikey=" . Yii::$app->params['api_key'] . "&json=1";
 
 
         $fields = array(
@@ -487,8 +512,8 @@ class ContactUs extends Model
             'work_phone' => isset($this->work_phone) ? $this->work_phone : null,
             'home_phone' => isset($this->home_phone) ? $this->home_phone : null,
             'country ' => isset($this->country) ? $this->country : null,
-            'appt'  => isset($this->appt) ? $this->appt : null,
-            'date'  => isset($this->visit_date) ? $this->visit_date : null,
+            'appt' => isset($this->appt) ? $this->appt : null,
+            'date' => isset($this->visit_date) ? $this->visit_date : null,
             'mobile_phone' => isset($this->mobile_phone) ? $this->mobile_phone : null,
             'listing_agency_id' => isset($this->listing_agency_id) ? $this->listing_agency_id : null,
             'user_id' => isset($this->user_id) ? $this->user_id : null,
@@ -519,8 +544,8 @@ class ContactUs extends Model
             'to_email' => isset($settings['general_settings']['admin_email']) ? $settings['general_settings']['admin_email'] : null,
             'html_content' => isset($this->html_content) ? $this->html_content : null,
             'lgroups' => isset($this->lgroups) ? (is_array($this->lgroups) ? implode(",", $this->lgroups) : $this->lgroups) : null,
-            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ?  $this->message : null),
-            'language' => isset($this->language) ? $this->language : strtoupper(\Yii::$app->language),
+            'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->message) ? $this->message : null),
+            'language' => isset($spoken) && !empty($spoken) ? $spoken : strtoupper(\Yii::$app->language),
             'sub_types' => isset($this->sub_types) ? (is_array($this->sub_types) ? implode(",", $this->sub_types) : $this->sub_types) : null,
             'feet_setting' => isset($this->feet_setting) ? (is_array($this->feet_setting) ? implode(",", $this->feet_setting) : $this->feet_setting) : null,
             'feet_categories' => isset($this->feet_categories) ? (is_array($this->feet_categories) ? implode(",", $this->feet_categories) : $this->feet_categories) : null,
@@ -566,11 +591,12 @@ class ContactUs extends Model
             'collaborator' => $this->collaborator,
             'city_town' => isset($this->city_town) ? $this->city_town : null,
             'street_address' => isset($this->street_address) ? $this->street_address : null,
-            'street_number' => isset($this->street_number) ? $this->street_number : null
+            'street_number' => isset($this->street_number) ? $this->street_number : null,
+            'commercial_profile' => isset($this->commercial_profile) ? $this->commercial_profile : null,
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $headers = Functions::getApiHeaders();
-        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url); 
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
+        $response = $curl->setRequestBody(json_encode($fields,JSON_UNESCAPED_SLASHES))->setHeaders($headers)->post($url);
         $res = json_decode($response);
         return $res->_id;
     }
@@ -596,8 +622,8 @@ class ContactUs extends Model
             'comments' => isset($call_rememeber) && $call_rememeber != '' ? $call_rememeber : (isset($this->guests) ? 'Number of Guests: ' . $this->guests : null),
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $headers = Functions::getApiHeaders();
-        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))->setHeaders($headers)->post($url);
     }
 
     public function collaboratorEmail()
@@ -621,8 +647,8 @@ class ContactUs extends Model
             'collaborator' => 'true',
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $headers = Functions::getApiHeaders();
-        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))->setHeaders($headers)->post($url);
     }
 
 
@@ -635,8 +661,8 @@ class ContactUs extends Model
                 'token' => $token,
             );
             $curl = new \linslin\yii2\curl\Curl();
-            $headers = Functions::getApiHeaders();
-            $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
+            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
+            $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))->setHeaders($headers)->post($url);
             $res = json_decode($response);
             return $res;
         } else {
@@ -646,25 +672,25 @@ class ContactUs extends Model
 
     public static function createUserAccount($data)
     {
-        $url = Yii::$app->params['apiUrl'] .'users/create&user_apikey=' . Yii::$app->params['api_key'];
+        $url = Yii::$app->params['apiUrl'] . 'users/create&user_apikey=' . Yii::$app->params['api_key'];
         $fields = array(
             'social_id' => isset($data['social_id']) ? $data['social_id'] : null,
             'first_name' => isset($data['first_name']) ? $data['first_name'] : null,
-            'last_name' => isset($data['last_name']) ? $data['last_name'] : null, 
+            'last_name' => isset($data['last_name']) ? $data['last_name'] : null,
             'company_name' => isset($data['company_name']) ? $data['company_name'] : '', //For company registration
             'tax_id' => isset($data['tax_id']) ? $data['tax_id'] : '',                   //For company registration
             'nationality' => isset($data['nationality']) ? $data['nationality'] : '',    //For company registration
             'full_name' => isset($data['full_name']) ? $data['full_name'] : '',          //For company registration
             'user_email' => isset($data['user_email']) ? $data['user_email'] : null,    //For company and user registration
-            "password_hash" =>  isset($data['password_hash']) ? $data['password_hash'] : null, //For company and user registration
-            "password_repeat" =>  isset($data['password_repeat']) ? $data['password_repeat'] : null, //For company and user registration
+            "password_hash" => isset($data['password_hash']) ? $data['password_hash'] : null, //For company and user registration
+            "password_repeat" => isset($data['password_repeat']) ? $data['password_repeat'] : null, //For company and user registration
             "type" => isset($data['type']) ? $data['type'] : null,        //For company and user registration
             "company_type" => isset($data['company_type']) ? $data['company_type'] : null,        //For company and user registration
             'address' => isset($data['address']) ? $data['address'] : '', //For company agency registration
             'country' => isset($data['country']) ? $data['country'] : '', //For company agency registration
             'province' => isset($data['province']) ? $data['province'] : '', //For company agency registration
-            "city" =>  isset($data['city']) ? $data['city'] : '', //For company agency registration
-            "location" =>  isset($data['location']) ? $data['location'] : '', //For company agency registration
+            "city" => isset($data['city']) ? $data['city'] : '', //For company agency registration
+            "location" => isset($data['location']) ? $data['location'] : '', //For company agency registration
             "street" => isset($data['street']) ? $data['street'] : '', //For company agency registration
             "street_number" => isset($data['street_number']) ? $data['street_number'] : '', //For company agency registration
             "phone" => isset($data['phone']) ? $data['phone'] : null,
@@ -674,8 +700,34 @@ class ContactUs extends Model
             "source" => isset($data['source']) ? $data['source'] : null,
         );
         $curl = new \linslin\yii2\curl\Curl();
-        $headers = Functions::getApiHeaders();
-        $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
+        $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields, JSON_UNESCAPED_SLASHES))]);
+        $response = $curl->setRequestBody(json_encode($fields, JSON_UNESCAPED_SLASHES))->setHeaders($headers)->post($url);
         return json_decode($response);
+    }
+
+    private function getSpokenLangFilePath()
+    {
+        $spoken_lang_file = dirname(__DIR__) . '/assets/json/spoken-lang.json';
+
+        if ($spoken_lang_file === null || !file_exists($spoken_lang_file)) {
+            $spoken = strtoupper(\Yii::$app->language);
+        } else {
+            $spoken_lang = json_decode(file_get_contents($spoken_lang_file), true);
+            if ($spoken_lang === null) {
+                $spoken = strtoupper(\Yii::$app->language);
+            } else {
+                $lang = isset($this->language) ? strtolower($this->language) : strtolower(\Yii::$app->language);
+                $spoken = strtoupper(\Yii::$app->language);
+                
+                foreach ($spoken_lang as $item) {
+                    if (isset($item["lang"]) && $item["lang"] == $lang) {
+                        $spoken = $item["key"];
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $spoken;
     }
 }
