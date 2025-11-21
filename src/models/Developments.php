@@ -915,7 +915,7 @@ class Developments extends Model
             ],
             "frontend" => true,
             "query" => [
-                "status" => isset($query['status']) && !empty($query['status']) ? $query['status'] : ["Available"],
+                "status" => isset(Yii::$app->params['project_properties_status']) && !empty(Yii::$app->params['project_properties_status']) ? Yii::$app->params['project_properties_status'] : ["Available"],
                 "similar_commercials" => 'include_similar'
             ]
         ];
