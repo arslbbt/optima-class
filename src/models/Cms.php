@@ -41,7 +41,7 @@ class Cms extends Model
      * and
      * For Page settings pass page_data['custom_settings'] as param without language
      * @param string $custom_settings
-     * 
+     *
      * @return false|array
      */
     public static function custom_settings($custom_settings = [])
@@ -307,7 +307,7 @@ class Cms extends Model
 
     /**
      * Get CMS page data by id, page_id or slug
-     * 
+     *
      * @param array $params =   [
      *                              ['id'] => '5eb3ebc9fe107a46744d2346',
      *                              ['page_id'] => '6425',
@@ -317,7 +317,7 @@ class Cms extends Model
      *                              ['seoimage'] => true,
      *                              ['template'] => true,
      *                          ]
-     * 
+     *
      * @return array|void
      */
     public static function getPage($params = [])
@@ -496,7 +496,7 @@ class Cms extends Model
      *                              ['without_templates'] => true,
      *                              ['without_tags'] => true,
      *                          ]
-     * 
+     *
      * @return array
      */
     public static function getSlugs($params = [])
@@ -535,7 +535,7 @@ class Cms extends Model
     /**
      * Get page slug by tag assigned to page
      * @param mixed $tag = 'propertyDetails'
-     * 
+     *
      * @return mixed|string
      */
     public static function getSlugByTagName($tag)
@@ -553,7 +553,7 @@ class Cms extends Model
 
     /**
      * Get Rules for web
-     * 
+     *
      * @return array|mixed
      */
     public static function cmsRules()
@@ -814,7 +814,7 @@ class Cms extends Model
     public static function postTypes($name, $category = null, $forRoutes = null, $pageSize = 10, $imageseo = false, $options = [])
     {
         if(isset($options['user_id']) && !empty($options['user_id'])){
-            $file_name = $name .'UserList'.$options['user_id'];    
+            $file_name = $name .'UserList'.$options['user_id'];
         }else{
             $file_name = $name;
         }
@@ -856,7 +856,7 @@ class Cms extends Model
         } else {
             $file_data = file_get_contents($file);
         }
-        $header = get_headers($url, 1);
+        $header = [];
         $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
         $ret_data = [];
