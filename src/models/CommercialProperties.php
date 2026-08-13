@@ -40,7 +40,7 @@ class CommercialProperties extends Model
             $query_array["archived"] = [
                 '$ne' => true
             ];
-            $query_array["reference"] = 
+            $query_array["reference"] =
             [
                 '$in' => $get['favorite_ids'],
             ];
@@ -54,7 +54,7 @@ class CommercialProperties extends Model
                 $query_array['status'] = ['$in' => (isset($_GET['status']) && !empty($_GET['status']) ? $_GET['status'] : (isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available', 'Under Offer']))];
             }
         }
-        
+
         $post_data = ["options" => $options];
         if(!empty($query_array)){
             $post_data["query"] =  $query_array;
@@ -63,15 +63,15 @@ class CommercialProperties extends Model
             $post_data['selectRecords'] = false;
         }
         $random_query = isset($get['random']) && !empty($get['random']) ? '&random='.$get['random'] : '';
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties?user=' . Yii::$app->params['user'].$random_query;
+        $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties?user=' . Yii::$app->params['user'].$random_query;
         if(isset($set_options['cache']) && $set_options['cache'] == true){
-            $response = self::DoCache($post_data, $node_url);
+            $response = self::DoCache($post_data, $commercial_url);
         }else{
             $curl = new curl\Curl();
             $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
             $response = $curl->setRequestBody(json_encode($post_data))
                 ->setHeaders($headers)
-                ->post($node_url);
+                ->post($commercial_url);
         }
         $response = json_decode($response, TRUE);
 
@@ -102,11 +102,11 @@ class CommercialProperties extends Model
 
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders($headers)
-            ->post(Yii::$app->params['node_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
-            
+            ->post(Yii::$app->params['commercial_url'] . 'commercial_properties/view/' . $id . '?user=' . Yii::$app->params['user']);
+
         $response = json_decode($response, TRUE);
         $property = self::formateProperty($response, $set_options);
-        
+
         return $property;
     }
 
@@ -472,7 +472,7 @@ class CommercialProperties extends Model
         if (isset($property['created_at']) && !empty($property['created_at'])) {
             $f_property['created_at'] = strtotime($property['created_at']);
         }
-        
+
         if (isset($property['featured'])) {
             $f_property['featured'] = $property['featured'];
         }
@@ -542,7 +542,7 @@ class CommercialProperties extends Model
         }
         if (isset($property['leasehold_rental_price']) && $property['leasehold_rental_price']) {
             $f_property['leasehold_rental_price'] = $property['leasehold_rental_price'];
-        }  
+        }
         if (isset($property['leasehold_rental_unit']) && $property['leasehold_rental_unit']) {
             $f_property['leasehold_rental_unit'] = $property['leasehold_rental_unit'];
         }
@@ -632,7 +632,7 @@ class CommercialProperties extends Model
                 }
                 if(isset($pic['alt_description'][$lang]) && !empty($pic['alt_description'][$lang])){
                     $attachments_alt[] = $pic['alt_description'][$lang];
-        
+
                 }
             }
             $f_property['attachments'] = $attachments;
@@ -826,7 +826,7 @@ class CommercialProperties extends Model
     public static function findAllWithLatLang($qry = 'true',$map_query =[], $cache = false)
     {
         $webroot = Yii::getAlias('@webroot');
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
+        $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/find-all?user=' . Yii::$app->params['user'].(isset($qry) && $qry == 'true' ? '&latLang=1' : '');
         $query = [];
         $sort = ['current_price' => '-1'];
         $query_array=[];
@@ -843,7 +843,7 @@ class CommercialProperties extends Model
         }
         $options['sort'] = $sort;
 
-        
+
         if(isset($query) && $query != '' && !is_array($query)){
             $vars = explode('&', $query);
             foreach($vars as $var){
@@ -879,7 +879,7 @@ class CommercialProperties extends Model
         $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
             ->setHeaders($headers)
-            ->post($node_url);
+            ->post($commercial_url);
         if (!is_dir($webroot . '/uploads/')) {
             mkdir($webroot . '/uploads/');
         }
@@ -906,13 +906,13 @@ class CommercialProperties extends Model
         $post_data['query'] = [
             'id' => $id
         ];
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
+        $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/get-properties-with-transaction-types/'. $transaction_type .'?user=' . Yii::$app->params['user'];
         $curl = new curl\Curl();
         $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
         ->setHeaders($headers)
-        ->post($node_url);
-        
+        ->post($commercial_url);
+
         $response = json_decode($response, TRUE);
         $properties = [];
         if(isset($response) && isset($response['docs']))
@@ -1035,7 +1035,7 @@ class CommercialProperties extends Model
         ];
         if(isset($data['transaction_type']) && $data['transaction_type'] == 'sale'){
             $fields['current_price'] = (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '');
-        } 
+        }
         elseif(isset($data['transaction_type']) && $data['transaction_type'] == 'rent'){
             $fields['period_seasons'][] = ['seasons' => (isset($data['seasons']) && !empty($data['seasons']) ? $data['seasons'] : 'All year'), 'new_price' => (isset($data['current_price']) && !empty($data['current_price']) ? ((int)$data['current_price'] * 12) : ''), 'total_per_month' => (isset($data['current_price']) && !empty($data['current_price']) ? (int)$data['current_price'] : '')];
         }
@@ -1097,19 +1097,19 @@ class CommercialProperties extends Model
         }
         $curl = new curl\Curl();
         if(isset($data['prop_id']) && !empty($data['prop_id'])){
-            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/update/'.$data['prop_id'].'?user=' . $data['user_id'];
+            $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/update/'.$data['prop_id'].'?user=' . $data['user_id'];
             $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($fields))]);
             $response = $curl->setRequestBody(json_encode($fields))
             ->setHeaders($headers)
-                ->put($node_url);
+                ->put($commercial_url);
         }else{
-            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/create?user=' . $data['user_id'];
+            $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/create?user=' . $data['user_id'];
             $response = $curl->setRequestBody(json_encode($fields))
             ->setHeaders([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen(json_encode($fields))
                 ])
-                ->post($node_url);
+                ->post($commercial_url);
         }
         return json_decode($response);
     }
@@ -1149,7 +1149,7 @@ class CommercialProperties extends Model
             ->post($node_url);
         return json_decode($response);
     }
-    
+
     public static function savePropertyOfInterest($data){
 
         $node_url = Yii::$app->params['node_url'] . 'accounts/update-with-email/?user_apikey=' . Yii::$app->params['api_key'];
@@ -1174,7 +1174,7 @@ class CommercialProperties extends Model
 
     public static function getAllUserProperties($query, $options = ['page' => 1, 'limit' => 10], $sort = ['current_price' => '-1']){
 
-        $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
+        $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/get-all-properties-of-user/?user=' . $query['_id'];
         $post_data['options'] = [
             'page' => isset($options['page']) ? (int)$options['page'] : 1,
             'limit' => isset($options['limit']) ? (int)$options['limit'] : 10,
@@ -1189,7 +1189,7 @@ class CommercialProperties extends Model
         $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
         $response = $curl->setRequestBody(json_encode($post_data))
         ->setHeaders($headers)
-            ->post($node_url);
+            ->post($commercial_url);
         return json_decode($response);
 
     }
@@ -1198,10 +1198,10 @@ class CommercialProperties extends Model
     {
         $file = Functions::directory() . 'cadastral-data.json';
         if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
+            $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
             $curl = new curl\Curl();
             $headers = Functions::getApiHeaders();
-            $file_data = $curl->setHeaders($headers)->post($node_url);
+            $file_data = $curl->setHeaders($headers)->post($commercial_url);
             file_put_contents($file, $file_data);
         } else {
             $file_data = file_get_contents($file);
@@ -1211,7 +1211,7 @@ class CommercialProperties extends Model
 
     public static function getCadastralProperties($same_cadastral_prop_ids)
     {
-        $url = Yii::$app->params['node_url'] .'/commercial_properties/get-same-properties-of-cadastral-number/?user=' . Yii::$app->params['user'];
+        $url = Yii::$app->params['commercial_url'] .'/commercial_properties/get-same-properties-of-cadastral-number/?user=' . Yii::$app->params['user'];
         $query['query'] = [
             'ids' => $same_cadastral_prop_ids,
         ];
@@ -1222,13 +1222,13 @@ class CommercialProperties extends Model
             ->post($url);
             $response = json_decode($response, TRUE);
             $properties = [];
-    
+
             if(isset($response) && isset($response['docs']))
             foreach ($response['docs'] as $property) {
                 $properties[] = self::formateProperty($property);
             }
             $response['docs'] = $properties;
-    
+
             return $response;
     }
 }

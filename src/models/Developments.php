@@ -63,19 +63,19 @@ class Developments extends Model
 
             if (isset($property->property->description->$lang) && $property->property->description->$lang != '')
                 $data['content'] = $property->property->description->$lang;
-                
+
             if (isset($property->property->phase) && $property->property->phase != '')
                 $data['phase_name'] = isset($property->property->phase['0']->phase_name) ? $property->property->phase['0']->phase_name : '';
 
             if (isset($property->property->phase) && $property->property->phase != '')
                 $data['phase_completion_date'] = isset($property->property->phase['0']->completion_date) ? $property->property->phase['0']->completion_date : '';
-            
+
             if (isset($property->property->type) && $property->property->type != '')
                 $data['type'] = implode(', ', $property->property->type);
 
             if (isset($property->property->total_number_of_unit) && $property->property->total_number_of_unit != '')
                 $data['total_number_of_unit'] = $property->property->total_number_of_unit;
-            
+
             if (isset($property->property->city_name) && $property->property->city_name != '')
                 $data['city_name'] = $property->property->city_name;
 
@@ -166,10 +166,10 @@ class Developments extends Model
         }
 
         $headers = Functions::getApiHeaders();
-        
+
         $JsonData = Functions::getCRMData($url, false, array(), false, $headers);
         $property = json_decode($JsonData);
-        
+
         $return_data = [];
         $attachments = [];
         $floor_plans = [];
@@ -196,7 +196,7 @@ class Developments extends Model
             $return_data['title'] = $property->property->title->$lang;
         else
             $return_data['title'] = 'N/A';
-            
+
         if (isset($property->property->city) && $property->property->city != '')
             $return_data['city'] = $property->property->city;
 
@@ -225,7 +225,7 @@ class Developments extends Model
         }
         if (isset($property->property->province)) {
             $return_data['province'] = $property->property->province;
-        }      
+        }
         if (isset($property->property->bedrooms_from) && $property->property->bedrooms_from > 0) {
             $return_data['bedrooms_from'] = $property->property->bedrooms_from;
         }
@@ -265,7 +265,7 @@ class Developments extends Model
         if (isset($property->property->videos) && $property->property->videos > 0) {
             $return_data['videos'] = $property->property->videos;
         }
-        
+
         if (isset($property->property->own) && $property->property->own == true && isset($property->agency_logo) && !empty($property->agency_logo)) {
             $return_data['agency_logo'] = 'https://images.optima-crm.com/agencies/' . (isset(Yii::$app->params['agency']) ? Yii::$app->params['agency'] : '') . '/' . (isset($property->agency_logo->logo->name) ? $property->agency_logo->logo->name : '');
         } elseif (isset($property->agency_logo) && !empty($property->agency_logo)) {
@@ -306,7 +306,7 @@ class Developments extends Model
                 }
             }
             $return_data['home_staging'] = $home_staging;
-        }        
+        }
         if (isset($property->documents) && count($property->documents) > 0) {
             foreach ($property->documents as $pic) {
                 if (isset($pic->identification_type) && $pic->identification_type == 'FP') {
@@ -319,7 +319,7 @@ class Developments extends Model
                         );
                     }
                 }
-              
+
             }
 
             $return_data['floor_plans'] = $floor_plans;
@@ -406,7 +406,7 @@ class Developments extends Model
             }
         }
         $properties = [];
-        
+
         if(isset($property->properties) && !empty($property->properties)){
             foreach ($property->properties as $key => $value) {
                 $data = [];
@@ -414,8 +414,8 @@ class Developments extends Model
                     $data['sale'] = $value->property->sale;
                 if (isset($value->property->rent) && $value->property->rent == 1)
                     $data['rent'] = $value->property->rent;
-                if (isset($value->property->oldprice->price_on_demand) && $value->property->oldprice->price_on_demand == true) 
-                    $data['price_on_demand'] = true;     
+                if (isset($value->property->oldprice->price_on_demand) && $value->property->oldprice->price_on_demand == true)
+                    $data['price_on_demand'] = true;
                 if (isset($value->property->currentprice) && $value->property->currentprice > 0)
                     $data['currentprice'] = str_replace(',', '.', (number_format((int) ($value->property->currentprice))));
                 if (isset($value->property->price_from) && $value->property->price_from > 0)
@@ -485,7 +485,7 @@ class Developments extends Model
                 $properties[] = $data;
             }
         }
-        // commercial properties 
+        // commercial properties
         $commercial_properties = [];
 
         if(isset($get['model']) && !empty($get['model']) && isset($property->properties) && !empty($property->properties)){
@@ -919,7 +919,7 @@ class Developments extends Model
                 "similar_commercials" => 'include_similar'
             ]
         ];
-        $url = Yii::$app->params['node_url'] . 'commercial_properties/commercial-construction?user=' . Yii::$app->params['user'] . '&ref=' . $query['reference'];
+        $url = Yii::$app->params['commercial_url'] . 'commercial_properties/commercial-construction?user=' . Yii::$app->params['user'] . '&ref=' . $query['reference'];
 
         $curl = new curl\Curl();
         $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query_data))]);
