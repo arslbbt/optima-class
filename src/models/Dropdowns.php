@@ -29,59 +29,96 @@ class Dropdowns extends Model
         $query .= isset($prop_types['prop_status']) && !empty($prop_types['prop_status']) ? '&prop_status='.implode(',', $prop_types['prop_status']) : '';
         $query .= isset($model_type) && !empty($model_type) ? '&model_type=' . $model_type : '';
         $file = Functions::directory() . 'countries'.(!empty($model_type) ? $model_type : '').(!empty($prop_types['type']) ?  '_'.implode('-', $prop_types['type']) : '').'.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key'].(!empty($query) ? $query : '');
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($query) {
+                $url = Yii::$app->params['apiUrl'] . 'properties/countries&user_apikey=' . Yii::$app->params['api_key'].(!empty($query) ? $query : '');
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
-    
+
     public static function getNationalities($nation_word = '')
     {
         $file = Functions::directory().'nationalities'.'.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/nationalities&user_apikey='.Yii::$app->params['api_key'].'&lang=en&search_word='.(isset($nation_word) ? $nation_word : '').'&page=1&per-page=1000';
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($nation_word) {
+                $url = Yii::$app->params['apiUrl'] . 'properties/nationalities&user_apikey='.Yii::$app->params['api_key'].'&lang=en&search_word='.(isset($nation_word) ? $nation_word : '').'&page=1&per-page=1000';
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function getRegions($params = [])
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
-        $return_data = [];
-
         $file = Functions::directory() . 'regions' . implode(',', $countries) . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+        $options = [
+            "page" => 1,
+            "limit" => 1000,
+            "sort" => ["accent_value.en" => 1]
+        ];
+        $post_data = ["query" => (object) $query, "options" => $options];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
+                $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
 
-            $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
-            $options = [
-                "page" => 1,
-                "limit" => 1000,
-                "sort" => ["accent_value.en" => 1]
-            ];
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
+                }
 
-            $post_data = ["query" => (object) $query, "options" => $options];
+                $data = json_decode($response, TRUE);
+                return json_encode($data['docs']);
+            },
+            $validator,
+            2 * 3600
+        );
 
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
-            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'regions?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
-        }
-        return $return_data;
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     // use Dropdowns::getProvinces() as it will provide more options to handle data in controller and works with countries and regions search too
@@ -89,14 +126,30 @@ class Dropdowns extends Model
     {
         $country_query = $country == 'all' ? '&country=all' : '';
         $file = Functions::directory() . 'provinces.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'] . $country_query;
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($country_query) {
+                $url = Yii::$app->params['apiUrl'] . 'properties/provinces&user_apikey=' . Yii::$app->params['api_key'] . $country_query;
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function getProvinces($params = [])
@@ -105,42 +158,47 @@ class Dropdowns extends Model
         $regions = isset($params['regions']) ? is_array($params['regions']) ? $params['regions'] : explode(',', $params['regions']) : [];
         $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
         $types = isset($params['type']) ? $params['type'] : [];
-        $return_data = [];
         $file = Functions::directory() . 'provinces_' . implode(',', $regions) . implode(',', $countries).'_'.implode('-', $types).'_'.implode('-', $transaction_types). '.json';
-
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-
-            $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
-            $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
-            $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
-            $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
-            if(isset($types) && !empty($types))
-            {
-                foreach($types as $p_type){
-                    $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
-                }
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+        $query = count($regions) ? array_merge($query, array('region' => ['$in' => $regions])) : $query;
+        $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+        $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
+        if(isset($types) && !empty($types))
+        {
+            foreach($types as $p_type){
+                $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
             }
-            $options = [
-                "page" => 1,
-                "limit" => 50,
-                "sort" => ["accent_value.en" => 1]
-            ];
-
-            $post_data = ["query" => (object) $query, "options" => $options];
-            
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
-            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
         }
-        return $return_data;
+        $options = [
+            "page" => 1,
+            "limit" => 50,
+            "sort" => ["accent_value.en" => 1]
+        ];
+        $post_data = ["query" => (object) $query, "options" => $options];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
+                $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'provinces?user=' . Yii::$app->params['user']);
+
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
+                }
+
+                $data = json_decode($response, TRUE);
+                return json_encode($data['docs']);
+            },
+            $validator,
+            2 * 3600
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     // use Dropdowns::getCities() as it will provide more options to handle data in controller and works with countries search too
@@ -148,37 +206,51 @@ class Dropdowns extends Model
     {
         $country_query = $country == 'all' ? '&country=all' : '&country='.$country;
         $file = Functions::directory() . 'cities_' .(isset($provinces) && !empty($provinces) ? implode(',', $provinces) : '') . '.json';
-        
-        if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $p_q = '';
-            foreach ($provinces as $province) {
-                $p_q .= '&province[]=' . $province;
-            }
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            $file_data = json_decode($file_data);
-            usort($file_data, function ($item1, $item2) {
-                return $item1->value <=> $item2->value;
-            });
-            $file_data = json_encode($file_data);
-            file_put_contents($file, $file_data);
-        } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            $file_data = json_decode($file_data);
-            usort($file_data, function ($item1, $item2) {
-                return $item1->value <=> $item2->value;
-            });
-            $file_data = json_encode($file_data);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
+
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload, ['value']);
+        };
+
+        /*
+         * refreshJsonCache() validates a fresh cached payload as JSON. Apply
+         * this method's stricter list shape before allowing it to be reused.
+         */
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($provinces, $country_query, $prop_count) {
+                if (is_array($provinces) && count($provinces)) {
+                    $p_q = '';
+                    foreach ($provinces as $province) {
+                        $p_q .= '&province[]=' . $province;
+                    }
+                    $url = Yii::$app->params['apiUrl'] . 'properties/all-cities' . $p_q . '&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
+                } else {
+                    $url = Yii::$app->params['apiUrl'] . 'properties/all-cities&user_apikey=' . Yii::$app->params['api_key']. $country_query.'&check_prop_count='.$prop_count;
+                }
+
+                $response = Functions::getCRMData($url);
+                if (!Functions::isJsonArrayOfObjects($response, ['value'])) {
+                    return false;
+                }
+
+                $data = json_decode($response);
+                usort($data, function ($item1, $item2) {
+                    return $item1->value <=> $item2->value;
+                });
+
+                return json_encode($data);
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        $return_data = $validator($file_data) ? json_decode($file_data, TRUE) : [];
+
+        return $to_json ? json_encode($return_data) : $return_data;
     }
 
     public static function getCities($params = [])
@@ -187,201 +259,276 @@ class Dropdowns extends Model
         $provinces = isset($params['provinces']) ? is_array($params['provinces']) ? $params['provinces'] : explode(',', $params['provinces']) : [];
         $transaction_types = isset($params['transaction_types']) ? $params['transaction_types'] : [];
         $types = isset($params['type']) ? $params['type'] : [];
-        $return_data = [];
         $file = Functions::directory() . 'cities_' . implode(',', $provinces).'_'.implode('-', $types).'_'.implode('-', $transaction_types). '.json';
-
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
-            $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
-            $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
-            $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
-            if(isset($types) && !empty($types))
-            {
-                foreach($types as $p_type){
-                    $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
-                }
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+        $query = count($provinces) ? array_merge($query, array('province' => ['$in' => $provinces])) : $query;
+        $query = isset($transaction_types) && !empty($transaction_types) ? array_merge($query, $transaction_types) : $query;
+        $query['prop_status'] = isset(Yii::$app->params['status']) && !empty(Yii::$app->params['status']) ? Yii::$app->params['status'] : ['Available','Under Offer','Sold'];
+        if(isset($types) && !empty($types))
+        {
+            foreach($types as $p_type){
+                $query = isset($p_type) && !empty($p_type) ? array_merge($query, array( $p_type => 1)) : $query;
             }
-            $options = [
-                "page" => 1,
-                "limit" => 1000,
-                "sort" => ["accent_value.en" => 1]
-            ];
-
-            $post_data = ["query" => (object) $query, "options" => $options];
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
-            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'cities?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
         }
-        return $return_data;
+        $options = [
+            "page" => 1,
+            "limit" => 1000,
+            "sort" => ["accent_value.en" => 1]
+        ];
+        $post_data = ["query" => (object) $query, "options" => $options];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
+                $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'cities?user=' . Yii::$app->params['user']);
+
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
+                }
+
+                $data = json_decode($response, TRUE);
+                return json_encode($data['docs']);
+            },
+            $validator,
+            2 * 3600
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function locationGroups($provinces = [])
     {
         $file = Functions::directory() . 'locationGroups_' . implode(',', $provinces) . '.json';
+        $language = isset(Yii::$app->language) ? Yii::$app->language : 'en';
+        $validator = static function ($payload) use ($language) {
+            return Functions::isJsonLocationGroups($payload, $language);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
 
-        if (is_array($provinces) && count($provinces) && !file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $p_q = '';
-            foreach ($provinces as $province) {
-                $p_q .= '&province[]=' . $province;
-            }
-            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value' . $p_q . '&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($provinces, $validator) {
+                if (is_array($provinces) && count($provinces)) {
+                    $p_q = '';
+                    foreach ($provinces as $province) {
+                        $p_q .= '&province[]=' . $province;
+                    }
+                    $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value' . $p_q . '&user_apikey=' . Yii::$app->params['api_key'];
+                } else {
+                    $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user_apikey=' . Yii::$app->params['api_key'];
+                }
 
-            file_put_contents($file, $file_data);
-        } elseif (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/location-groups-key-value&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, true);
+                $response = Functions::getCRMData($url);
+                if (!$validator($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, true) : [];
     }
 
     // use Dropdowns::getLocations() as it will provide more options to handle data in controller
     public static function locations($provinces = [], $to_json = false, $cities = [], $country = '', $count = 'true')
     {
         $file = Functions::directory() . 'locations_' . implode(',', $provinces) . implode(',', $cities) . '.json';
-        
-        
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $p_q = '';
-            $c_q = '';
-            if (is_array($provinces) && count($provinces)) {
-                foreach ($provinces as $province) {
-                    $p_q .= '&province[]=' . $province;
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($provinces, $cities, $country, $count, $validator) {
+                $p_q = '';
+                $c_q = '';
+                if (is_array($provinces) && count($provinces)) {
+                    foreach ($provinces as $province) {
+                        $p_q .= '&province[]=' . $province;
+                    }
                 }
-            }
-            if (is_array($cities) && count($cities)) {
-                foreach ($cities as $city) {
-                    $c_q .= '&city[]=' . $city;
+                if (is_array($cities) && count($cities)) {
+                    foreach ($cities as $city) {
+                        $c_q .= '&city[]=' . $city;
+                    }
                 }
-            }
-            $country_check = '';
-            if ($country) {
-                $country_check = '&country=' . $country;
-            }
-            $url = Yii::$app->params['apiUrl'] . 'properties/locations'.($count == 'true' ? '&count=true' : ''). $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
-            
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return $to_json ? json_encode(json_decode($file_data, TRUE)) : json_decode($file_data, TRUE);
+                $country_check = '';
+                if ($country) {
+                    $country_check = '&country=' . $country;
+                }
+                $url = Yii::$app->params['apiUrl'] . 'properties/locations'.($count == 'true' ? '&count=true' : ''). $p_q . $c_q . '&user_apikey=' . Yii::$app->params['api_key'] . '&lang=' . ((isset(\Yii::$app->language) && strtolower(\Yii::$app->language) == 'es') ? 'es_AR' : 'en') . $country_check;
+
+                $response = Functions::getCRMData($url);
+                if (!$validator($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        $return_data = $validator($file_data) ? json_decode($file_data, TRUE) : [];
+
+        return $to_json ? json_encode($return_data) : $return_data;
     }
 
     public static function getLocations($params = [])
     {
         $countries = isset($params['countries']) ? is_array($params['countries']) ? $params['countries'] : explode(',', $params['countries']) : [];
         $cities = isset($params['cities']) ? is_array($params['cities']) ? $params['cities'] : explode(',', $params['cities']) : [];
-        $return_data = [];
         $file = Functions::directory() . 'locations_' . implode(',', $cities) . '.json';
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
+        $query = count($cities) ? array_merge($query, array('city' => ['$in' => $cities])) : $query;
+        $options = [
+            "page" => 1,
+            "limit" => 1000,
+            "sort" => ["accent_value.en" => 1]
+        ];
+        $post_data = ["query" => (object) $query, "options" => $options];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
+                $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'locations?user=' . Yii::$app->params['user']);
 
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
+                }
 
-            $query = count($countries) ? array('country' => ['$in' => $countries]) : [];
-            $query = count($cities) ? array_merge($query, array('city' => ['$in' => $cities])) : $query;
-            $options = [
-                "page" => 1,
-                "limit" => 1000,
-                "sort" => ["accent_value.en" => 1]
-            ];
+                $data = json_decode($response, TRUE);
+                return json_encode($data['docs']);
+            },
+            $validator,
+            2 * 3600
+        );
 
-            $post_data = ["query" => (object) $query, "options" => $options];
-
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
-            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'locations?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
-        }
-        return $return_data;
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     // use Dropdowns::getUrbanisations() as it will provide more options to handle data in controller
     public static function urbanisations()
     {
-        $return_data = [];
-
         $file = Functions::directory() . 'urbanisations.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
-            $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
-            $data = json_decode($response, TRUE);
-            if (isset($data['docs']) && count($data['docs']) > 0) {
-                foreach ($data['docs'] as $doc) {
-                    if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
-                        $return_data[$doc['key']] = isset($doc['value']) ? $doc['value'] : '';
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $post_data = ["query" => (object) [], "options" => ["page" => 1, "limit" => 1000, "sort" => ["value" => 1], "select" => "_id key value agency basic_info." . Yii::$app->params['agency']]];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
+                $response = $curl->setRequestBody(json_encode($post_data))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
+
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
                 }
-            }
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
-        }
-        return $return_data;
+
+                $data = json_decode($response, TRUE);
+                $return_data = [];
+                if (isset($data['docs']) && count($data['docs']) > 0) {
+                    foreach ($data['docs'] as $doc) {
+                        if (isset($doc['basic_info'][Yii::$app->params['agency']]['status']) && $doc['basic_info'][Yii::$app->params['agency']]['status'] == 'Active' && isset($doc['key']))
+                            $return_data[$doc['key']] = isset($doc['value']) ? $doc['value'] : '';
+                    }
+                }
+                return json_encode($return_data);
+            },
+            $validator,
+            2 * 3600
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function getUrbanisations($params = [])
     {
-        $return_data = [];
         $file = Functions::directory() . 'urbanisation.json';
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+        $query = [];
+        $options = [
+            "page" => 1,
+            "limit" => 1000,
+            "sort" => ["value" => 1],
+            "select" => "_id key value agency basic_info." . Yii::$app->params['agency']
+        ];
+        $post_data = ["query" => (object) $query, "options" => $options];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
+                $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
 
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $query = [];
-            $options = [
-                "page" => 1,
-                "limit" => 1000,
-                "sort" => ["value" => 1],
-                "select" => "_id key value agency basic_info." . Yii::$app->params['agency']
-            ];
+                if (!Functions::isJsonNodeDocsEnvelope($response)) {
+                    return false;
+                }
 
-            $post_data = ["query" => (object) $query, "options" => $options];
+                $data = json_decode($response, TRUE);
+                return json_encode($data['docs']);
+            },
+            $validator,
+            2 * 3600
+        );
 
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data, JSON_NUMERIC_CHECK))]);
-            $response = $curl->setRequestBody(json_encode($post_data, JSON_NUMERIC_CHECK))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'urbanisations/dropdown?user=' . Yii::$app->params['user']);
-
-            $data = json_decode($response, TRUE);
-            $return_data = isset($data['docs']) ? $data['docs'] : [];
-            file_put_contents($file, json_encode($return_data));
-        } else {
-            $return_data = json_decode(file_get_contents($file), TRUE);
-        }
-        return $return_data;
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function getCustomCategories($params = [])
     {
         $file = Functions::directory() . 'custom_categories.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () {
+                $url = Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key'];
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function mooringTypes($params = [])
@@ -407,14 +554,24 @@ class Dropdowns extends Model
     public static function types()
     {
         $file = Functions::directory() . 'types.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonDropdownTypes($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () {
+                $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
+                return Functions::getCRMData($url);
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function CommercialType($params = [])
@@ -437,17 +594,29 @@ class Dropdowns extends Model
         ];
         $file = Functions::directory() . 'Commercial_types_'.implode('_', $types).implode('_', $countries).implode('_', $transaction_types).'.json';
         $post_data = ["query" => (object) $query, "options" => $options];
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
-            $response = $curl->setRequestBody(json_encode($post_data))
-                ->setHeaders($headers)
-                ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
-                file_put_contents($file, $response);
-        }else{
-            $response = file_get_contents($file);
-        }
-        return json_decode($response, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonNodeDocsEnvelope($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $response = Functions::refreshJsonCache(
+            $file,
+            static function () use ($post_data) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($post_data))]);
+                $response = $curl->setRequestBody(json_encode($post_data))
+                    ->setHeaders($headers)
+                    ->post(Yii::$app->params['node_url'] . 'commercial_types?user_apikey=' . Yii::$app->params['api_key']);
+
+                return Functions::isJsonNodeDocsEnvelope($response) ? $response : false;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($response) ? json_decode($response, TRUE) : [];
     }
 
     public static function typesByLanguage()
@@ -455,13 +624,27 @@ class Dropdowns extends Model
         $types = [];
 
         $file = Functions::directory() . 'types.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
+        $validator = static function ($payload) {
+            return Functions::isJsonDropdownTypes($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () {
+                $url = Yii::$app->params['apiUrl'] . 'properties/types&user_apikey=' . Yii::$app->params['api_key'];
+                return Functions::getCRMData($url);
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        if (!$validator($file_data)) {
+            return [];
         }
+
         $fdata = json_decode($file_data);
 
         foreach ($fdata as $file) {
@@ -486,27 +669,59 @@ class Dropdowns extends Model
     {
 
         $file = Functions::directory() . 'building-style.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/building-style&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () {
+                $url = Yii::$app->params['apiUrl'] . 'properties/building-style&user_apikey=' . Yii::$app->params['api_key'];
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function offices()
     {
         $file = Functions::directory() . 'offices.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/get-offices&user_apikey=' . Yii::$app->params['api_key'] . '&agency_id=' . Yii::$app->params['agency'];
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $validator = static function ($payload) {
+            return Functions::isJsonArrayOfObjects($payload);
+        };
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = $cachedPayload !== null && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () {
+                $url = Yii::$app->params['apiUrl'] . 'properties/get-offices&user_apikey=' . Yii::$app->params['api_key'] . '&agency_id=' . Yii::$app->params['agency'];
+                $response = Functions::getCRMData($url);
+
+                if (!Functions::isJsonArrayOfObjects($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $validator($file_data) ? json_decode($file_data, TRUE) : [];
     }
 
     public static function numbers($limit)
@@ -712,7 +927,7 @@ class Dropdowns extends Model
      *
      * Get types html
      *
-     * @param    array data array e.g for options return html 
+     * @param    array data array e.g for options return html
      * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
      * @return   JSON OR html
      * @use      Dropdowns::typesHTML($data, $options = [name='test'])
@@ -781,7 +996,7 @@ class Dropdowns extends Model
      *
      * Get prepared select data
      *
-     * @param    array data array e.g for options return html 
+     * @param    array data array e.g for options return html
      * @param    array options array e.g array('name'=>'test','id'=>'my_id','class'=>'my_class')
      * @return   html
      * @use      Dropdowns::prepare_select_data($dataArray='Data to be formated', $option_key_index='key', $option_value_index='value')
@@ -804,7 +1019,7 @@ class Dropdowns extends Model
      *
      * Get dropdown
      *
-     * @param    array data array e.g for options return html 
+     * @param    array data array e.g for options return html
      * @param    array options array e.g array('name' => 'ContactUs[provinces][]', 'class' => "multiselect", 'multiple' => 'multiple', 'onchange' => 'loadCities()', 'id' => 'provinces', 'placeholder' => 'Provinces', 'noValueTranslation' => true )
      * @return   html
      * @use      Dropdowns::dropdown($dataArray='Data to be formated', $options = ['name' => 'ContactUs[provinces][]'])
@@ -824,7 +1039,7 @@ class Dropdowns extends Model
      *
      * Get html_select dropdown
      *
-     * @param    array data array e.g for options return html 
+     * @param    array data array e.g for options return html
      * @param    array options array e.g array('name'=>'test','id'=>'my_id',class='my_class')
      * @return   html
      * @use      Dropdowns::html_select($data, $options = [name='test'])

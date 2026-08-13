@@ -810,16 +810,28 @@ class CommercialProperties extends Model
             }
         }
         $file = $webroot . '/uploads/temp/' . sha1($file_name) . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query))]);
-            $file_data = $curl->setRequestBody(json_encode($query))
-                ->setHeaders($headers)
-                ->post($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($query, $url) {
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders(['Content-Length' => strlen(json_encode($query))]);
+
+                return $curl->setRequestBody(json_encode($query))
+                    ->setHeaders($headers)
+                    ->post($url);
+            },
+            static function ($payload) {
+                if (!Functions::isJsonObjectWithKeys($payload, ['docs'])) {
+                    return false;
+                }
+
+                $decoded = json_decode($payload);
+
+                return is_object($decoded) && is_array($decoded->docs);
+            },
+            2 * 3600
+        );
+
         return $file_data;
     }
 
@@ -890,12 +902,16 @@ class CommercialProperties extends Model
             return json_decode($response, true);
         }
         $file = $webroot . '/uploads/temp/commercial_properties-latlang.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = file_put_contents($file, $response);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, true);
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($response) {
+                return $response;
+            },
+            null,
+            2 * 3600
+        );
+
+        return $file_data !== null ? json_decode($file_data, true) : [];
     }
     public static function getAgencyProperties($transaction_type = 'sale', $id, $options = ['page' => 1, 'limit' => 10]){
         $post_data['options'] = [
@@ -1197,16 +1213,40 @@ class CommercialProperties extends Model
     public static function getCadastralData()
     {
         $file = Functions::directory() . 'cadastral-data.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $commercial_url = Yii::$app->params['commercial_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
-            $curl = new curl\Curl();
-            $headers = Functions::getApiHeaders();
-            $file_data = $curl->setHeaders($headers)->post($commercial_url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
+        $validator = static function ($payload) {
+            return Functions::isValidJson($payload);
+        };
+
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = is_file($file)
+            && time() - filemtime($file) <= 2 * 3600
+            && $cachedPayload !== null
+            && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($validator) {
+                $node_url = Yii::$app->params['node_url'] . 'commercial_properties/get-all-agencies-of-same-cadastral-number/?user=' . Yii::$app->params['user'];
+                $curl = new curl\Curl();
+                $headers = Functions::getApiHeaders();
+                $response = $curl->setHeaders($headers)->post($node_url);
+
+                if (!$validator($response)) {
+                    return false;
+                }
+
+                return $response;
+            },
+            $validator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        if ($validator($file_data)) {
+            return json_decode($file_data, TRUE);
         }
-        return json_decode($file_data, TRUE);
+
+        return [];
     }
 
     public static function getCadastralProperties($same_cadastral_prop_ids)

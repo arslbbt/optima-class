@@ -892,13 +892,14 @@ class Developments extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/develop_' . $query . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = Functions::getCRMData($url, false);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return $file_data;
+        return Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url, false);
+            },
+            null,
+            2 * 3600
+        );
     }
 
     public static function getRelatedProjectProperties($query = [], $set_options = [])

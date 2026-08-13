@@ -45,6 +45,13 @@ class Properties extends Model
      */
     public static function findAll($query, $wm = false, $cache = false, $options = [])
     {
+        $rawSourceObserver = null;
+        if (isset($options['__optima_raw_source_observer']) && is_callable($options['__optima_raw_source_observer'])) {
+            $rawSourceObserver = $options['__optima_raw_source_observer'];
+        }
+        unset($options['__optima_raw_source_observer']);
+        $rawSourceAcquired = false;
+
         $url_to_use_without_watermark = 'https://images.optima-crm.com/resize/properties_images/';
         $agency_data = self::getAgency();
         $langugesSystem = Cms::SystemLanguages();
@@ -70,7 +77,11 @@ class Properties extends Model
             $response = $curl->setPostParams($fields)->setHeaders($headers)->post($url);
             if(Yii::$app->request->post('return_property') == 1){
                 $JsonData = $response;
+                $rawSourceAcquired = true;
             }else{
+                if ($rawSourceObserver !== null) {
+                    call_user_func($rawSourceObserver, $response);
+                }
                 return json_decode($response, true);
             }
         }
@@ -79,9 +90,14 @@ class Properties extends Model
         if(!isset($_POST['return_property']) || empty($_POST['return_property'])){
             if ($cache == true) {
                 $JsonData = self::DoCache($query, $url);
+                $rawSourceAcquired = true;
             } else {
                 $JsonData = Functions::getCRMData($url, false);
+                $rawSourceAcquired = true;
             }
+        }
+        if ($rawSourceObserver !== null && $rawSourceAcquired) {
+            call_user_func($rawSourceObserver, $JsonData);
         }
         if (strpos($query, "&latlng=true")) {
             return json_decode($JsonData, true);
@@ -2610,15 +2626,60 @@ class Properties extends Model
         $webroot = Yii::getAlias('@webroot');
         $file = $webroot . '/uploads/temp/' . (isset($options['transaction_type']) ? $options['transaction_type'] . '_' : '') . 'properties-all-latlang.json';
         $query .= '&latlng=true';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $data_array = self::findAll($query, $wm, $cache, $options);
-            $json_data =  json_encode($data_array);
 
-            file_put_contents($file, $json_data);
-        } else {
-            $json_data = file_get_contents($file);
+        $finalCacheValidator = static function ($payload) {
+            if (!Functions::isValidJson($payload)) {
+                return false;
+            }
+
+            $decoded = json_decode($payload);
+
+            if (!is_array($decoded)) {
+                return false;
+            }
+
+            foreach ($decoded as $row) {
+                if (!is_array($row) && !is_object($row)) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        $forceRefresh = false;
+        if (is_file($file) && time() - filemtime($file) <= 2 * 3600) {
+            $cachedPayload = @file_get_contents($file);
+            if (!$finalCacheValidator($cachedPayload)) {
+                $forceRefresh = true;
+            }
         }
-        return json_decode($json_data, true);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($query, $wm, $cache, $options) {
+                $usableSource = false;
+                $localOptions = $options;
+                $localOptions['__optima_raw_source_observer'] = static function ($payload) use (&$usableSource) {
+                    $usableSource = Functions::isJsonArrayOfObjects($payload);
+                };
+
+                $data_array = self::findAll($query, $wm, $cache, $localOptions);
+
+                if ($usableSource !== true) {
+                    return false;
+                }
+
+                $json_data = json_encode($data_array);
+
+                return $json_data;
+            },
+            $finalCacheValidator,
+            2 * 3600,
+            $forceRefresh
+        );
+
+        return $file_data !== null && $finalCacheValidator($file_data) ? json_decode($file_data, true) : [];
     }
 
     public static function findAllWithLatLang($type = "")
@@ -2635,30 +2696,34 @@ class Properties extends Model
             mkdir($webroot . '/uploads/temp/');
         }
         $file = $webroot . '/uploads/temp/properties-latlong.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, true);
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            null,
+            2 * 3600
+        );
+
+        return $file_data !== null ? json_decode($file_data, true) : null;
     }
 
     public static function getAgency()
     {
         $file = Functions::directory() . 'agency' . '.json';
         $url = Yii::$app->params['apiUrl'] . 'properties/agency&user_apikey=' . Yii::$app->params['api_key'] . '&site_id=' . Yii::$app->params['site_id'];
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = Functions::getCRMData($url);
-            if ($file_data) {
-                file_put_contents($file, $file_data);
-            }
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, true);
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonObject($payload);
+            },
+            2 * 3600
+        );
+
+        return $file_data !== null ? json_decode($file_data, true) : null;
     }
 
     public static function getAgent($id)
@@ -2669,17 +2734,17 @@ class Properties extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/agent_' . str_replace(' ', '_', strtolower($id)) . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&listing_agent=' . $id . '&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
+        $url = Yii::$app->params['apiUrl'] . 'properties/get-listing-agent&listing_agent=' . $id . '&user_apikey=' . Yii::$app->params['api_key'];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            null,
+            2 * 3600
+        );
 
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, true);
+        return $file_data !== null ? json_decode($file_data, true) : null;
     }
 
     public static function Categories()
@@ -2690,16 +2755,19 @@ class Properties extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/property_categories.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key'];
-            $file_data =
-                //file_get_contents();
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        $Arr = json_decode($file_data, true);
+        $url = Yii::$app->params['apiUrl'] . 'properties/categories&user_apikey=' . Yii::$app->params['api_key'];
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonListOfObjects($payload);
+            },
+            2 * 3600
+        );
+
+        $Arr = $file_data !== null ? json_decode($file_data, true) : [];
         $return_data = [];
         foreach ($Arr as $data) {
             if (isset($data['value']['en']))
@@ -2716,15 +2784,14 @@ class Properties extends Model
         if (!is_dir($webroot . '/uploads/temp/'))
             mkdir($webroot . '/uploads/temp/');
         $file = $webroot . '/uploads/temp/' . sha1($query) . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return $file_data;
+        return Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            null,
+            2 * 3600
+        );
     }
     /**
      * calculations

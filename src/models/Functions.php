@@ -391,4 +391,549 @@ class Functions extends Model
 
         return $headers;
     }
+
+    public static function isValidJson($payload)
+    {
+        if (!is_string($payload) || $payload === '') {
+            return false;
+        }
+
+        json_decode($payload, true);
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    public static function isJsonListOfObjects($payload, array $requiredKeys = [])
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        /*
+         * Require sequential numeric keys without depending on array_is_list(),
+         * so this remains usable on PHP versions before 8.1.
+         */
+        if (!empty($decoded) && array_keys($decoded) !== range(0, count($decoded) - 1)) {
+            return false;
+        }
+
+        foreach ($decoded as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+
+            foreach ($requiredKeys as $key) {
+                if (!array_key_exists($key, $item)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonArrayOfObjects($payload, array $requiredKeys = [])
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        /*
+         * Decode as objects to preserve the difference between a literal JSON
+         * array ([]) and a JSON object ({}), including when both are empty.
+         */
+        $decoded = json_decode($payload);
+
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        foreach ($decoded as $item) {
+            if (!is_object($item)) {
+                return false;
+            }
+
+            foreach ($requiredKeys as $key) {
+                if (!property_exists($item, $key)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonDropdownTypes($payload)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload);
+
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        foreach ($decoded as $item) {
+            if (!self::isDropdownTypeObject($item)) {
+                return false;
+            }
+
+            if (property_exists($item, 'sub_type')) {
+                if (!is_array($item->sub_type)) {
+                    return false;
+                }
+
+                foreach ($item->sub_type as $subtype) {
+                    if (!self::isDropdownTypeObject($subtype)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static function isDropdownTypeObject($item)
+    {
+        if (!is_object($item) || !property_exists($item, 'key') || !property_exists($item, 'value')) {
+            return false;
+        }
+
+        if (!is_object($item->value) || !property_exists($item->value, 'en') || !is_string($item->value->en)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function isJsonLocationGroups($payload, $language)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload);
+
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        $languageKey = self::locationGroupLanguageKey($language);
+
+        foreach ($decoded as $item) {
+            if (!self::isLocationGroupObject($item, $languageKey)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static function locationGroupLanguageKey($language)
+    {
+        $language = is_string($language) && $language !== '' ? strtolower($language) : 'en';
+
+        return $language === 'es' ? 'es_AR' : $language;
+    }
+
+    private static function isLocationGroupObject($item, $languageKey)
+    {
+        if (!is_object($item) || !property_exists($item, 'key_system')) {
+            return false;
+        }
+
+        if (property_exists($item, 'value') && !self::isLocationGroupValue($item->value)) {
+            return false;
+        }
+
+        if (property_exists($item, 'group_value')) {
+            if (!is_array($item->group_value)) {
+                return false;
+            }
+
+            foreach ($item->group_value as $location) {
+                if (!self::isLocationGroupNestedLocation($location, $languageKey)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static function isLocationGroupValue($value)
+    {
+        if ($value === null || is_string($value)) {
+            return true;
+        }
+
+        return is_object($value) && property_exists($value, 'en') && is_string($value->en);
+    }
+
+    private static function isLocationGroupNestedLocation($location, $languageKey)
+    {
+        if (!is_object($location) || !property_exists($location, 'key')) {
+            return false;
+        }
+
+        $hasActiveLabel = property_exists($location, $languageKey) && is_string($location->{$languageKey});
+        $hasEnglishFallback = property_exists($location, 'en') && is_string($location->en);
+
+        return $hasActiveLabel || $hasEnglishFallback;
+    }
+
+    public static function isJsonObject($payload)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        return is_object(json_decode($payload));
+    }
+
+
+    public static function readJsonCache($file)
+    {
+        if (!is_file($file)) {
+            return null;
+        }
+
+        $payload = @file_get_contents($file);
+
+        if (!self::isValidJson($payload)) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    public static function writeJsonCacheAtomic($file, $payload)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $dir = dirname($file);
+        $realDir = realpath($dir);
+
+        if ($realDir === false || !is_dir($realDir) || !is_writable($realDir)) {
+            return false;
+        }
+
+        $tmp = tempnam($realDir, '.optima-cache-');
+
+        if ($tmp === false) {
+            return false;
+        }
+
+        if (dirname($tmp) !== $realDir) {
+            @unlink($tmp);
+            return false;
+        }
+
+        try {
+            $written = file_put_contents($tmp, $payload, LOCK_EX);
+
+            if ($written === false || $written !== strlen($payload)) {
+                return false;
+            }
+
+            if (!rename($tmp, $file)) {
+                return false;
+            }
+
+            return true;
+        } finally {
+            if (is_file($tmp)) {
+                @unlink($tmp);
+            }
+        }
+    }
+
+    public static function refreshJsonCache(
+        $file,
+        callable $fetcher,
+        callable $validator = null,
+        $maxAge = 7200,
+        $forceRefresh = false
+    ) {
+        $cachedPayload = self::readJsonCache($file);
+
+        $cacheExpired = $forceRefresh === true
+            || !is_file($file)
+            || $cachedPayload === null
+            || time() - filemtime($file) > $maxAge;
+
+        if (!$cacheExpired) {
+            return $cachedPayload;
+        }
+
+        $freshPayload = $fetcher();
+
+        if (!self::isValidJson($freshPayload)) {
+            return $cachedPayload;
+        }
+
+        if ($validator !== null && !$validator($freshPayload)) {
+            return $cachedPayload;
+        }
+
+        if (!self::writeJsonCacheAtomic($file, $freshPayload)) {
+            /*
+             * Publication failed, but the freshly fetched payload itself is
+             * valid. Return it for the current request rather than failing.
+             */
+            return $freshPayload;
+        }
+
+        return $freshPayload;
+   }
+
+    public static function isJsonObjectOfObjects($payload, array $requiredKeys = [])
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        /*
+         * A JSON list must not be accepted as an object/map.
+         */
+        if (!empty($decoded) && array_keys($decoded) === range(0, count($decoded) - 1)) {
+            return false;
+        }
+
+        foreach ($decoded as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+
+            foreach ($requiredKeys as $key) {
+                if (!array_key_exists($key, $item)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonObjectWithKeys($payload, array $requiredKeys = [])
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_array($decoded) || empty($decoded)) {
+            return false;
+        }
+
+        if (array_keys($decoded) === range(0, count($decoded) - 1)) {
+            return false;
+        }
+
+        foreach ($requiredKeys as $key) {
+            if (!array_key_exists($key, $decoded)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonNodeDocsEnvelope($payload)
+    {
+        if (!self::isJsonObjectWithKeys($payload, ['docs'])) {
+            return false;
+        }
+
+        /*
+         * Decode without associative arrays so an empty object in docs does
+         * not become indistinguishable from an empty docs list.
+         */
+        $decoded = json_decode($payload);
+
+        return is_object($decoded) && is_array($decoded->docs);
+    }
+
+    public static function isJsonCmsPage($payload)
+    {
+        if (!self::isJsonObjectWithKeys(
+            $payload,
+            ['_id', 'slug', 'title', 'content']
+        )) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_string($decoded['_id']) || $decoded['_id'] === '') {
+            return false;
+        }
+
+        foreach (['slug', 'title', 'content'] as $key) {
+            if (!is_array($decoded[$key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    public static function isJsonMenu($payload)
+    {
+        if (!self::isJsonObjectWithKeys($payload, ['menu_items'])) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_array($decoded['menu_items'])) {
+            return false;
+        }
+
+        foreach ($decoded['menu_items'] as $menuItem) {
+            if (!is_array($menuItem) || !isset($menuItem['item']) || !is_array($menuItem['item'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    public static function isJsonCmsSlugs($payload)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        /*
+         * Both Slugs() and getSlugs() currently treat an empty response
+         * as an application error, so an empty list is not a publishable
+         * cache value for this endpoint family.
+         */
+        if (!is_array($decoded) || empty($decoded)) {
+            return false;
+        }
+
+        /*
+         * Slug endpoints return a JSON list, never an associative object.
+         */
+        if (array_keys($decoded) !== range(0, count($decoded) - 1)) {
+            return false;
+        }
+
+        foreach ($decoded as $row) {
+            if (!is_array($row)) {
+                return false;
+            }
+
+            if (!array_key_exists('type', $row) || !is_string($row['type'])) {
+                return false;
+            }
+
+            if (!array_key_exists('slug', $row) || !is_array($row['slug'])) {
+                return false;
+            }
+
+            /*
+             * V2 may include these fields depending on request flags.
+             * When present, enforce their observed structural type without
+             * making either field mandatory.
+             */
+            if (
+                array_key_exists('template', $row)
+                && $row['template'] !== null
+                && !is_array($row['template'])
+            ) {
+                return false;
+            }
+
+            if (
+                array_key_exists('tags', $row)
+                && $row['tags'] !== null
+                && !is_array($row['tags'])
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonCmsPostList($payload)
+    {
+        if (!self::isValidJson($payload)) {
+            return false;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        if (!is_array($decoded) || empty($decoded)) {
+            return false;
+        }
+
+        /*
+         * CMS post endpoints return a JSON list, never an associative
+         * object. Do not use array_is_list() for PHP < 8.1 compatibility.
+         */
+        if (array_keys($decoded) !== range(0, count($decoded) - 1)) {
+            return false;
+        }
+
+        foreach ($decoded as $row) {
+            if (!is_array($row)) {
+                return false;
+            }
+
+            if (!array_key_exists('_id', $row) || !is_string($row['_id']) || $row['_id'] === '') {
+                return false;
+            }
+
+            foreach (['title', 'slug', 'content'] as $key) {
+                if (!array_key_exists($key, $row) || !is_array($row[$key])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function isJsonCmsUsers($payload)
+    {
+        if (!self::isJsonObjectWithKeys($payload, ['users'])) {
+            return false;
+        }
+
+        /*
+         * Decode without associative arrays here so an empty JSON object
+         * remains distinguishable from an empty JSON list for users.
+         */
+        $decoded = json_decode($payload);
+
+        return is_object($decoded) && is_array($decoded->users);
+    }
+
+
 }

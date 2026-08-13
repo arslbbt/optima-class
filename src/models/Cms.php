@@ -23,17 +23,29 @@ class Cms extends Model
     {
         $file = Functions::directory() . 'settings.json';
 
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'cms/setting&user=' . Yii::$app->params['user'] . '&id=' . Yii::$app->params['template'];
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/setting&user='
+            . Yii::$app->params['user']
+            . '&id='
+            . Yii::$app->params['template'];
 
-            $file_data = Functions::getCRMData($url);
-            if(json_decode($file_data, true)){
-                file_put_contents($file, $file_data);
-            }
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonObjectWithKeys(
+                    $payload,
+                    ['general_settings', 'custom_settings']
+                );
+            },
+            2 * 3600
+        );
+
+        return $payload !== null
+            ? json_decode($payload, true)
+            : [];
     }
 
     /**
@@ -69,34 +81,78 @@ class Cms extends Model
     {
         $lang = \Yii::$app->language;
         $file = Functions::directory() . 'translations_' . $lang . '.json';
-        $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-        $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $query .= isset(\Yii::$app->params['commercial']) ? '&commercial=' . \Yii::$app->params['commercial'] : '';
+
+        $query = isset(\Yii::$app->params['user'])
+            ? '&user=' . \Yii::$app->params['user']
+            : '';
+
+        $query .= isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
+
+        $query .= isset(\Yii::$app->params['commercial'])
+            ? '&commercial=' . \Yii::$app->params['commercial']
+            : '';
+
         $query .= '&lang=' . strtoupper($lang);
 
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-translatons' . $query;
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/get-translatons'
+            . $query;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonObjectOfObjects(
+                    $payload,
+                    ['key', 'value']
+                );
+            },
+            2 * 3600
+        );
+
+        return $payload !== null
+            ? json_decode($payload, true)
+            : [];
     }
 
     public static function menu($name, $getUrlsFromPage = true, $getOtherSettings = true)
     {
         $lang = strtoupper(\Yii::$app->language);
-        $file = Functions::directory() . 'menu_' . str_replace(' ', '_', strtolower($name)) . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $url = Yii::$app->params['apiUrl'] . 'cms/menu-by-name&user=' . Yii::$app->params['user'] . '&name=' . $name . $site_id;
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        $dataArr = json_decode($file_data, TRUE);
+        $file = Functions::directory()
+            . 'menu_'
+            . str_replace(' ', '_', strtolower($name))
+            . '.json';
+
+        $site_id = isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/menu-by-name&user='
+            . Yii::$app->params['user']
+            . '&name='
+            . $name
+            . $site_id;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonMenu($payload);
+            },
+            2 * 3600
+        );
+
+        $dataArr = $payload !== null
+            ? json_decode($payload, true)
+            : [];
+
         $items = (isset($dataArr['menu_items'])) ? $dataArr['menu_items'] : '';
         $finalData = [];
         if ($items) {
@@ -131,15 +187,30 @@ class Cms extends Model
     {
         $lang = strtoupper(\Yii::$app->language);
         $file = Functions::directory() . 'menu.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'cms/menu&user=' . Yii::$app->params['user'] . '&id=' . $id;
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        $menu = json_decode($file_data, TRUE);
+
+        $url = Yii::$app->params['apiUrl'] . 'cms/menu&user=' . Yii::$app->params['user'] . '&id=' . $id;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonMenu($payload);
+            },
+            2 * 3600
+        );
+
+        $menu = $payload !== null
+            ? json_decode($payload, true)
+            : [];
+
         $itemsArr = [];
+
+        if (!isset($menu['menu_items']) || !is_array($menu['menu_items'])) {
+            return $itemsArr;
+        }
+
         foreach ($menu['menu_items'] as $key => $value) {
             if (isset($value['children']) && count($value['children']) > 0) {
                 $childArr = [];
@@ -159,21 +230,58 @@ class Cms extends Model
                 $itemsArr[] = ['label' => (isset($value['item']['title'][$lang]) && $value['item']['title'][$lang] != '') ? $value['item']['title'][$lang] : 'please set menu label', 'url' => (isset($value['item']['slug'][$lang]) && $value['item']['slug'][$lang] != '') ? str_replace('//', '/', ('/' . $value['item']['slug'][$lang])) : 'slug-not-set'];
             }
         }
+
         return $itemsArr;
     }
+
 
     public static function languages()
     {
         $file = Functions::directory() . 'languages.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $url = Yii::$app->params['apiUrl'] . 'cms/languages&user=' . Yii::$app->params['user'] . $site_id;
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
+
+        $site_id = isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/languages&user='
+            . Yii::$app->params['user']
+            . $site_id;
+
+        $validator = static function ($payload) {
+            if (!Functions::isValidJson($payload)) {
+                return false;
+            }
+
+            $decoded = json_decode($payload, true);
+
+            if (!is_array($decoded)) {
+                return false;
+            }
+
+            foreach ($decoded as $language) {
+                if (!is_array($language) || !isset($language['key'])) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            $validator,
+            2 * 3600
+        );
+
+        if ($payload === null) {
+            return [];
         }
-        return json_decode($file_data, TRUE);
+
+        return json_decode($payload, true);
     }
 
     /**
@@ -208,42 +316,92 @@ class Cms extends Model
     public static function SystemLanguages()
     {
         $file = Functions::directory() . 'SystemLanguages.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'cms/system-languages&user=' . Yii::$app->params['user'] . '&name=gogo';
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/system-languages&user='
+            . Yii::$app->params['user']
+            . '&name=gogo';
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonListOfObjects(
+                    $payload,
+                    ['key']
+                );
+            },
+            2 * 3600
+        );
+
+        return $payload !== null
+            ? json_decode($payload, true)
+            : [];
     }
 
     public static function UserLanguages()
     {
         $file = Functions::directory() . 'UserLanguages.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'cms/user-languages&user=' . Yii::$app->params['user'] . '&name=gogo';
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/user-languages&user='
+            . Yii::$app->params['user']
+            . '&name=gogo';
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonListOfObjects(
+                    $payload,
+                    ['key']
+                );
+            },
+            2 * 3600
+        );
+
+        return $payload !== null
+            ? json_decode($payload, true)
+            : [];
     }
 
     public static function Categories()
     {
         $file = Functions::directory() . 'categories.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-            $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $url = Yii::$app->params['apiUrl'] . 'cms/categories' . $query;
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
-        return json_decode($file_data, TRUE);
+
+        $query = isset(\Yii::$app->params['user'])
+            ? '&user=' . \Yii::$app->params['user']
+            : '';
+
+        $query .= isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/categories'
+            . $query;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonListOfObjects(
+                    $payload,
+                    ['_id', 'name', 'type', 'site_id']
+                );
+            },
+            2 * 3600
+        );
+
+        return $payload !== null
+            ? json_decode($payload, true)
+            : [];
     }
 
     public static function pageBySlug($slug, $lang_slug = 'EN', $id = null, $type = 'page', $options = [])
@@ -253,55 +411,137 @@ class Cms extends Model
         } else {
             $file = Functions::directory() . $id . '.json';
         }
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $query = isset($options['seoimage']) ? '&seoimage=yes' : '';
-            $query .= isset($options['template']) ? '&expand=template' : '';
-            $query .= isset($_GET['created_full_name']) ? '&created_full_name=' . $_GET['created_full_name'] : '';
-            if ($id == null) {
-                $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id . $query;
 
-                //echo $file;
+        $query = isset($options['seoimage']) ? '&seoimage=yes' : '';
+        $query .= isset($options['template']) ? '&expand=template' : '';
+        $query .= isset($_GET['created_full_name'])
+            ? '&created_full_name=' . $_GET['created_full_name']
+            : '';
 
-                $file_data =
-                    //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-by-slug&user=' . Yii::$app->params['user'] . '&lang=' . $lang_slug . '&slug=' . $slug . '&type=' . $type . $site_id);
-                    Functions::getCRMData($url);
-            } else {
-                $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id . $query;
-                $file_data =
-                    //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
-                    Functions::getCRMData($url);
-            }
-            file_put_contents($file, $file_data);
+        if ($id == null) {
+            $site_id = isset(\Yii::$app->params['site_id'])
+                ? '&site_id=' . \Yii::$app->params['site_id']
+                : '';
+
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-by-slug&user='
+                . Yii::$app->params['user']
+                . '&lang='
+                . $lang_slug
+                . '&slug='
+                . $slug
+                . '&type='
+                . $type
+                . $site_id
+                . $query;
         } else {
-            $file_data =
-                file_get_contents($file);
-            //Functions::getCRMData($file);
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-view-by-id&user='
+                . Yii::$app->params['user']
+                . '&id='
+                . $id
+                . $query;
         }
-        $data = json_decode($file_data, TRUE);
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonCmsPage($payload);
+            },
+            2 * 3600
+        );
+
+        $data = $payload !== null
+            ? json_decode($payload, true)
+            : [];
+
         $lang = strtoupper(\Yii::$app->language);
-        $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
+
+        $attachment_url = isset($data['featured_image'][$lang]['name'])
+            ? Yii::$app->params['cms_img']
+                . '/'
+                . $data['_id']
+                . '/'
+                . $data['featured_image'][$lang]['name']
+            : '';
+
         if (isset($options['seoimage'])) {
-            $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : $attachment_url;
+            $attachment_url = isset($data['featured_image'][$lang]['file_md5_name'])
+                ? Yii::$app->params['cms_img']
+                    . '/'
+                    . $data['_id']
+                    . '/'
+                    . $data['featured_image'][$lang]['file_md5_name']
+                : $attachment_url;
         }
-        // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
+
         return [
-            'featured_image' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '',
-            'featured_image_200' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url, 200) : '',
-            'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '',
-            'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '',
-            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
-            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
-            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
-            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
-            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
-            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
-            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
-            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
-            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
-            'categories' => isset($data['categories']) ? $data['categories'] : [],
-            'created_username' => isset($data['created_username']) ? $data['created_username'] : [],
-            'created_by' => isset($data['created_by']) ? $data['created_by'] : [],
+            'featured_image' => isset($attachment_url) && !empty($attachment_url)
+                ? Cms::ResizeImage($attachment_url)
+                : '',
+
+            'featured_image_200' => isset($attachment_url) && !empty($attachment_url)
+                ? Cms::ResizeImage($attachment_url, 200)
+                : '',
+
+            'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc'])
+                ? $data['featured_image'][$lang]['seo_alt_desc']
+                : '',
+
+            'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title'])
+                ? $data['featured_image'][$lang]['seo_meta_title']
+                : '',
+
+            'content' => isset($data['content'][$lang])
+                ? $data['content'][$lang]
+                : '',
+
+            'title' => isset($data['title'][$lang])
+                ? $data['title'][$lang]
+                : '',
+
+            'slug' => isset($data['slug'][$lang])
+                ? $data['slug'][$lang]
+                : '',
+
+            'slug_all' => isset($data['slug'])
+                ? $data['slug']
+                : '',
+
+            'meta_title' => isset($data['meta_title'][$lang])
+                ? $data['meta_title'][$lang]
+                : '',
+
+            'meta_desc' => isset($data['meta_desc'][$lang])
+                ? $data['meta_desc'][$lang]
+                : '',
+
+            'meta_keywords' => isset($data['meta_keywords'][$lang])
+                ? $data['meta_keywords'][$lang]
+                : '',
+
+            'custom_settings' => isset($data['custom_settings'])
+                ? $data['custom_settings']
+                : '',
+
+            'created_at' => isset($data['created_at'])
+                ? $data['created_at']
+                : '',
+
+            'categories' => isset($data['categories'])
+                ? $data['categories']
+                : [],
+
+            'created_username' => isset($data['created_username'])
+                ? $data['created_username']
+                : [],
+
+            'created_by' => isset($data['created_by'])
+                ? $data['created_by']
+                : [],
         ];
     }
 
@@ -332,108 +572,216 @@ class Cms extends Model
             $imagesSeo = isset($params['seoimage']) ? true : false;
             $template = isset($params['without_template']) ? false : true;
 
-            if ($id) {
-                $file = Functions::directory() . $id;
-            } elseif ($page_id) {
-                $file = Functions::directory() . $page_id;
-            } else {
-                $file = Functions::directory() . str_replace('/', '_', $slug) . '-' . $type;
+        if ($id) {
+            $file = Functions::directory() . $id;
+        } elseif ($page_id) {
+            $file = Functions::directory() . $page_id;
+        } else {
+            $file = Functions::directory()
+                . str_replace('/', '_', $slug)
+                . '-'
+                . $type;
             }
-            $file .= $template ? '_with_template' : '';
-            $file .= '.json';
-            if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-                $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-                $query .= $template ? '&expand=template' : '';
 
-                if ($id !== null) {
-                    $query .= '&id=' . $id;
+        $file .= $template ? '_with_template' : '';
+        $file .= '.json';
 
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id' . $query;
+        $query = isset(\Yii::$app->params['user'])
+            ? '&user=' . \Yii::$app->params['user']
+            : '';
 
-                    $file_data = Functions::getCRMData($url);
-                } elseif ($page_id !== null) {
-                    $query .= '&page_id=' . $page_id;
+        $query .= $template ? '&expand=template' : '';
 
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-page-id' . $query;
+        if ($id !== null) {
+            $query .= '&id=' . $id;
 
-                    $file_data = Functions::getCRMData($url);
-                } else {
-                    $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-                    $query .= '&lang=' . strtoupper($slug_lang);
-                    $query .= '&slug=' . $slug;
-                    $query .= '&type=' . $type;
-                    $query .= $imagesSeo ? '&seoimage=yes' : '';
-                    $query .= '&condition=and';
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-view-by-id'
+                . $query;
+        } elseif ($page_id !== null) {
+            $query .= '&page_id=' . $page_id;
 
-                    $url = Yii::$app->params['apiUrl'] . 'cms/page-by-slug' . $query;
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-view-by-page-id'
+                . $query;
+        } else {
+            $query .= isset(\Yii::$app->params['site_id'])
+                ? '&site_id=' . \Yii::$app->params['site_id']
+                : '';
 
-                    $file_data = Functions::getCRMData($url);
-                }
-                if (json_decode($file_data, true)) {
-                    file_put_contents($file, $file_data);
-                }
-            } else {
-                $file_data = file_get_contents($file);
-            }
-            $data = json_decode($file_data, TRUE);
+            $query .= '&lang=' . strtoupper($slug_lang);
+            $query .= '&slug=' . $slug;
+            $query .= '&type=' . $type;
+            $query .= $imagesSeo ? '&seoimage=yes' : '';
+            $query .= '&condition=and';
 
-            $lang = strtoupper(\Yii::$app->language);
-
-            $attachment_url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-            if ($imagesSeo) {
-                $attachment_url = isset($data['featured_image'][$lang]['file_md5_name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['file_md5_name'] : $attachment_url;
-            }
-            // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-            return [
-                'featured_image' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url) : '',
-                'featured_image_200' => isset($attachment_url) && !empty($attachment_url) ? Cms::ResizeImage($attachment_url, 200) : '',
-                'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc']) ? $data['featured_image'][$lang]['seo_alt_desc'] : '',
-                'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title']) ? $data['featured_image'][$lang]['seo_meta_title'] : '',
-                'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
-                'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
-                'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
-                'slug_all' => isset($data['slug']) ? $data['slug'] : '',
-                'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
-                'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
-                'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
-                'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
-                'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
-                'view_path' => isset($data['template']['viewPath']) ? $data['template']['viewPath'] : '',
-            ];
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-by-slug'
+                . $query;
         }
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                    return Functions::getCRMData($url);
+                },
+            static function ($payload) {
+                    return Functions::isJsonCmsPage($payload);
+                },
+                2 * 3600
+        );
+
+        $data = $payload !== null
+                ? json_decode($payload, true)
+                : [];
+
+        $lang = strtoupper(\Yii::$app->language);
+
+        $attachment_url = isset($data['featured_image'][$lang]['name'])
+                ? Yii::$app->params['cms_img']
+                . '/'
+                . $data['_id']
+                . '/'
+                . $data['featured_image'][$lang]['name']
+                : '';
+
+        if ($imagesSeo) {
+                $attachment_url = isset($data['featured_image'][$lang]['file_md5_name'])
+                    ? Yii::$app->params['cms_img']
+                    . '/'
+                    . $data['_id']
+                    . '/'
+                    . $data['featured_image'][$lang]['file_md5_name']
+                    : $attachment_url;
+        }
+
+        return [
+                'featured_image' => isset($attachment_url) && !empty($attachment_url)
+                    ? Cms::ResizeImage($attachment_url)
+                    : '',
+                'featured_image_200' => isset($attachment_url) && !empty($attachment_url)
+                    ? Cms::ResizeImage($attachment_url, 200)
+                    : '',
+                'featured_image_seo_alt_desc' => isset($data['featured_image'][$lang]['seo_alt_desc'])
+                    ? $data['featured_image'][$lang]['seo_alt_desc']
+                    : '',
+                'featured_image_seo_meta_title' => isset($data['featured_image'][$lang]['seo_meta_title'])
+                        ? $data['featured_image'][$lang]['seo_meta_title']
+                        : '',
+                'content' => isset($data['content'][$lang])
+                        ? $data['content'][$lang]
+                        : '',
+                'title' => isset($data['title'][$lang])
+                        ? $data['title'][$lang]
+                        : '',
+                'slug' => isset($data['slug'][$lang])
+                        ? $data['slug'][$lang]
+                        : '',
+                'slug_all' => isset($data['slug'])
+                        ? $data['slug']
+                        : '',
+                'meta_title' => isset($data['meta_title'][$lang])
+                        ? $data['meta_title'][$lang]
+                        : '',
+                'meta_desc' => isset($data['meta_desc'][$lang])
+                        ? $data['meta_desc'][$lang]
+                        : '',
+                'meta_keywords' => isset($data['meta_keywords'][$lang])
+                        ? $data['meta_keywords'][$lang]
+                        : '',
+                'custom_settings' => isset($data['custom_settings'])
+                        ? $data['custom_settings']
+                        : '',
+                'created_at' => isset($data['created_at'])
+                        ? $data['created_at']
+                        : '',
+                'view_path' => isset($data['template']['viewPath'])
+                        ? $data['template']['viewPath']
+                        : '',
+                ];
+            }
     }
 
     public static function postById($id)
     {
         $file = Functions::directory() . $id . '.json';
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $url = Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id;
-            $file_data =
-                //file_get_contents(Yii::$app->params['apiUrl'] . 'cms/page-view-by-id&user=' . Yii::$app->params['user'] . '&id=' . $id);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data =
-                file_get_contents($file);
-            //Functions::getCRMData($file);
-        }
-        $data = json_decode($file_data, TRUE);
-        $lang = strtoupper(\Yii::$app->language);
-        $url = isset($data['featured_image'][$lang]['name']) ? Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'] : '';
-        // $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
-        return [
-            'featured_image' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url) : '',
-            'featured_image_200' => isset($data['featured_image'][$lang]['name']) ? Cms::ResizeImage($url, 200) : '',
-            'content' => isset($data['content'][$lang]) ? $data['content'][$lang] : '',
-            'title' => isset($data['title'][$lang]) ? $data['title'][$lang] : '',
-            'slug' => isset($data['slug'][$lang]) ? $data['slug'][$lang] : '',
-            'slug_all' => isset($data['slug']) ? $data['slug'] : '',
-            'meta_title' => isset($data['meta_title'][$lang]) ? $data['meta_title'][$lang] : '',
-            'meta_desc' => isset($data['meta_desc'][$lang]) ? $data['meta_desc'][$lang] : '',
-            'meta_keywords' => isset($data['meta_keywords'][$lang]) ? $data['meta_keywords'][$lang] : '',
-            'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
-            'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
-        ];
+
+            $url = Yii::$app->params['apiUrl']
+                . 'cms/page-view-by-id&user='
+                . Yii::$app->params['user']
+                . '&id='
+                . $id;
+
+            $payload = Functions::refreshJsonCache(
+                $file,
+                static function () use ($url) {
+                    return Functions::getCRMData($url);
+                },
+                static function ($payload) {
+                    return Functions::isJsonCmsPage($payload);
+                },
+                2 * 3600
+            );
+
+                $data = $payload !== null
+                        ? json_decode($payload, true)
+                        : [];
+
+                $lang = strtoupper(\Yii::$app->language);
+
+                $url = isset($data['featured_image'][$lang]['name'])
+                        ? Yii::$app->params['cms_img']
+                            . '/'
+                            . $data['_id']
+                            . '/'
+                            . $data['featured_image'][$lang]['name']
+                            : '';
+
+                return [
+                        'featured_image' => isset($data['featured_image'][$lang]['name'])
+                            ? Cms::ResizeImage($url)
+                            : '',
+
+                        'featured_image_200' => isset($data['featured_image'][$lang]['name'])
+                            ? Cms::ResizeImage($url, 200)
+                            : '',
+
+                        'content' => isset($data['content'][$lang])
+                            ? $data['content'][$lang]
+                            : '',
+
+                        'title' => isset($data['title'][$lang])
+                            ? $data['title'][$lang]
+                            : '',
+
+                        'slug' => isset($data['slug'][$lang])
+                            ? $data['slug'][$lang]
+                            : '',
+
+                        'slug_all' => isset($data['slug'])
+                            ? $data['slug']
+                            : '',
+
+                        'meta_title' => isset($data['meta_title'][$lang])
+                            ? $data['meta_title'][$lang]
+                            : '',
+
+                        'meta_desc' => isset($data['meta_desc'][$lang])
+                            ? $data['meta_desc'][$lang]
+                            : '',
+
+                        'meta_keywords' => isset($data['meta_keywords'][$lang])
+                            ? $data['meta_keywords'][$lang]
+                            : '',
+
+                        'custom_settings' => isset($data['custom_settings'])
+                            ? $data['custom_settings']
+                            : '',
+
+                        'created_at' => isset($data['created_at'])
+                            ? $data['created_at']
+                            : '',
+                    ];
     }
 
     /**
@@ -457,32 +805,62 @@ class Cms extends Model
         \Yii::$app->language  = (isset($url_array[1]) ? $url_array[1] : 'en');
     }
 
-
     public static function Slugs($name)
     {
-        $file = Functions::directory() . 'slugs' . str_replace(' ', '_', strtolower($name)) . '.json';
-        $site_id = isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-        $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs&user=' . \Yii::$app->params['user'] . $site_id;
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data = Functions::getCRMData($url);
-            if ($file_data)
-                file_put_contents($file, $file_data);
-        } else
-            $file_data = file_get_contents($file);
+        $file = Functions::directory()
+            . 'slugs'
+            . str_replace(' ', '_', strtolower($name))
+            . '.json';
 
-        $dataEach = json_decode($file_data, true);
+        $site_id = isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/get-slugs&user='
+            . \Yii::$app->params['user']
+            . $site_id;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonCmsSlugs($payload);
+            },
+            2 * 3600
+        );
+
+        $dataEach = $payload !== null
+            ? json_decode($payload, true)
+            : [];
+
         $lang = strtoupper(\Yii::$app->language);
         $retdata = [];
         $array = [];
 
+        /*
+         * Preserve the legacy failure behavior when there is no usable
+         * cache and CRM also failed.
+         */
         if (!is_array($dataEach) || count($dataEach) <= 0) {
             die('Error Getting CMS Data');
         }
 
         foreach ($dataEach as $key => $data) {
-            $array['type'] = isset($data['type']) ? $data['type'] : '';
-            $array['slug'] = isset($data['slug'][$lang]) ? $data['slug'][$lang] : '';
-            $array['slug_all'] = isset($data['slug']) ? $data['slug'] : '';
+            $array['type'] = isset($data['type'])
+                ? $data['type']
+                : '';
+
+            $array['slug'] = isset($data['slug'][$lang])
+                ? $data['slug'][$lang]
+                : '';
+
+            $array['slug_all'] = isset($data['slug'])
+                ? $data['slug']
+                : '';
+
             $retdata[] = $array;
         }
 
@@ -501,33 +879,66 @@ class Cms extends Model
      */
     public static function getSlugs($params = [])
     {
-        $name = isset($params['name']) ? $params['name'] : 'all';
-        $with_templates = isset($params['without_templates']) ? false : true;
-        $with_tags = isset($params['without_tags']) ? false : true;
+        $name = isset($params['name'])
+            ? $params['name']
+            : 'all';
+
+        $with_templates = isset($params['without_templates'])
+            ? false
+            : true;
+
+        $with_tags = isset($params['without_tags'])
+            ? false
+            : true;
+
         $file = Functions::directory() . 'slugs_for_';
         $file .= str_replace(' ', '_', strtolower($name));
         $file .= $with_templates ? '_with_templates' : '';
         $file .= $with_tags ? '_with_tags' : '';
         $file .= '.json';
 
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $query = isset(\Yii::$app->params['user']) ? '&user=' . \Yii::$app->params['user'] : '';
-            $query .= isset(\Yii::$app->params['site_id']) ? '&site_id=' . \Yii::$app->params['site_id'] : '';
-            $query .= $with_templates ? '&expand=template' : '';
-            $query .= $with_tags ? '&tags=true' : '';
+        $query = isset(\Yii::$app->params['user'])
+            ? '&user=' . \Yii::$app->params['user']
+            : '';
 
-            $url = Yii::$app->params['apiUrl'] . 'cms/get-slugs-v2' . $query;
+        $query .= isset(\Yii::$app->params['site_id'])
+            ? '&site_id=' . \Yii::$app->params['site_id']
+            : '';
 
-            $file_data = Functions::getCRMData($url);
-            if (json_decode($file_data, true)) {
-                file_put_contents($file, $file_data);
-            }
-        } else
-            $file_data = file_get_contents($file);
-        $data = json_decode($file_data, true);
+        $query .= $with_templates
+            ? '&expand=template'
+            : '';
 
-        if (!is_array($data) || count($data) <= 0)
+        $query .= $with_tags
+            ? '&tags=true'
+            : '';
+
+        $url = Yii::$app->params['apiUrl']
+            . 'cms/get-slugs-v2'
+            . $query;
+
+        $payload = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonCmsSlugs($payload);
+            },
+            2 * 3600
+        );
+
+        $data = $payload !== null
+            ? json_decode($payload, true)
+            : [];
+
+        /*
+         * Keep the legacy contract when neither stale nor fresh data
+         * is usable.
+         */
+        if (!is_array($data) || count($data) <= 0) {
             die('Error Getting CMS Data');
+        }
 
         return $data;
     }
@@ -561,78 +972,133 @@ class Cms extends Model
         /* to set some config because config not loaded yet in from web */
         self::setParams();
         $file = Functions::directory() . 'rules.json';
+        $maxAge = 2 * 3600;
 
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
+        $validator = function ($payload) {
+            if (!Functions::isValidJson($payload)) {
+                return false;
+            }
 
-            $cmsData = self::getSlugs();
-            $rules = [];
-            foreach ($cmsData as $row) {
-                if (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
-                    if (isset($row['template']['template_action']) && !empty($row['template']['template_action'])) {
-                        if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
-                            foreach ($row['slug'] as $key => $val) {
-                                if ($val) {
-                                    $rules[] = [
-                                        'pattern'  => $val . $row['template']['template_pattern'],
-                                        'route'    => $row['template']['template_action'],
-                                        'defaults' => ['slug' => $val],
-                                    ];
+            /*
+             * Decode as objects to preserve literal JSON object/array identity:
+             * a route row must be an object, and defaults must be an object/map.
+             */
+            $decoded = json_decode($payload);
+
+            if (!is_array($decoded)) {
+                return false;
+            }
+
+            foreach ($decoded as $rule) {
+                if (!is_object($rule)) {
+                    return false;
+                }
+
+                if (
+                    !property_exists($rule, 'pattern')
+                    || !property_exists($rule, 'route')
+                    || !property_exists($rule, 'defaults')
+                    || !is_object($rule->defaults)
+                    || !property_exists($rule->defaults, 'slug')
+                ) {
+                    return false;
+                }
+
+                if (!is_string($rule->pattern) && $rule->pattern !== $rule->defaults->slug) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        $cachedPayload = Functions::readJsonCache($file);
+        $forceRefresh = is_file($file)
+            && time() - filemtime($file) <= $maxAge
+            && $cachedPayload !== null
+            && !$validator($cachedPayload);
+
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            function () use ($validator) {
+                $cmsData = self::getSlugs();
+                $rules = [];
+                foreach ($cmsData as $row) {
+                    if (isset($row['type']) && $row['type'] == 'page' && isset($row['slug']) && is_array($row['slug'])) {
+                        if (isset($row['template']['template_action']) && !empty($row['template']['template_action'])) {
+                            if (isset($row['template']['template_pattern']) && !empty($row['template']['template_pattern'])) {
+                                foreach ($row['slug'] as $key => $val) {
+                                    if ($val) {
+                                        $rules[] = [
+                                            'pattern'  => $val . $row['template']['template_pattern'],
+                                            'route'    => $row['template']['template_action'],
+                                            'defaults' => ['slug' => $val],
+                                        ];
+                                    }
                                 }
                             }
-                        }
-                        /**
-                         * TODO:Remove this code starting here after all template using sites migrate
-                         */
-                        elseif (
-                            strpos($row['template']['template_action'], '/view')
-                            || strpos($row['template']['template_action'], '/blog-post') || strpos($row['template']['template_action'], '/recruitment-details')
-                        ) {
-                            foreach ($row['slug'] as $key => $val) {
-                                if ($val) {
-                                    $rules[] = [
-                                        'pattern'  => $val . '/<title>',
-                                        'route'    => $row['template']['template_action'],
-                                        'defaults' => ['slug' => $val],
-                                    ];
+                            /**
+                             * TODO:Remove this code starting here after all template using sites migrate
+                             */
+                            elseif (
+                                strpos($row['template']['template_action'], '/view')
+                                || strpos($row['template']['template_action'], '/blog-post') || strpos($row['template']['template_action'], '/recruitment-details')
+                            ) {
+                                foreach ($row['slug'] as $key => $val) {
+                                    if ($val) {
+                                        $rules[] = [
+                                            'pattern'  => $val . '/<title>',
+                                            'route'    => $row['template']['template_action'],
+                                            'defaults' => ['slug' => $val],
+                                        ];
+                                    }
                                 }
                             }
-                        }
-                        /**
-                         * TODO:Remove this code ending here after all template using sites migrate
-                         */
-                        else {
+                            /**
+                             * TODO:Remove this code ending here after all template using sites migrate
+                             */
+                            else {
+                                foreach ($row['slug'] as $key => $val) {
+                                    if ($val) {
+                                        $rules[] = [
+                                            'pattern'  => $val,
+                                            'route'    => $row['template']['template_action'],
+                                            'defaults' => ['slug' => $val],
+                                        ];
+                                    }
+                                }
+                            }
+                        } else {
                             foreach ($row['slug'] as $key => $val) {
                                 if ($val) {
                                     $rules[] = [
                                         'pattern'  => $val,
-                                        'route'    => $row['template']['template_action'],
+                                        'route'    => 'site/page',
                                         'defaults' => ['slug' => $val],
                                     ];
                                 }
                             }
                         }
-                    } else {
-                        foreach ($row['slug'] as $key => $val) {
-                            if ($val) {
-                                $rules[] = [
-                                    'pattern'  => $val,
-                                    'route'    => 'site/page',
-                                    'defaults' => ['slug' => $val],
-                                ];
-                            }
-                        }
                     }
                 }
-            }
-            $file_data = json_encode($rules);
+                $file_data = json_encode($rules);
 
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-            $rules = json_decode($file_data, true);
+                if (!$validator($file_data)) {
+                    return false;
+                }
+
+                return $file_data;
+            },
+            $validator,
+            $maxAge,
+            $forceRefresh
+        );
+
+        if ($validator($file_data)) {
+            return json_decode($file_data, true);
         }
 
-        return $rules;
+        return [];
     }
 
     /* Template Code started  */
@@ -850,14 +1316,19 @@ class Cms extends Model
         }else{
             $url = Yii::$app->params['apiUrl'] . 'cms/posts' . $query;
         }
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600) || !$cache) {
-            $file_data = Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data = file_get_contents($file);
-        }
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonCmsPostList($payload);
+            },
+            2 * 3600,
+            !$cache
+        );
+        $data = $file_data !== null ? json_decode($file_data, TRUE) : [];
         $header = [];
-        $data = json_decode($file_data, TRUE);
         $lang = strtoupper(\Yii::$app->language);
         $ret_data = [];
         $array = [];
@@ -898,16 +1369,16 @@ class Cms extends Model
     {
         $file = Functions::directory() . 'users_data.json';
         $url = Yii::$app->params['apiUrl'] . 'cms/users&user=' . Yii::$app->params['user'];
-        if (!file_exists($file) || (file_exists($file) && time() - filemtime($file) > 2 * 3600)) {
-            $file_data =
-                //file_get_contents($url);
-                Functions::getCRMData($url);
-            file_put_contents($file, $file_data);
-        } else {
-            $file_data =
-                file_get_contents($file);
-            //Functions::getCRMData($file);
-        }
+        $file_data = Functions::refreshJsonCache(
+            $file,
+            static function () use ($url) {
+                return Functions::getCRMData($url);
+            },
+            static function ($payload) {
+                return Functions::isJsonCmsUsers($payload);
+            },
+            2 * 3600
+        );
 
         //  $url = Yii::$app->params['cms_img'] . '/' . $data['_id'] . '/' . $data['featured_image'][$lang]['name'];
         //  $name = isset($data['featured_image'][$lang]['name']) ? $data['featured_image'][$lang]['name'] : '';
@@ -923,7 +1394,7 @@ class Cms extends Model
         //      'custom_settings' => isset($data['custom_settings']) ? $data['custom_settings'] : '',
         //      'created_at' => isset($data['created_at']) ? $data['created_at'] : '',
         //  ];
-        $data = json_decode($file_data, true);
+        $data = $file_data !== null ? json_decode($file_data, true) : ['users' => []];
         $users = [];
         foreach ($data['users'] as $user) {
             $users[] = [
@@ -937,7 +1408,6 @@ class Cms extends Model
         return $users;
     }
 
-
     public static function clean($string)
     {
         trigger_error(__METHOD__ . ' is deprecated', E_USER_DEPRECATED);
@@ -946,4 +1416,6 @@ class Cms extends Model
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
+
+
 }
