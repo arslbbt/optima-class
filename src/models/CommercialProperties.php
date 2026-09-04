@@ -120,8 +120,8 @@ class CommercialProperties extends Model
             $query['current_price'] = ['$gte' => (int) $get['price_from'],'$lte' => isset($get['price_to']) && !empty($get['price_to']) ?  (int) $get['price_to'] : ''];
         }
         if (isset($get['reference']) && !empty($get['reference'])) {
+            $query['reference'] = (int) $get['reference'];
             $query['$or'] = [
-                ["reference" => (int) $get['reference']],
                 ["other_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]],
                 ["external_reference" => ['$regex' => ".*" . $get['reference'] . ".*", '$options' => "i"]]
             ];
