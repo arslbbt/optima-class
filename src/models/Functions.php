@@ -10,6 +10,14 @@ use linslin\yii2\curl;
 class Functions extends Model
 {
 
+    private static $jsonCacheRefreshHandler;
+
+    /** Optional application policy hook; retain the package's existing API. */
+    public static function setJsonCacheRefreshHandler(callable $handler = null)
+    {
+        self::$jsonCacheRefreshHandler = $handler;
+    }
+
     public static function directory()
     {
         $webroot = Yii::getAlias('@webroot');
@@ -666,6 +674,9 @@ class Functions extends Model
         $maxAge = 7200,
         $forceRefresh = false
     ) {
+        if (self::$jsonCacheRefreshHandler !== null) {
+            return call_user_func(self::$jsonCacheRefreshHandler, $file, $fetcher, $validator, $maxAge, $forceRefresh);
+        }
         $cachedPayload = self::readJsonCache($file);
 
         $cacheExpired = $forceRefresh === true
