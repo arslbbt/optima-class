@@ -354,7 +354,7 @@ class Functions extends Model
 
     public static function getApiHeaders($headers_params = [])
     {
-        $client_ip = $_SERVER["REMOTE_ADDR"];
+        $client_ip = $_SERVER["REMOTE_ADDR"] ?? '';
         if (filter_var(@$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP)) {
             $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } elseif (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
